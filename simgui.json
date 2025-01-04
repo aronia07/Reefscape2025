@@ -1,4 +1,13 @@
 {
+  "HALProvider": {
+    "Other Devices": {
+      "Pigeon 2 (v6)[21]": {
+        "header": {
+          "open": true
+        }
+      }
+    }
+  },
   "NTProvider": {
     "types": {
       "/FMSInfo": "FMSInfo",
@@ -13,7 +22,8 @@
       "/SmartDashboard/Suboofer": "Command",
       "/SmartDashboard/Vision field": "Field2d",
       "/SmartDashboard/autos": "String Chooser",
-      "/SmartDashboard/burn to flash": "Command"
+      "/SmartDashboard/burn to flash": "Command",
+      "/SmartDashboard/test shoot": "Command"
     },
     "windows": {
       "/SmartDashboard/Vision field": {
@@ -31,6 +41,16 @@
         "window": {
           "visible": true
         }
+      }
+    }
+  },
+  "NetworkTables": {
+    "Retained Values": {
+      "open": false
+    },
+    "transitory": {
+      "SmartDashboard": {
+        "open": true
       }
     }
   },

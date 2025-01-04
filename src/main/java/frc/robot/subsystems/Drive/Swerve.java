@@ -24,6 +24,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -216,7 +218,7 @@ public class Swerve extends SubsystemBase {
 
     SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.SwerveConstants.maxSpeed);
 
-    setStates(swerveModuleStates);
+    setStates(swerveModuleStates);  
   }
 
   public void driveRobotRelative(ChassisSpeeds robotRelativeSpeeds) {
@@ -326,17 +328,25 @@ public class Swerve extends SubsystemBase {
 
     if (angleP.hasChanged() || angleI.hasChanged() || angleD.hasChanged()) {
       for (SwerveModule mod : mSwerveMods) {
-        mod.angleController.setP(angleP.get());
-        mod.angleController.setI(angleI.get());
-        mod.angleController.setD(angleD.get());
+        // mod.angleController.setP(angleP.get());
+        // mod.angleController.setI(angleI.get());
+        // mod.angleController.setD(angleD.get());
+
+        
+
+
+
       }
     }
 
     if (driveP.hasChanged() || driveI.hasChanged() || driveD.hasChanged()) {
       for (SwerveModule mod : mSwerveMods) {
-        mod.driveController.setP(driveP.get());
-        mod.driveController.setI(driveI.get());
-        mod.driveController.setD(driveD.get());
+        // config.slot0.kP = angleP.get();
+        // config.slot0.kI = angleI.get();
+        // config.slot0.kD = angleD.get();
+
+      //mod.angleMotor.configAllSettings(config, 50);
+
 
         // mod.drivePIDController.setPID(driveP.get(), driveI.get(), driveD.get());
       }
@@ -456,12 +466,8 @@ public class Swerve extends SubsystemBase {
     SmartDashboard.putNumber("Snap Setpoint", snapSetpoint.getDegrees());
     SmartDashboard.putNumber("Snap Actual", getYawForSnap().getDegrees());
 
-  }
 
-  public void burnToFlash() {
-    for (SwerveModule mod : mSwerveMods) {
-      mod.burnToFlash();
-    }
+
   }
 
   public Rotation2d getSpeedCompensationAngle() {
@@ -469,6 +475,13 @@ public class Swerve extends SubsystemBase {
         (robotSpeed.getY() * Constants.ShooterConstants.onTheFlyMultiplier)
             * ((FieldConstants.fieldLength - getDistanceFromSpeaker()) / FieldConstants.fieldLength));
   }
+
+  //Logs the SM States
+//   public void logStates(SwerveModuleState[] swerveModuleState){
+//     StructArrayPublisher<SwerveModuleState> publisher = NetworkTableInstance.getDefault()
+// .getStructArrayTopic("MyStates", SwerveModuleState.struct).publish();
+//     publisher.set(swerveModuleState);
+//   }
 
   @Override
   public void periodic() {
@@ -493,5 +506,8 @@ public class Swerve extends SubsystemBase {
       mod.periodic();
     }
     logValues();
+
+    //Logging on Advantage Scope
+    
   }
 }

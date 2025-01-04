@@ -1,5 +1,8 @@
 {
   "NetworkTables": {
+    "Retained Values": {
+      "open": false
+    },
     "transitory": {
       "SmartDashboard": {
         "TunableNumbers": {
@@ -14,10 +17,15 @@
       "/SmartDashboard/Arm up": "Command",
       "/SmartDashboard/Feed IN": "Command",
       "/SmartDashboard/Feed OUT": "Command",
+      "/SmartDashboard/Home Climber": "Command",
       "/SmartDashboard/Reset Pose": "Command",
+      "/SmartDashboard/Shoot": "Command",
       "/SmartDashboard/Shooter test command": "Command",
+      "/SmartDashboard/Suboofer": "Command",
       "/SmartDashboard/Vision field": "Field2d",
-      "/SmartDashboard/autos": "String Chooser"
+      "/SmartDashboard/autos": "String Chooser",
+      "/SmartDashboard/burn to flash": "Command",
+      "/SmartDashboard/test shoot": "Command"
     },
     "windows": {
       "/SmartDashboard/Reset Pose": {
@@ -42,10 +50,9 @@
             255.0
           ]
         },
-        "bottom": 544,
-        "builtin": "2024 Crescendo",
-        "height": 8.013679504394531,
-        "left": 46,
+        "bottom": 1476,
+        "height": 8.210550308227539,
+        "left": 150,
         "pathplanner target pose": {
           "color": [
             0.0,
@@ -54,8 +61,8 @@
             255.0
           ]
         },
-        "right": 1088,
-        "top": 36,
+        "right": 2961,
+        "top": 79,
         "width": 16.541748046875,
         "window": {
           "visible": true
@@ -64,14 +71,27 @@
     }
   },
   "NetworkTables Info": {
+    "Connections": {
+      "open": true
+    },
     "Server": {
+      "open": true
+    },
+    "glass@1": {
+      "Publishers": {
+        "open": true
+      },
       "open": true
     },
     "visible": true
   },
+  "NetworkTables Log": {
+    "visible": true
+  },
   "NetworkTables Settings": {
     "mode": "Client (NT4)",
-    "serverTeam": "3161"
+    "serverTeam": "3161",
+    "visible": false
   },
   "Plots": {
     "Plot <0>": {
@@ -83,7 +103,7 @@
             0.0,
             0.8500000238418579
           ],
-          "height": 617,
+          "height": 209,
           "series": [
             {
               "color": [
@@ -105,7 +125,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     },
     "Plot <1>": {
       "plots": [
@@ -142,6 +165,174 @@
       "window": {
         "visible": false
       }
+    },
+    "Plot <2>": {
+      "plots": [
+        {
+          "backgroundColor": [
+            0.0,
+            0.0,
+            0.0,
+            0.8500000238418579
+          ],
+          "height": 332,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/Back Left Desired Speed"
+            },
+            {
+              "color": [
+                0.8666667342185974,
+                0.5176470875740051,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/Back Left Actual Speed"
+            }
+          ]
+        }
+      ],
+      "window": {
+        "visible": false
+      }
+    },
+    "Plot <3>": {
+      "plots": [
+        {
+          "backgroundColor": [
+            0.0,
+            0.0,
+            0.0,
+            0.8500000238418579
+          ],
+          "height": 358,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/Front Left Actual Angle"
+            },
+            {
+              "color": [
+                0.8666667342185974,
+                0.5176470875740051,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/Front Left Desired Angle"
+            }
+          ]
+        }
+      ]
+    },
+    "Plot <4>": {
+      "plots": [
+        {
+          "backgroundColor": [
+            0.0,
+            0.0,
+            0.0,
+            0.8500000238418579
+          ],
+          "height": 332,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/Front Right Actual Angle"
+            },
+            {
+              "color": [
+                0.8666667342185974,
+                0.5176470875740051,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/Front Right Desired Angle"
+            }
+          ]
+        }
+      ]
+    },
+    "Plot <5>": {
+      "plots": [
+        {
+          "backgroundColor": [
+            0.0,
+            0.0,
+            0.0,
+            0.8500000238418579
+          ],
+          "height": 332,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/Back Left Actual Angle"
+            },
+            {
+              "color": [
+                0.8666667342185974,
+                0.5176470875740051,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/Back Left Desired Angle"
+            }
+          ]
+        }
+      ]
+    },
+    "Plot <6>": {
+      "plots": [
+        {
+          "backgroundColor": [
+            0.0,
+            0.0,
+            0.0,
+            0.8500000238418579
+          ],
+          "height": 332,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/Back Right Actual Angle"
+            },
+            {
+              "color": [
+                0.8666667342185974,
+                0.5176470875740051,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/Back Right Desired Angle"
+            }
+          ]
+        }
+      ]
     }
   }
 }
