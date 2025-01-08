@@ -129,7 +129,7 @@ public final class Constants {
     public static final double driveI = 0.0000;
     public static final double driveD = 0.00010;
 
-    public static final double[] anglePID = new double[] { 0.0, 0.0, 0.000 }; //was originally { 0.02, 0.0, 0.0005 };
+    public static final double[] anglePID = new double[] { 1, 0.0, 0.000 }; //was originally { 0.02, 0.0, 0.0005 };
 
     /* Front Left Module - Module 0 */
     public static final class Mod0 {

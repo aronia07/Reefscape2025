@@ -203,7 +203,9 @@ private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop){
     
         angleSetpoint = angle;
 
-        angleMotor.setControl(angPositionVoltage.withPosition(angleSetpoint).withVelocity(7));
+        //Controlling the swerve pod: testing if conversion factor math needs to be done
+        angleMotor.setControl(angPositionVoltage.withPosition(angleSetpoint/Constants.SwerveConstants.angleConversionFactor));
+
         
       }
 
@@ -212,7 +214,7 @@ private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop){
     SmartDashboard.putNumber(Constants.SwerveConstants.moduleNames[moduleNumber] + " Actual Speed", Conversions.RPSToMPS(driveMotor.getVelocity().getValueAsDouble(), Constants.SwerveConstants.wheelCircumference));
 
     SmartDashboard.putNumber(Constants.SwerveConstants.moduleNames[moduleNumber] + " Angle (From motor in deg)", getAngleCTRE());
-
+    
     SmartDashboard.putNumber(Constants.SwerveConstants.moduleNames[moduleNumber] + " Desired Angle", angleSetpoint);
     SmartDashboard.putNumber(Constants.SwerveConstants.moduleNames[moduleNumber] + " Actual Angle", getAngle().getRotations());
 
