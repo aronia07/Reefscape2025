@@ -211,7 +211,7 @@
             0.0,
             0.8500000238418579
           ],
-          "height": 358,
+          "height": 249,
           "series": [
             {
               "color": [
@@ -233,7 +233,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     },
     "Plot <4>": {
       "plots": [
@@ -266,7 +269,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     },
     "Plot <5>": {
       "plots": [
@@ -299,7 +305,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     },
     "Plot <6>": {
       "plots": [
@@ -332,7 +341,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     }
   }
 }

@@ -82,8 +82,8 @@ public class Swerve extends SubsystemBase {
     /* Gyro setup */
     gyro = new GyroPigeon2(Constants.SwerveConstants.pigeonID);
     gyro.home();
-
-    /* Swerve modules setup */
+  
+  /* Swerve modules setup */
     mSwerveMods = new SwerveModule[] {
         new SwerveModule(0, Constants.SwerveConstants.Mod0.constants),
         new SwerveModule(1, Constants.SwerveConstants.Mod1.constants),
@@ -328,10 +328,12 @@ public class Swerve extends SubsystemBase {
 
     if (angleP.hasChanged() || angleI.hasChanged() || angleD.hasChanged()) {
       for (SwerveModule mod : mSwerveMods) {
+        
+        
         // mod.angleController.setP(angleP.get());
         // mod.angleController.setI(angleI.get());
-        // mod.angleController.setD(angleD.get());
-
+        // mod.angleController.setD(angleD.get());    
+        
         
 
 
@@ -341,14 +343,14 @@ public class Swerve extends SubsystemBase {
 
     if (driveP.hasChanged() || driveI.hasChanged() || driveD.hasChanged()) {
       for (SwerveModule mod : mSwerveMods) {
-        // config.slot0.kP = angleP.get();
-        // config.slot0.kI = angleI.get();
-        // config.slot0.kD = angleD.get();
+        // config.slot0.kP = driveP
+        // config.slot0.kI = driveI
+        // config.slot0.kD = driveD
 
       //mod.angleMotor.configAllSettings(config, 50);
 
 
-        // mod.drivePIDController.setPID(driveP.get(), driveI.get(), driveD.get());
+        mod.drivePIDController.setPID(driveP.get(), driveI.get(), driveD.get());
       }
     }
     if (driveS.hasChanged() || driveV.hasChanged() || driveA.hasChanged()) {

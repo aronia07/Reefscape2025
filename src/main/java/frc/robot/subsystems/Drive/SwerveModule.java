@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.math.Conversions;
 import frc.lib.math.OnboardModuleState;
+import frc.lib.util.LoggedTunableNumber;
 import frc.lib.util.SwerveModuleConstants;
 import frc.lib.util.CANSparkMaxUtil.Usage;
 import frc.robot.Constants;
@@ -61,6 +62,9 @@ public class SwerveModule {
   private VelocityVoltage drVelocityVoltage;
   private DutyCycleOut drDutyCycleOut;
   private PositionVoltage angPositionVoltage;
+
+
+  public LoggedTunableNumber driveSpeed;
   
   // For logging
   private double driveSetpoint = 0f;
@@ -69,6 +73,8 @@ public class SwerveModule {
   private final TalonFXConfiguration angleConfig = new TalonFXConfiguration();
   private final TalonFXConfiguration driveConfig = new TalonFXConfiguration();
 
+  private Rotation2d angleOffset;
+
 
   public SwerveModule(int moduleNumber, SwerveModuleConstants moduleConstants) {
     this.moduleNumber = moduleNumber;
@@ -76,6 +82,7 @@ public class SwerveModule {
     this.anglePID = moduleConstants.anglePID;
     this.driveSVA = moduleConstants.driveSVA;
     this.drivePID = moduleConstants.drivePID;
+    this.angleOffset = moduleConstants.angleOffset;
     this.drivePIDController = new PIDController(drivePID[0], drivePID[1], drivePID[2]);
     this.feedforward = new SimpleMotorFeedforward(driveSVA[0], driveSVA[1], driveSVA[2]);
     /* Angle Encoder Config */
@@ -93,10 +100,10 @@ public class SwerveModule {
     driveMotor.getConfigurator().apply(driveConfig, 0.050);
     configDriveMotor();
 
-    lastAngle = getState().angle.getDegrees();
+    lastAngle = getState().angle.getRotations();
 
-    drVelocityVoltage = new VelocityVoltage(driveSetpoint).withSlot(0);
-    angPositionVoltage = new PositionVoltage(lastAngle).withSlot(0);
+    drVelocityVoltage = new VelocityVoltage(0).withSlot(0);
+    angPositionVoltage = new PositionVoltage(0).withSlot(0);
   }
 
 
@@ -108,15 +115,19 @@ public class SwerveModule {
     // continuous controller which REV and CTRE are not
     this.setSpeed(desiredState,false);
     this.setAngle(desiredState);
+    
+    //angleMotor.setControl(angPositionVoltage.withPosition(desiredState.angle.getRotations()));
   }
 
   public void resetToAbsolute() {
-    double integratedAngleEncoderPosition = angleMotor.getPosition().getValueAsDouble() % 360;
-    double absolutePosition = integratedAngleEncoderPosition - integratedAngleEncoderPosition % 360
-        + angleEncoder.getAbsolutePosition().getDegrees();
-    angleMotor.setPosition(absolutePosition);  
-  }
+    // double integratedAngleEncoderPosition = angleMotor.getPosition().getValueAsDouble() % 360;
+    // double absolutePosition = integratedAngleEncoderPosition - integratedAngleEncoderPosition % 360
+    //     + angleEncoder.getAbsolutePosition().getDegrees();
+    // angleMotor.setPosition(absolutePosition);  
 
+    double absolutePosition = getAngle().getRotations() - angleOffset.getRotations();
+    angleMotor.setPosition(absolutePosition);
+  }
 
   private void configAngleMotor() {
     // Angle motor configuration
@@ -130,6 +141,8 @@ public class SwerveModule {
     angleConfig.Voltage.PeakReverseVoltage = -12.0;
     angleMotor.setInverted(true);
     angleMotor.setNeutralMode(NeutralModeValue.Brake);
+    
+    //angleConfig.Audio.withBeepOnBoot(false);
     
     angleMotor.getConfigurator().apply(angleConfig);
   //resetToAbsolute();
@@ -148,6 +161,8 @@ private void configDriveMotor() {
     driveConfig.CurrentLimits.SupplyCurrentLimit = 30;
     driveConfig.Voltage.PeakForwardVoltage = 12.0;
     driveConfig.Voltage.PeakReverseVoltage = -12.0;
+
+    driveMotor.setPosition(0.0);
 
     // Drive motor configuration.
     driveConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0.5;
@@ -173,51 +188,51 @@ private void setSpeed(SwerveModuleState desiredState, boolean isOpenLoop){
       driveMotor.setControl(drDutyCycleOut);
   }
   else {
-      drVelocityVoltage.Velocity = Conversions.MPSToRPS(desiredState.speedMetersPerSecond, Constants.SwerveConstants.wheelCircumference);
-      drVelocityVoltage.FeedForward = feedforward.calculate(desiredState.speedMetersPerSecond);
-      driveMotor.setControl(drVelocityVoltage);
+    //driveMotor.set(desiredState.speedMetersPerSecond);
+      // drVelocityVoltage.Velocity = Conversions.MPSToRPS(desiredState.speedMetersPerSecond, Constants.SwerveConstants.wheelCircumference);
+      // drVelocityVoltage.FeedForward = feedforward.calculate(desiredState.speedMetersPerSecond);
+      //driveMotor.setControl(drVelocityVoltage);
   }
 }
 
   private void setAngle(SwerveModuleState desiredState) {
-    // Prevent rotating module if speed is less then 1%. Prevents jittering.
+   //Prevent rotating module if speed is less then 1%. Prevents jittering.
     double angle = (Math.abs(desiredState.speedMetersPerSecond) <= (Constants.SwerveConstants.maxSpeed * 0.01))
         ? lastAngle
-        : desiredState.angle
-            .getDegrees();   
-            angleSetpoint = angle;
+        : desiredState.angle.getRotations();   
+    
+        angleSetpoint = angle;
 
-  angleMotor.setControl(angPositionVoltage.withPosition(angle).withVelocity(2*Math.PI));
-
-  lastAngle = angle;
-  }
-
+        angleMotor.setControl(angPositionVoltage.withPosition(angleSetpoint).withVelocity(7));
+        
+      }
 
   public void logValues() {
     SmartDashboard.putNumber(Constants.SwerveConstants.moduleNames[moduleNumber] + " Desired Speed", driveSetpoint);
-    SmartDashboard.putNumber(Constants.SwerveConstants.moduleNames[moduleNumber] + " Actual Speed", this.getSpeed());
+    SmartDashboard.putNumber(Constants.SwerveConstants.moduleNames[moduleNumber] + " Actual Speed", Conversions.RPSToMPS(driveMotor.getVelocity().getValueAsDouble(), Constants.SwerveConstants.wheelCircumference));
 
-    SmartDashboard.putNumber(Constants.SwerveConstants.moduleNames[moduleNumber] + " Desired Angle",
-    angleSetpoint % 360);
-SmartDashboard.putNumber(Constants.SwerveConstants.moduleNames[moduleNumber] + " Actual Angle",
-getAngle().getDegrees());
+    SmartDashboard.putNumber(Constants.SwerveConstants.moduleNames[moduleNumber] + " Angle (From motor in deg)", getAngleCTRE());
 
-SmartDashboard.putNumber(Constants.SwerveConstants.moduleNames[moduleNumber] + " AngleEncoder Reading:",
-angleEncoder.getAbsolutePosition().getDegrees());
+    SmartDashboard.putNumber(Constants.SwerveConstants.moduleNames[moduleNumber] + " Desired Angle", angleSetpoint);
+    SmartDashboard.putNumber(Constants.SwerveConstants.moduleNames[moduleNumber] + " Actual Angle", getAngle().getRotations());
 
-
+    SmartDashboard.putNumber(Constants.SwerveConstants.moduleNames[moduleNumber] + " AngleEncoder Reading:", angleEncoder.getAbsolutePosition().getRotations());
   }
 
-  public void goToHome() {
-    Rotation2d angle = getAngle();
-    angleMotor.setControl(angPositionVoltage.withPosition(angle.getDegrees() - angle.getDegrees() % 360));
-    lastAngle = angle.getDegrees() - angle.getDegrees() % 360;
+  // public void goToHome() {
+  //   Rotation2d angle = getAngle();
+
+  //   angleMotor.setControl(angPositionVoltage.withPosition(angle.getDegrees()-angle.getDegrees()%360));
+  //   lastAngle = angle.getDegrees() - angle.getDegrees() % 360;
+  // }
+
+  private Rotation2d getAngle() {
+    return Rotation2d.fromRotations(angleEncoder.getAbsolutePosition().getRotations());
   }
 
-  private Rotation2d getAngle() {   
-    return Rotation2d.fromDegrees(angleMotor.getPosition().getValueAsDouble());
-  }
-
+public double getAngleCTRE(){
+  return 360 * ( (angleMotor.getPosition().getValueAsDouble() * Constants.SwerveConstants.angleConversionFactor) % 1);
+}
   public SwerveModuleState getState() {
     return new SwerveModuleState(this.getSpeed(), this.getAngle());
   }
@@ -228,8 +243,8 @@ angleEncoder.getAbsolutePosition().getDegrees());
   }
 
   public double getDistance() {
-    //In meters
-    return this.driveMotor.getPosition().getValueAsDouble() * Constants.SwerveConstants.wheelCircumference;
+    //@TODO: CHnage
+    return (this.driveMotor.getPosition().getValueAsDouble() / 1024) * Constants.SwerveConstants.wheelCircumference;
   }
 
   public SwerveModulePosition getPosition() {
