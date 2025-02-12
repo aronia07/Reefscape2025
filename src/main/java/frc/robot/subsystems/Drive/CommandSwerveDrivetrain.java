@@ -46,7 +46,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     //for robot centric path following
     private final SwerveRequest.ApplyRobotSpeeds m_pathApplyRobotSpeeds = new SwerveRequest.ApplyRobotSpeeds();
     //the field
-    private Field2d TheField = new Field2d();
+    
 
     /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
     private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.kZero;
@@ -198,6 +198,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             startSimThread();
         }
     }
+    /* Pathplanner and CTRE Swerve config */
     @SuppressWarnings("unused")
     private void configureAutoBuilder() {
         try {
@@ -266,9 +267,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public void updateVisionMeasurements() {
         var visionEst = vision.getEstimatedGlobalPose();
         visionEst.ifPresent(est -> {
-          if (est.estimatedPose.toPose2d().getX() > 4) {
+          if (Math.sqrt(Math.pow(est.estimatedPose.toPose2d().getX(), 2) + Math.pow(est.estimatedPose.toPose2d().getY(), 2)) 
+          > 4) {
             return;
           }
+        //   if (est.estimatedPose.toPose2d().getX() > 4) {
+        //     return;
+        //   }
           var estPose = est.estimatedPose.toPose2d();
           var estStdDevs = vision.getEstimationStdDevs(estPose);
           this.addVisionMeasurement(est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
@@ -305,6 +310,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         updateVisionMeasurements();
         // TheField.setRobotPose(getState().Pose);
         // logValues();
+        
         /*
          * Periodically try to apply the operator perspective.
          * If we haven't applied the operator perspective before, then we should apply it regardless of DS state.

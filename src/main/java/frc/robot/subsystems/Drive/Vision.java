@@ -1,5 +1,6 @@
 package frc.robot.subsystems.Drive;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.photonvision.EstimatedRobotPose;
@@ -13,56 +14,86 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
+import frc.robot.Constants1;
+import frc.robot.Constants1.VisionConstants;
 
 public class Vision extends SubsystemBase {
-    private final PhotonCamera camera;
-    private double lastEstTimestamp = 0;
-    private final PhotonPoseEstimator photonPoseEstimator;
-    public Optional<EstimatedRobotPose> latestVision = Optional.empty();
-    public AprilTagFieldLayout kFieldLayout;
-    
-    public Vision() {
-        kFieldLayout = AprilTagFields.k2025Reefscape.loadAprilTagLayoutField();
-        camera = new PhotonCamera(Constants.VisionConstants.cameraName);
-        photonPoseEstimator = new PhotonPoseEstimator(kFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, 
-        Constants.VisionConstants.kRobotToCam);
-        photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
-    
+  private final PhotonCamera camera;
+  private double lastEstTimestamp = 0;
+  private final PhotonPoseEstimator photonPoseEstimator;
+  public Optional<EstimatedRobotPose> latestVision = Optional.empty();
+  public AprilTagFieldLayout kFieldLayout;
 
+  public Vision() {
+    kFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+    camera = new PhotonCamera(Constants1.VisionConstants.cameraName);
+    photonPoseEstimator = new PhotonPoseEstimator(kFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
+        Constants1.VisionConstants.kRobotToCam);
+    photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+
+    final Field2d TheField = new Field2d();
+    SmartDashboard.putData("Field", TheField);
+  }
+
+  /**
+   * The latest estimated robot pose on the field from vision data. This may be
+   * empty. This should
+   * only be called once per loop.
+   *
+   * @return An {@link EstimatedRobotPose} with an estimated pose, estimate
+   *         timestamp, and targets
+   *         used for estimation.
+   */
+  public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
+    // photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
+    var estVision = photonPoseEstimator.update(getLatestResult());
+    double latestTimestamp = getLatestResult().getTimestampSeconds();
+    boolean newResult = Math.abs(latestTimestamp - lastEstTimestamp) > 1e-5;
+    if (newResult) {
+      lastEstTimestamp = latestTimestamp;
     }
-    /**
-    * The latest estimated robot pose on the field from vision data. This may be
-    * empty. This should
-    * only be called once per loop.
-    *
-    * @return An {@link EstimatedRobotPose} with an estimated pose, estimate
-    *         timestamp, and targets
-    *         used for estimation.
-    */
-    public Optional<EstimatedRobotPose> getEstimatedGlobalPose() {
-        // photonPoseEstimator.setReferencePose(prevEstimatedRobotPose);
-        var estVision = photonPoseEstimator.update(getLatestResult());
-        double latestTimestamp = getLatestResult().getTimestampSeconds();
-        boolean newResult = Math.abs(latestTimestamp-lastEstTimestamp) > 1e-5;
-        if (newResult){
-            lastEstTimestamp = latestTimestamp;
-        }
-        latestVision = estVision;
-        return latestVision;
+    latestVision = estVision;
+    return latestVision;
+  }
+
+  /**
+   * Gets camera's latest result
+   * 
+   * @return The latest {@link PhotonPipelineResult} from the camera
+   */
+  public PhotonPipelineResult getLatestResult() {
+    return camera.getLatestResult();
+
+    // return camera.getAllUnreadResults();
+  }
+
+  private Optional<Pose3d> getReefPose() {
+    var alliance = DriverStation.getAlliance();
+    Optional<Pose3d> ampPose = null;
+
+    if (alliance.isPresent()) {
+      if (alliance.get() == Alliance.Blue) {
+        ampPose = VisionConstants.blueReefPose;
+      } else {
+        ampPose = VisionConstants.redReefPose;
+      }
+    } else {
+      ampPose = VisionConstants.blueReefPose;
     }
-    /**
-     * Gets camera's latest result
-     * @return The latest {@link PhotonPipelineResult} from the camera 
-     */
-    public PhotonPipelineResult getLatestResult() {
-        return camera.getLatestResult();
-    }
-     public Matrix<N3, N1> getEstimationStdDevs(Pose2d estimatedPose) {
-    var estStdDevs = Constants.VisionConstants.kSingleTagStdDevs;
+
+    return ampPose;
+  }
+
+  public Matrix<N3, N1> getEstimationStdDevs(Pose2d estimatedPose) {
+    var estStdDevs = Constants1.VisionConstants.kSingleTagStdDevs;
     var targets = getLatestResult().getTargets();
     int numTags = 0;
     double avgDist = 0;
@@ -78,7 +109,7 @@ public class Vision extends SubsystemBase {
     avgDist /= numTags;
     // Decrease std devs if multiple targets are visible
     if (numTags > 1)
-      estStdDevs = Constants.VisionConstants.kSingleTagStdDevs;
+      estStdDevs = Constants1.VisionConstants.kMultiTagStdDevs;
     // Increase std devs based on (average) distance
     if (numTags == 1 && avgDist > 4)
       estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
@@ -87,8 +118,5 @@ public class Vision extends SubsystemBase {
 
     return estStdDevs;
   }
-
-
-   
 
 }
