@@ -21,9 +21,9 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.util.LoggedTunableNumber;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants1;
-import frc.robot.Constants1.ElevatorConstants;
-import frc.robot.Constants1.ElevatorConstants.ElevateMode;
+import frc.robot.Constants;
+import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Constants.ElevatorConstants.ElevateMode;
 
 public class Elevator extends SubsystemBase {
 
@@ -129,7 +129,7 @@ public class Elevator extends SubsystemBase {
     }
 
     public void checkTunableValues() {
-    if (!Constants1.enableTunableValues)
+    if (!Constants.enableTunableValues)
       return;
 
     if (elevatorP.hasChanged() || elevatorI.hasChanged() || elevatorD.hasChanged()) {

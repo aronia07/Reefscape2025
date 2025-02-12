@@ -6,8 +6,8 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants1.ElevatorConstants;
-import frc.robot.Constants1.ElevatorConstants.ElevateMode;
+import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Constants.ElevatorConstants.ElevateMode;
 import frc.robot.subsystems.Elevator.Elevator;
 
 public class ElevateLevel extends Command {

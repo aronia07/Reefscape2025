@@ -2,8 +2,8 @@ package frc.robot.subsystems.Intake;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LoggedTunableNumber;
-import frc.robot.Constants1;
-import frc.robot.Constants1.IntakeConstants;
+import frc.robot.Constants;
+import frc.robot.Constants.IntakeConstants;
 
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;

@@ -22,8 +22,8 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants1;
-import frc.robot.Constants1.VisionConstants;
+import frc.robot.Constants;
+import frc.robot.Constants.VisionConstants;
 
 public class Vision extends SubsystemBase {
   private final PhotonCamera camera;
@@ -34,9 +34,9 @@ public class Vision extends SubsystemBase {
 
   public Vision() {
     kFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
-    camera = new PhotonCamera(Constants1.VisionConstants.cameraName);
+    camera = new PhotonCamera(Constants.VisionConstants.cameraName);
     photonPoseEstimator = new PhotonPoseEstimator(kFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-        Constants1.VisionConstants.kRobotToCam);
+        Constants.VisionConstants.kRobotToCam);
     photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
 
     final Field2d TheField = new Field2d();
@@ -93,7 +93,7 @@ public class Vision extends SubsystemBase {
   }
 
   public Matrix<N3, N1> getEstimationStdDevs(Pose2d estimatedPose) {
-    var estStdDevs = Constants1.VisionConstants.kSingleTagStdDevs;
+    var estStdDevs = Constants.VisionConstants.kSingleTagStdDevs;
     var targets = getLatestResult().getTargets();
     int numTags = 0;
     double avgDist = 0;
@@ -109,7 +109,7 @@ public class Vision extends SubsystemBase {
     avgDist /= numTags;
     // Decrease std devs if multiple targets are visible
     if (numTags > 1)
-      estStdDevs = Constants1.VisionConstants.kMultiTagStdDevs;
+      estStdDevs = Constants.VisionConstants.kMultiTagStdDevs;
     // Increase std devs based on (average) distance
     if (numTags == 1 && avgDist > 4)
       estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);

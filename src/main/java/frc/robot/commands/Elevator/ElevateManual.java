@@ -3,7 +3,7 @@ package frc.robot.commands.Elevator;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants1.ElevatorConstants.ElevateMode;
+import frc.robot.Constants.ElevatorConstants.ElevateMode;
 import frc.robot.subsystems.Elevator.Elevator;
 
 public class ElevateManual extends Command {
