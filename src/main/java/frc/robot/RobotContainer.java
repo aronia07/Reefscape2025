@@ -11,18 +11,29 @@ import com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.commands.Arm.ManualArm;
+import frc.robot.commands.Arm.ToAngle;
 import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Drive.TunerConstants;
+import frc.robot.subsystems.Arm.Arm;
+
+import frc.robot.commands.Arm.ManualArm;
 
 public class RobotContainer {
     
+final Arm arm = new Arm();
+
     public RobotContainer() {
         configureBindings();
+        configureTestCommands();
         // getDashboardCommand();
     }
     
@@ -41,13 +52,14 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     private final CommandXboxController driver = new CommandXboxController(0);
+    private final CommandXboxController operator = new CommandXboxController(1);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     
 
     private void configureBindings() {
-        // Note that X is defined as forward according to WPILib convention,
+        // Nperte that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
         drivetrain.setDefaultCommand(
             // Drivetrain will execute this command periodically
@@ -75,13 +87,36 @@ public class RobotContainer {
         driver.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
         drivetrain.registerTelemetry(logger::telemeterize);
+
+        arm.setDefaultCommand(new ManualArm(() -> operator.getLeftY(), arm));
+
+        // operator.x().onTrue(new SequentialCommandGroup(new ToAngle() Units.degreesToRadians(40),
+        // ));
     }
 
     public void getDashboardCommand() {
     }
 
+
+    public void getIdleCommands(){
+        // new ToAngle(() -> Constants.ArmConstants.min.getRadians(), arm);
+    }
+
+
     public Command getAutonomousCommand() {
         return Commands.print("No autonomous command configured");
         // return m_chooser.getSelected();
+    }
+
+
+    public void configureTestCommands(){
+        // SmartDashboard.putData("Arm up", new ToAngle(() -> Units.degreesToRadians(90), arm));
+        // SmartDashboard.putData("Arm down", new ToAngle(() -> Units.degreesToRadians(37), arm));
+    }
+
+
+    public void disabledActions(){
+        arm.resetI();
+        arm.runState(new TrapezoidProfile.State(arm.getEncoderPosition().getRadians(), 0));
     }
 }

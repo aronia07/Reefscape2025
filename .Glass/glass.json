@@ -1,5 +1,44 @@
 {
+  "NetworkTables": {
+    "transitory": {
+      "SmartDashboard": {
+        "TunableNumbers": {
+          "open": true
+        },
+        "open": true
+      }
+    },
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/Pose": "Field2d",
+      "/SmartDashboard/Arm down": "Command",
+      "/SmartDashboard/Arm up": "Command",
+      "/SmartDashboard/Module 0": "Mechanism2d",
+      "/SmartDashboard/Module 1": "Mechanism2d",
+      "/SmartDashboard/Module 2": "Mechanism2d",
+      "/SmartDashboard/Module 3": "Mechanism2d"
+    },
+    "windows": {
+      "/SmartDashboard/Arm down": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Arm up": {
+        "window": {
+          "visible": true
+        }
+      }
+    }
+  },
   "NetworkTables Info": {
     "visible": true
+  },
+  "NetworkTables Log": {
+    "visible": true
+  },
+  "NetworkTables Settings": {
+    "mode": "Client (NT4)",
+    "serverTeam": "3161"
   }
 }
