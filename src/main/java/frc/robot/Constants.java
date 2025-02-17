@@ -36,20 +36,21 @@ public final class Constants {
 
   }
   public static final class IntakeConstants {
-      public static int fivefiftyID = 300;
+      public static int intakeID = 61;
+      public static int deflectorID = 62;
       public static int[] intakePID = {0, 0, 0};
   }
   public static final class ElevatorConstants {
-      public static int min;
-      public static int max;
+      public static double min = .5;
+      public static double max = 17.5;
       public static int desiredMin;
       public static int desiredMax;
-      public static int leftElevatorMotorID = 401;
-      public static int rightElevatorMotorID = 402;
-      public static double[] elevatorPID = new double[] {0, 0, 0};
-      public static double[] elevatorSGV = new double[] {0, 0, 0};
-      public static double maxVelocity; // in rpm
-      public static double maxAccel; // in rpm/s
+      public static int leftElevatorMotorID = 41;
+      public static int rightElevatorMotorID = 42;
+      public static double[] elevatorPID = new double[] {0.00005, 0, 0}; //p is .08
+      public static double[] elevatorSGV = new double[] {0, .03, 0.018, 0}; //v is .0002
+      public static double maxVelocity = 100; // in mps
+      public static double maxAccel = 40; // in mps/s
       public static double elevatorPIDTolerance;
       public static enum ElevateMode {
           UP,
@@ -60,20 +61,22 @@ public final class Constants {
           L4,
           HP,
           OFF,
-          MANUAL
+          MANUAL,
+          TEST
       }
       public static double LevelOneSetpoint;
       public static double LevelTwoSetpoint;
       public static double LevelThreeSetpoint;
       public static double LevelFourSetpoint;
-      public static double HPsetpoint;        
+      public static double HPsetpoint;
+      public static double test = 14;  //5 works, 7, 9, and 11 unknown      
       
   }
 
   public static final class ArmConstants {
     //Motor and encoder IDs
-    public static final int leaderID = 21;
-    public static final int followerID = 22;
+    public static final int leaderID = 31;
+    public static final int followerID = 32;
     public static final int encoderID = 0;
 
     public static final Rotation2d offset = Rotation2d.fromDegrees(0);   //**WAS 88-90//How far away the arm is (at rest) from 0 degrees

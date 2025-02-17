@@ -14,7 +14,7 @@ import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 public class Intake extends SubsystemBase {
-    private static SparkMax intake = new SparkMax(IntakeConstants.fivefiftyID, MotorType.kBrushless); 
+    private static SparkMax intake = new SparkMax(IntakeConstants.intakeID, MotorType.kBrushless); 
     private static SparkMaxConfig intakeConfig = new SparkMaxConfig();
     private static SparkClosedLoopController pid = intake.getClosedLoopController();
     private static LoggedTunableNumber kP = new LoggedTunableNumber("Intake P", IntakeConstants.intakePID[0]);

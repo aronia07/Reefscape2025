@@ -21,31 +21,37 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.Arm.ManualArm;
 import frc.robot.commands.Arm.ToAngle;
+import frc.robot.commands.Elevator.ElevateLevel;
+import frc.robot.commands.Elevator.ElevateTest;
 import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Drive.TunerConstants;
+import frc.robot.subsystems.Elevator.Elevator;
+import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.Arm.Arm;
 
 import frc.robot.commands.Arm.ManualArm;
 
 public class RobotContainer {
-    
-final Arm arm = new Arm();
+    /* Subsystems */
+    // final Arm arm = new Arm();
+    final Elevator elevator = new Elevator();
+    // final Intake intake = new Intake();
 
     public RobotContainer() {
         configureBindings();
         configureTestCommands();
         // getDashboardCommand();
     }
-    
-    
+
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
-    private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+    private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second
+                                                                                      // max angular velocity
 
     /* Setting up bindings for necessary control of the swerve drive platform */ // TODO: move to a drive command
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-            .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) 
+            .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1)
             .withDriveRequestType(DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
-            // .withSteerRequestType(SteerRequestType.Position); 
+    // .withSteerRequestType(SteerRequestType.Position);
     private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
@@ -56,27 +62,24 @@ final Arm arm = new Arm();
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
-    
-
     private void configureBindings() {
         // Nperte that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
         drivetrain.setDefaultCommand(
-            // Drivetrain will execute this command periodically
-            drivetrain.applyRequest(() ->
-                drive.withVelocityX(-driver.getLeftY() * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(-driver.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(-driver.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
-            )
-        );
+                // Drivetrain will execute this command periodically
+                drivetrain.applyRequest(() -> drive.withVelocityX(-driver.getLeftY() * MaxSpeed) // Drive forward with
+                                                                                                 // negative Y (forward)
+                        .withVelocityY(-driver.getLeftX() * MaxSpeed) // Drive left with negative X (left)
+                        .withRotationalRate(-driver.getRightX() * MaxAngularRate) // Drive counterclockwise with
+                                                                                  // negative X (left)
+                ));
 
         driver.a().whileTrue(drivetrain.applyRequest(() -> brake));
-        driver.b().whileTrue(drivetrain.applyRequest(() ->
-            point.withModuleDirection(new Rotation2d(-driver.getLeftY(), -driver.getLeftX()))
-        ));
+        driver.b().whileTrue(drivetrain
+                .applyRequest(() -> point.withModuleDirection(new Rotation2d(-driver.getLeftY(), -driver.getLeftX()))));
 
         // Run SysId routines when holding back/start and X/Y.
-        //CHANGED: changed from back/start+x/y to pov buttons
+        // CHANGED: changed from back/start+x/y to pov buttons
         // Note that each routine should be run exactly once in a single log.
         driver.povUp().whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
         driver.povDown().whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
@@ -86,37 +89,41 @@ final Arm arm = new Arm();
         // reset the field-centric heading on left bumper press
         driver.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-        drivetrain.registerTelemetry(logger::telemeterize);
+        // drivetrain.registerTelemetry(logger::telemeterize);
 
-        arm.setDefaultCommand(new ManualArm(() -> operator.getLeftY(), arm));
+        // arm.setDefaultCommand(new ManualArm(() -> operator.getLeftY(), arm));
 
-        // operator.x().onTrue(new SequentialCommandGroup(new ToAngle() Units.degreesToRadians(40),
+        // operator.x().onTrue(new SequentialCommandGroup(new ToAngle()
+        // Units.degreesToRadians(40),
         // ));
     }
 
     public void getDashboardCommand() {
+
     }
 
-
-    public void getIdleCommands(){
+    public void getIdleCommands() {
         // new ToAngle(() -> Constants.ArmConstants.min.getRadians(), arm);
     }
-
 
     public Command getAutonomousCommand() {
         return Commands.print("No autonomous command configured");
         // return m_chooser.getSelected();
     }
 
+    public void configureTestCommands() {
+        SmartDashboard.putData("Elevator test", new ElevateTest(elevator));
+        SmartDashboard.putData("Elevate", new ElevateLevel(elevator, () -> 7));
+        SmartDashboard.putData("Go down", new ElevateLevel(elevator, () -> 5));
 
-    public void configureTestCommands(){
-        // SmartDashboard.putData("Arm up", new ToAngle(() -> Units.degreesToRadians(90), arm));
-        // SmartDashboard.putData("Arm down", new ToAngle(() -> Units.degreesToRadians(37), arm));
+        // SmartDashboard.putData("Arm up", new ToAngle(() ->
+        // Units.degreesToRadians(90), arm));
+        // SmartDashboard.putData("Arm down", new ToAngle(() ->
+        // Units.degreesToRadians(37), arm));
     }
 
-
-    public void disabledActions(){
-        arm.resetI();
-        arm.runState(new TrapezoidProfile.State(arm.getEncoderPosition().getRadians(), 0));
+    public void disabledActions() {
+        // arm.resetI();
+        // arm.runState(new TrapezoidProfile.State(arm.getEncoderPosition().getRadians(), 0));
     }
 }
