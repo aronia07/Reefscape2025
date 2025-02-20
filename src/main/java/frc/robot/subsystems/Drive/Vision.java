@@ -70,26 +70,26 @@ public class Vision extends SubsystemBase {
    * @return The latest {@link PhotonPipelineResult} from the camera
    */
   public PhotonPipelineResult getLatestResult() {
+    // List<PhotonPipelineResult> results = camera.getAllUnreadResults();
+    // // return results.get(results.size()-1);
     return camera.getLatestResult();
-
-    // return camera.getAllUnreadResults();
   }
 
   private Optional<Pose3d> getReefPose() {
     var alliance = DriverStation.getAlliance();
-    Optional<Pose3d> ampPose = null;
+    Optional<Pose3d> reefPose = null;
 
     if (alliance.isPresent()) {
       if (alliance.get() == Alliance.Blue) {
-        ampPose = VisionConstants.blueReefPose;
+        reefPose = VisionConstants.blueReefPose;
       } else {
-        ampPose = VisionConstants.redReefPose;
+        reefPose = VisionConstants.redReefPose;
       }
     } else {
-      ampPose = VisionConstants.blueReefPose;
+      reefPose = VisionConstants.blueReefPose;
     }
 
-    return ampPose;
+    return reefPose;
   }
 
   public Matrix<N3, N1> getEstimationStdDevs(Pose2d estimatedPose) {

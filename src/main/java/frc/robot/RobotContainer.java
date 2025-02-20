@@ -22,7 +22,9 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.Arm.ManualArm;
 import frc.robot.commands.Arm.ToAngle;
 import frc.robot.commands.Elevator.ElevateLevel;
+import frc.robot.commands.Elevator.ElevateManual;
 import frc.robot.commands.Elevator.ElevateTest;
+import frc.robot.commands.Intake.IntakeIn;
 import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Drive.TunerConstants;
 import frc.robot.subsystems.Elevator.Elevator;
@@ -33,9 +35,9 @@ import frc.robot.commands.Arm.ManualArm;
 
 public class RobotContainer {
     /* Subsystems */
-    // final Arm arm = new Arm();
+    final Arm arm = new Arm();
     final Elevator elevator = new Elevator();
-    // final Intake intake = new Intake();
+    final Intake intake = new Intake();
 
     public RobotContainer() {
         configureBindings();
@@ -65,6 +67,8 @@ public class RobotContainer {
     private void configureBindings() {
         // Nperte that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
+        /* DRIVER CONTROLS */
+        //drive with joysticks
         drivetrain.setDefaultCommand(
                 // Drivetrain will execute this command periodically
                 drivetrain.applyRequest(() -> drive.withVelocityX(-driver.getLeftY() * MaxSpeed) // Drive forward with
@@ -73,7 +77,7 @@ public class RobotContainer {
                         .withRotationalRate(-driver.getRightX() * MaxAngularRate) // Drive counterclockwise with
                                                                                   // negative X (left)
                 ));
-
+        //buttons
         driver.a().whileTrue(drivetrain.applyRequest(() -> brake));
         driver.b().whileTrue(drivetrain
                 .applyRequest(() -> point.withModuleDirection(new Rotation2d(-driver.getLeftY(), -driver.getLeftX()))));
@@ -81,6 +85,7 @@ public class RobotContainer {
         // Run SysId routines when holding back/start and X/Y.
         // CHANGED: changed from back/start+x/y to pov buttons
         // Note that each routine should be run exactly once in a single log.
+        //d-pad
         driver.povUp().whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
         driver.povDown().whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
         driver.povLeft().whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
@@ -91,11 +96,22 @@ public class RobotContainer {
 
         // drivetrain.registerTelemetry(logger::telemeterize);
 
-        // arm.setDefaultCommand(new ManualArm(() -> operator.getLeftY(), arm));
+        /* OPERATOR CONTROLS */
+        //joysticks
+        arm.setDefaultCommand(new ManualArm(() -> operator.getLeftY(), arm));
+        elevator.setDefaultCommand(new ElevateManual(() -> operator.getRightY(), elevator));
 
+        //buttons
+        operator.x().whileTrue(new IntakeIn(intake));
+        operator.b().whileTrue(new IntakeIn(intake));
+        operator.y().onTrue(new ElevateLevel(elevator, () -> 7));
+        operator.a().onTrue(new ElevateLevel(elevator, () -> 5));
         // operator.x().onTrue(new SequentialCommandGroup(new ToAngle()
         // Units.degreesToRadians(40),
         // ));
+
+        //d-pad
+        
     }
 
     public void getDashboardCommand() {

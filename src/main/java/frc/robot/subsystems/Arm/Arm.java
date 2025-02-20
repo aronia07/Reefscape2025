@@ -80,21 +80,18 @@ public class Arm extends SubsystemBase {
   //Motor Set-Up
   private void setupMotors() {
 
-    armLeaderConfig.inverted(true).idleMode(IdleMode.kBrake);
 
+    armLeaderConfig.voltageCompensation(12).smartCurrentLimit(60, 30).inverted(true).idleMode(IdleMode.kBrake);
     leader.configure(armLeaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     //leader.restoreFactoryDefaults();
     CANSparkMaxUtil.setSparkMaxBusUsage(leader, armLeaderConfig, Usage.kPositionOnly);
-    armLeaderConfig.voltageCompensation(12);
-    armLeaderConfig.smartCurrentLimit(20, 20);
 
     //follower.restoreFactoryDefaults();
-    follower.configure(armFollowerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    
     CANSparkMaxUtil.setSparkMaxBusUsage(follower, armFollowerConfig, Usage.kPositionOnly);
-    armFollowerConfig.voltageCompensation(12);
-    armFollowerConfig.smartCurrentLimit(30, 30);
-    armLeaderConfig.inverted(false).idleMode(IdleMode.kBrake);
-
+    armFollowerConfig.voltageCompensation(12).smartCurrentLimit(60, 30).inverted(false).idleMode(IdleMode.kBrake);
+    follower.configure(armFollowerConfig, ResetMode.kResetSafeParameters  , PersistMode.kPersistParameters);
+    
     pid.setIntegratorRange(-0.05, 0.05);
   }
 
@@ -182,6 +179,7 @@ public class Arm extends SubsystemBase {
     SmartDashboard.putNumber("Arm Actual Angle", getEncoderPosition().getDegrees());
     SmartDashboard.putNumber("Arm Desired Angle", setpoint.getDegrees());
     SmartDashboard.putNumber("Arm Desired Speed", velocity.getDegrees());
+    SmartDashboard.putNumber("Arm current", leader.getOutputCurrent());
   }
 
   @Override
@@ -200,6 +198,7 @@ public class Arm extends SubsystemBase {
     //PID+FF output on the leader and follower motors
     leader.set(ffOutput + pidOutput);
     follower.set(ffOutput + pidOutput);
+    // follower.set(ffOutput + pidOutput);
   }
 
 }
