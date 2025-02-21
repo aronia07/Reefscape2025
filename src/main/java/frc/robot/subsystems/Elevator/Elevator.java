@@ -39,19 +39,10 @@ public class Elevator extends SubsystemBase {
   private ElevatorFeedforward ffElevate = new ElevatorFeedforward(ElevatorConstants.elevatorSGV[0],
       ElevatorConstants.elevatorSGV[1], ElevatorConstants.elevatorSGV[2], ElevatorConstants.elevatorSGV[3]);
 
-  // private final SparkClosedLoopController pid =
-  // leftElevatorMotor.getClosedLoopController();
-  // private final ClosedLoopConfig leftPIDConfig = new ClosedLoopConfig();
-
-  // private SparkMax rightElevatorMotor = new
-  // SparkMax(ElevatorConstants.rightElevatorMotorID, MotorType.kBrushless);
-  // private Timer timer = new Timer();
-  // private final SparkClosedLoopController rightPID =
-  // rightElevatorMotor.getClosedLoopController();
-
   private final RelativeEncoder encoderLeft;
-  // private final RelativeEncoder encoderRight;
+  private final RelativeEncoder encoderRight;
 
+  private Timer timer = new Timer();
   public double encoderPosition;
   private double nextVelocity = 0.0;
   private double nextNextVelocity = 0.0;
@@ -61,7 +52,7 @@ public class Elevator extends SubsystemBase {
   // private double leftPower = 0;
   // private double rightPower = 0;
   private ElevateMode elevateMode = ElevateMode.OFF;
-  // private boolean isLeftDone = false;
+  private boolean isLeftDone = false;
   // private boolean isRightDone = false;
 
   /* Tunable Values */
@@ -76,9 +67,8 @@ public class Elevator extends SubsystemBase {
   public Elevator() {
     setupMotors();
     encoderLeft = leftElevatorMotor.getEncoder();
-    resetEncoderLeft();
-    // encoderRight = leftElevatorMotor.getAlternateEncoder();
-    // resetEncoderRight();
+    resetEncoders();
+    encoderRight = leftElevatorMotor.getEncoder();
 
   }
 
@@ -99,7 +89,7 @@ public class Elevator extends SubsystemBase {
     rightConfig.inverted(false)
         .idleMode(IdleMode.kBrake)
         .smartCurrentLimit(40, 20)
-        .voltageCompensation(12).follow(leftElevatorMotor, false);
+        .voltageCompensation(12);
     // rightConfig.apply(leftConfig)
     // .follow(leftElevatorMotor, true);
 
@@ -123,6 +113,10 @@ public class Elevator extends SubsystemBase {
     elevatorSetpoint = goal;
   }
 
+  public double getSetpoint() {
+    return this.elevatorSetpoint;
+  }
+
   public void SET(double value) {
     encoderLeft.setPosition(value);
   }
@@ -135,19 +129,15 @@ public class Elevator extends SubsystemBase {
     return positionRateOfChange;
   }
 
-  private void resetEncoderLeft() {
+  private void resetEncoders() {
     encoderLeft.setPosition(0);
+    encoderRight.setPosition(0);
   }
-
-  // private void resetEncoderRight() {
-  // encoderRight.setPosition(0);
-  // }
 
   public void logValues() {
     SmartDashboard.putNumber("Actual Elevator Position Left", encoderLeft.getPosition());
     SmartDashboard.putNumber("Desired Elevator Setpoint", elevatorSetpoint);
-    // SmartDashboard.putNumber("Actual Elevator Position Right",
-    // encoderRight.getPosition());
+    SmartDashboard.putNumber("Actual Elevator Position Right", encoderRight.getPosition());
   }
 
   public TrapezoidProfile.State getCurrentState() {
@@ -165,7 +155,7 @@ public class Elevator extends SubsystemBase {
 
       if (elevatorP.hasChanged() || elevatorI.hasChanged() || elevatorD.hasChanged()) {
         pid.setPID(elevatorP.get(), elevatorI.get(), elevatorD.get());
-        // leftConfig.closedLoop.pid(elevatorP.get(), elevatorI.get(), elevatorD.get());
+        leftConfig.closedLoop.pid(elevatorP.get(), elevatorI.get(), elevatorD.get());
       }
       if (elevatorS.hasChanged() || elevatorG.hasChanged() || elevatorV.hasChanged() || elevatorA.hasChanged()) {
         ffElevate = new ElevatorFeedforward(elevatorS.get(), elevatorG.get(), elevatorV.get(), elevatorA.get());
@@ -193,9 +183,9 @@ public class Elevator extends SubsystemBase {
     }
   }
 
-  // public States isRightOutOfBounds() {
-  // return outOfBounds(-encoderRight.getPosition());
-  // }
+  public States isRightOutOfBounds() {
+    return outOfBounds(-encoderRight.getPosition());
+  }
 
   public States isLeftOutOfBounds() {
     return outOfBounds(encoderLeft.getPosition());
@@ -205,20 +195,142 @@ public class Elevator extends SubsystemBase {
    * Logic for the elevator command, switches through modes to
    * control elevator
    */
-  // private void handleLeft() {
-  // case HOMING:
-  // if (leftClimberMotor.getOutputCurrent() >=
-  // ClimberConstants.homingCurrentThreshold) {
-  // if (timer.get() < 1)
-  // return;
-  // stopLeft();
-  // isLeftDone = true;
-  // encoderLeft.setPosition(0);
-  // } else {
-  // setLeft(ClimberConstants.selfHomeSpeedVoltage);
-  // }
-  // break;
-  // }
+  private void handleLeft() {
+    // case HOMING:
+    // if (leftClimberMotor.getOutputCurrent() >=
+    // ClimberConstants.homingCurrentThreshold) {
+    // if (timer.get() < 1)
+    // return;
+    // stopLeft();
+    // isLeftDone = true;
+    // encoderLeft.setPosition(0);
+    // } else {
+    // setLeft(ClimberConstants.selfHomeSpeedVoltage);
+    // }
+    // break;
+    switch (elevateMode) {
+      case UP:
+        break;
+      case DOWN:
+        break;
+      case L1:
+        elevatorSetpoint = ElevatorConstants.LevelOneSetpoint;
+        break;
+      case L2:
+        elevatorSetpoint = ElevatorConstants.LevelTwoSetpoint;
+        break;
+      case L3:
+        elevatorSetpoint = ElevatorConstants.LevelThreeSetpoint;
+        break;
+      case L4:
+        elevatorSetpoint = ElevatorConstants.LevelFourSetpoint;
+        break;
+      case HP:
+        elevatorSetpoint = ElevatorConstants.HPsetpoint;
+        break;
+      case MANUAL:
+        // switch (isLeftOutOfBounds()) {
+        // case BADBADBAD:
+        // elevatorSetpoint = 0;
+        // break;
+
+        // case OKAYUP:
+        // if (leftPower > 0) {
+        // setRight(0);
+        // }
+        // break;
+
+        // case OKAYDOWN:
+        // if (rightPower < 0) {
+        // setRight(0);
+        // }
+        // break;
+        // default:
+        // break;
+        // }
+        break;
+      case TEST:
+        elevatorSetpoint = ElevatorConstants.test;
+      case OFF:
+        elevatorSetpoint = 0;
+        break;
+      case HOMING:
+        if (leftElevatorMotor.getOutputCurrent() >= ElevatorConstants.homingCurrentThreshold) {
+          if (timer.get() < 1)
+            return;
+          leftElevatorMotor.setVoltage(0);
+          isLeftDone = true;
+          encoderLeft.setPosition(0);
+        } else {
+          leftElevatorMotor.setVoltage(ElevatorConstants.selfHomeSpeedVoltage);
+        }
+        break;
+      default:
+        break;
+    }
+  }
+
+  private void handleRight() {
+    // case HOMING:
+    // if (leftClimberMotor.getOutputCurrent() >=
+    // ClimberConstants.homingCurrentThreshold) {
+    // if (timer.get() < 1)
+    // return;
+    // stopLeft();
+    // isLeftDone = true;
+    // encoderLeft.setPosition(0);
+    // } else {
+    // setLeft(ClimberConstants.selfHomeSpeedVoltage);
+    // }
+    // break;
+    switch (elevateMode) {
+      case UP:
+        break;
+      case DOWN:
+        break;
+      case L1:
+        elevatorSetpoint = ElevatorConstants.LevelOneSetpoint;
+        break;
+      case L2:
+        elevatorSetpoint = ElevatorConstants.LevelTwoSetpoint;
+        break;
+      case L3:
+        elevatorSetpoint = ElevatorConstants.LevelThreeSetpoint;
+        break;
+      case L4:
+        elevatorSetpoint = ElevatorConstants.LevelFourSetpoint;
+        break;
+      case HP:
+        elevatorSetpoint = ElevatorConstants.HPsetpoint;
+        break;
+      case MANUAL:
+        // switch (isLeftOutOfBounds()) {
+        // case BADBADBAD:
+        // elevatorSetpoint = 0;
+        // break;
+
+        // case OKAYUP:
+        // if (leftPower > 0) {
+        // setRight(0);
+        // }
+        // break;
+
+        // case OKAYDOWN:
+        // if (rightPower < 0) {
+        // setRight(0);
+        // }
+        // break;
+        // default:
+        // break;
+        // }
+        break;
+      case OFF:
+        elevatorSetpoint = 0;
+        break;
+      default:
+        break;
+    }
+  }
   // private void handleRight() {
   // switch (climberMode) {
   // case HOMING:
@@ -281,6 +393,7 @@ public class Elevator extends SubsystemBase {
 
   @Override
   public void periodic() {
+    handleLeft();
     encoderPosition = encoderLeft.getPosition();
     logValues();
     checkTunableValues();
@@ -294,16 +407,22 @@ public class Elevator extends SubsystemBase {
     }
 
     var ffOutput = ffElevate.calculateWithVelocities(nextVelocity, nextNextVelocity);
+    var rightffOuput = ffElevate.calculateWithVelocities(nextVelocity, nextNextVelocity);
+
     if (ffOutput < ffElevate.calculate(nextVelocity)) {
       ffOutput = ffElevate.calculate(nextVelocity); // the docmentation said "calculateWithVelocities" is inaccurate
-                                                    // with velocities close to 0
+      rightffOuput = ffElevate.calculate(nextVelocity); // with velocities close to 0
     }
-    var pidOutput = pid.calculate(encoderPosition, elevatorSetpoint);
+    var leftpidOutput = pid.calculate(encoderPosition, elevatorSetpoint);
+    var rightpidOutput = pid.calculate(encoderPosition, elevatorSetpoint);
 
     SmartDashboard.putNumber("Elevator velocity", nextVelocity);
-    SmartDashboard.putNumber("Elevator PID output", pidOutput);
+    SmartDashboard.putNumber("Elevator PID output left", leftpidOutput);
+    SmartDashboard.putNumber("Elevator PID ouput right", elevatorSetpoint);
     SmartDashboard.putNumber("Elevator FF Output", ffOutput);
-    leftElevatorMotor.set(ffOutput + pidOutput);
+
+    leftElevatorMotor.set(ffOutput + leftpidOutput);
+    rightElevatorMotor.set(rightffOuput + rightffOuput);
     // pid.setReference(elevatorSetpoint, ControlType.kPosition,
     // ClosedLoopSlot.kSlot0, ffOutput);
 

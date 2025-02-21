@@ -14,7 +14,9 @@ public class ElevateManual extends Command {
     public ElevateManual(DoubleSupplier doubleSupplier, Elevator elevator){
         elevator_y = elevator;
         this.doubleSupplier = doubleSupplier;
+        addRequirements(elevator);
     }
+
 
     @Override
     public void initialize() {

@@ -15,11 +15,11 @@ public class WristMove extends Command {
         this.wristSupplier = doubleSupplier;
         addRequirements(wrist);
 
-    }
+    }    
 
     @Override
     public void initialize() {
-
+ 
     }
 
     @Override

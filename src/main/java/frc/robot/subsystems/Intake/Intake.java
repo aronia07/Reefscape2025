@@ -45,13 +45,14 @@ public class Intake extends SubsystemBase {
         // intake.configure(intakeConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
     /* Function for updating pid values from dashboard */
-    // public static void checkTunableValues() {
-    //     if (!Constants.enableTunableValues)
-    //         return;
-    //     if(kP.hasChanged() || kI.hasChanged() || kD.hasChanged()){
-    //         intakeConfig.closedLoop.pid(kP.get(), kI.get(), kD.get());
-    //     }
-    // }
+    // .
+    public static void checkTunableValues() {
+        if (!Constants.enableTunableValues)
+            return;
+        if(kP.hasChanged() || kI.hasChanged() || kD.hasChanged()){
+            intakeConfig.closedLoop.pid(kP.get(), kI.get(), kD.get());
+        }
+    }
 
     public void pulse(double time) {
         if (time % 2 == 0) {
