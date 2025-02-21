@@ -87,7 +87,7 @@ public final class Constants {
         public static double LevelThreeSetpoint;
         public static double LevelFourSetpoint;
         public static double HPsetpoint;
-        public static double test = 14;
+        public static double test = 5;
 
     }
 
@@ -108,7 +108,7 @@ public final class Constants {
         public static final Rotation2d maxAcceleration = Rotation2d.fromDegrees(1); // was 250
 
         public static double[] armSGV = new double[] { 0.0, 0.0, 0.0 }; // Static, Gravity, and Velocity gains
-        public static double[] armPID = new double[] { 0, 0, 0f }; // Arm PID values
+        public static double[] armPID = new double[] { 1.5, 0, 0f }; // Arm PID values
 
         // Arm's polynomial regression (useed to predict distances from speaker)
         // public static final PolynomialRegression

@@ -25,7 +25,6 @@ public class ElevateLevel extends Command {
         elevator_y = elevator;
         this.doubleSupplier = doubleSupplier;
 
-        this.addRequirements(elevator_y);
     }
 
     @Override
@@ -33,39 +32,41 @@ public class ElevateLevel extends Command {
         y_timer.reset();
         y_timer.start();
 
+        double level = doubleSupplier.getAsDouble();
+        if (level == 4) {
+        elevator_y.setMode(ElevateMode.L4);
+        } else if (level == 3) {
+        elevator_y.setMode(ElevateMode.L3);
+        } else if (level == 2) {
+        elevator_y.setMode(ElevateMode.L2);
+        } else if (level == 1) {
+        elevator_y.setMode(ElevateMode.L1);
+        } else if (level == 0) {
+        elevator_y.setMode(ElevateMode.HP);
+        } else if (level == 5) {
+        elevator_y.setMode(ElevateMode.DOWN);
+        } else if (level == 6) {
+        elevator_y.setMode(ElevateMode.UP);
+        } else if (level == 7) {
+        elevator_y.setMode(ElevateMode.TEST);
+        }
+
         initialState = elevator_y.getCurrentState();
         // this.elevatorSetpoint = Elevator.elevatorSetpoint;
     }
 
     @Override
     public void execute() {
-        // double level = doubleSupplier.getAsDouble();
-        // if (level == 4) {
-        // elevator_y.setMode(ElevateMode.L4);
-        // } else if (level == 3) {
-        // elevator_y.setMode(ElevateMode.L3);
-        // } else if (level == 2) {
-        // elevator_y.setMode(ElevateMode.L2);
-        // } else if (level == 1) {
-        // elevator_y.setMode(ElevateMode.L1);
-        // } else if (level == 0) {
-        // elevator_y.setMode(ElevateMode.HP);
-        // } else if (level == 5) {
-        // elevator_y.setMode(ElevateMode.DOWN);
-        // } else if (level == 6) {
-        // elevator_y.setMode(ElevateMode.UP);
-        // } else if (level == 7) {
-        // elevator_y.setMode(ElevateMode.TEST);
-        // }
+        
         var nextState = profiler_y.calculate(y_timer.get(),
                 initialState,
                 new TrapezoidProfile.State(elevator_y.elevatorSetpoint, 0));
 
-        var nextNextState = profiler_y.calculate(y_timer.get(),
-                initialState,
-                new TrapezoidProfile.State(elevator_y.elevatorSetpoint, 0));
+        // var nextNextState = profiler_y.calculate(y_timer.get(),
+        //         initialState,
+        //         new TrapezoidProfile.State(elevator_y.elevatorSetpoint, 0));
 
-        elevator_y.runState(nextState, nextNextState);
+        elevator_y.runState(nextState);
     }
 
     @Override

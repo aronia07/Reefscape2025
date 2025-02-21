@@ -22,24 +22,24 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.Arm.ManualArm;
 import frc.robot.commands.Arm.ToAngle;
 import frc.robot.commands.Elevator.ElevateLevel;
-import frc.robot.commands.Elevator.ElevateManual;
+// import frc.robot.commands.Elevator.ElevateManual;
 import frc.robot.commands.Elevator.ElevateTest;
-import frc.robot.commands.Intake.IntakeIn;
-import frc.robot.commands.Intake.IntakeOut;
-import frc.robot.commands.Wrist.WristMove;
+//import frc.robot.commands.Intake.IntakeIn;
+//import frc.robot.commands.Intake.IntakeOut;
+//import frc.robot.commands.Wrist.WristMove;
 import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Drive.TunerConstants;
 import frc.robot.subsystems.Elevator.Elevator;
-import frc.robot.subsystems.Intake.Intake;
-import frc.robot.subsystems.Wrist.Wrist;
+//import frc.robot.subsystems.Intake.Intake;
+//import frc.robot.subsystems.Wrist.Wrist;
 import frc.robot.subsystems.Arm.Arm;
 
 public class RobotContainer {
     /* Subsystems */
     final Arm arm = new Arm();
     final Elevator elevator = new Elevator();
-    final Intake intake = new Intake();
-    final Wrist wrist = new Wrist();
+    // final Intake intake = new Intake();
+    // final Wrist wrist = new Wrist();
 
     public RobotContainer() {
         configureBindings();
@@ -101,13 +101,13 @@ public class RobotContainer {
         /* OPERATOR CONTROLS */
         // joysticks
         arm.setDefaultCommand(new ManualArm(() -> operator.getLeftY(), arm));
-        elevator.setDefaultCommand(new ElevateManual(() -> operator.getRightY(), elevator));
-        operator.leftTrigger().whileTrue(new WristMove(() -> operator.getLeftTriggerAxis(), wrist));
-        operator.rightTrigger().whileTrue(new WristMove(() -> -operator.getRightTriggerAxis(), wrist));
+        // elevator.setDefaultCommand(new ElevateManual(() -> operator.getRightY(), elevator));
+        //operator.leftTrigger().whileTrue(new WristMove(() -> operator.getLeftTriggerAxis(), wrist));
+        //operator.rightTrigger().whileTrue(new WristMove(() -> -operator.getRightTriggerAxis(), wrist));
 
         // buttons
-        operator.x().whileTrue(new IntakeIn(intake));
-        operator.b().whileTrue(new IntakeOut(intake));
+       // operator.x().whileTrue(new IntakeIn(intake));
+        //operator.b().whileTrue(new IntakeOut(intake));
         operator.y().onTrue(new ElevateLevel(elevator, () -> 7));
         operator.a().onTrue(new ElevateLevel(elevator, () -> 5));
         // operator.x().onTrue(new SequentialCommandGroup(new ToAngle()
@@ -123,7 +123,7 @@ public class RobotContainer {
     }
 
     public void getIdleCommands() {
-        // new ToAngle(() -> Constants.ArmConstants.min.getRadians(), arm);
+        // new ToAngle(() -> 0, arm);
     }
 
     public Command getAutonomousCommand() {

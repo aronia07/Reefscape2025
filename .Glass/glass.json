@@ -1,13 +1,18 @@
 {
   "NetworkTables": {
+    "Retained Values": {
+      "open": false
+    },
+    "retained": {
+      ".schema": {
+        "open": true
+      }
+    },
     "transitory": {
       "SmartDashboard": {
         "TunableNumbers": {
           "open": true
         },
-        "open": true
-      },
-      "photonvision": {
         "open": true
       }
     },
@@ -26,17 +31,22 @@
       "/SmartDashboard/Module 3": "Mechanism2d"
     },
     "windows": {
+      "/SmartDashboard/Arm down": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Arm up": {
+        "window": {
+          "visible": true
+        }
+      },
       "/SmartDashboard/Elevate": {
         "window": {
           "visible": true
         }
       },
       "/SmartDashboard/Elevator test": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/SmartDashboard/Go down": {
         "window": {
           "visible": true
         }
@@ -63,17 +73,8 @@
             0.0,
             0.8500000238418579
           ],
-          "height": 319,
+          "height": 455,
           "series": [
-            {
-              "color": [
-                0.8666667342185974,
-                0.5176470875740051,
-                0.32156863808631897,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard/Actual Elevator Position Left"
-            },
             {
               "color": [
                 0.2980392277240753,
@@ -81,7 +82,49 @@
                 0.6901960968971252,
                 1.0
               ],
-              "id": "NT:/SmartDashboard/Desired Elevator Setpoint"
+              "id": "NT:/SmartDashboard/Arm Desired Angle"
+            },
+            {
+              "color": [
+                0.8666667342185974,
+                0.5176470875740051,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/Arm Actual Angle"
+            }
+          ]
+        }
+      ]
+    },
+    "Plot <1>": {
+      "plots": [
+        {
+          "backgroundColor": [
+            0.0,
+            0.0,
+            0.0,
+            0.8500000238418579
+          ],
+          "height": 462,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/Actual Elevator Position Left"
+            },
+            {
+              "color": [
+                0.8666667342185974,
+                0.5176470875740051,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/Actual Elevator Position Right"
             },
             {
               "color": [
@@ -90,25 +133,7 @@
                 0.4078431725502014,
                 1.0
               ],
-              "id": "NT:/SmartDashboard/Arm Desired Angle"
-            },
-            {
-              "color": [
-                0.7686275243759155,
-                0.30588236451148987,
-                0.32156863808631897,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard/Arm Actual Angle"
-            },
-            {
-              "color": [
-                0.5058823823928833,
-                0.44705885648727417,
-                0.7019608020782471,
-                1.0
-              ],
-              "id": "NT:/SmartDashboard/ffoutput arm"
+              "id": "NT:/SmartDashboard/Desired Elevator Setpoint"
             }
           ]
         }
