@@ -62,11 +62,11 @@ public class ElevateLevel extends Command {
                 initialState,
                 new TrapezoidProfile.State(elevator_y.elevatorSetpoint, 0));
 
-        // var nextNextState = profiler_y.calculate(y_timer.get(),
-        //         initialState,
-        //         new TrapezoidProfile.State(elevator_y.elevatorSetpoint, 0));
+        var nextNextState = profiler_y.calculate(y_timer.get(),
+                initialState,
+                new TrapezoidProfile.State(elevator_y.elevatorSetpoint, 0));
 
-        elevator_y.runState(nextState);
+        elevator_y.runState(nextState, nextNextState);
     }
 
     @Override
