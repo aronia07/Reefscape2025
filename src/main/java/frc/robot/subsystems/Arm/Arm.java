@@ -71,22 +71,15 @@ public class Arm extends SubsystemBase {
     runSetpoint(getEncoderPosition());
   }
 
-  //Makes sure that the motor controllers are configured properly
-  public void burnToFlash() {
-    // leader.burnFlash();
-    // follower.burnFlash();
-  }
 
   //Motor Set-Up
   private void setupMotors() {
-
 
     armLeaderConfig.voltageCompensation(12).smartCurrentLimit(60, 30).inverted(true).idleMode(IdleMode.kBrake);
     leader.configure(armLeaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     //leader.restoreFactoryDefaults();
     CANSparkMaxUtil.setSparkMaxBusUsage(leader, armLeaderConfig, Usage.kPositionOnly);
 
-    //follower.restoreFactoryDefaults();
     
     CANSparkMaxUtil.setSparkMaxBusUsage(follower, armFollowerConfig, Usage.kPositionOnly);
     armFollowerConfig.voltageCompensation(12).smartCurrentLimit(60, 30).inverted(false).idleMode(IdleMode.kBrake);
