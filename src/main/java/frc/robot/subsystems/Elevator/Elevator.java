@@ -59,7 +59,7 @@ public class Elevator extends SubsystemBase {
 
   public Elevator() {
     setupMotors();
-    encoderLeft = leftElevatorMotor.getEncoder();
+    encoderLeft = rightElevatorMotor.getEncoder();
     // encoderRight = leftElevatorMotor.getEncoder();
     resetEncoders();
 
@@ -123,7 +123,7 @@ public class Elevator extends SubsystemBase {
 
   public void logValues() {
     SmartDashboard.putNumber("Actual Elevator Position Left", encoderLeft.getPosition());
-    SmartDashboard.putNumber("Desired Elevator Setpoint", elevatorSetpoint);    
+    SmartDashboard.putNumber("Desired Elevator Setpoint", elevatorSetpoint);
   }
 
   public TrapezoidProfile.State getCurrentState() {
@@ -170,7 +170,7 @@ public class Elevator extends SubsystemBase {
   }
 
   // public States isRightOutOfBounds() {
-  //   return outOfBounds(-encoderRight.getPosition());
+  // return outOfBounds(-encoderRight.getPosition());
   // }
 
   public States isLeftOutOfBounds() {
@@ -198,6 +198,7 @@ public class Elevator extends SubsystemBase {
       case UP:
         break;
       case DOWN:
+        elevatorSetpoint = 2;
         break;
       case L1:
         elevatorSetpoint = ElevatorConstants.LevelOneSetpoint;
@@ -218,8 +219,9 @@ public class Elevator extends SubsystemBase {
         break;
       case TEST:
         elevatorSetpoint = ElevatorConstants.test;
+        break;
       case OFF:
-        elevatorSetpoint = 0;
+        elevatorSetpoint = 1;
         break;
       case HOMING:
         if (leftElevatorMotor.getOutputCurrent() >= ElevatorConstants.homingCurrentThreshold) {
@@ -290,7 +292,7 @@ public class Elevator extends SubsystemBase {
     switch (isLeftOutOfBounds()) {
       case BADBADBAD:
         // leftElevatorMotor.setVoltage(0);
-       // System.out.println("BADDBADBADBAD");
+        // System.out.println("BADDBADBADBAD");
         break;
       default:
         break;
@@ -299,15 +301,14 @@ public class Elevator extends SubsystemBase {
     var ffOutput = ffElevate.calculateWithVelocities(nextVelocity, nextNextVelocity);
 
     if (ffOutput < ffElevate.calculate(nextVelocity)) {
-      ffOutput = ffElevate.calculate(nextVelocity); // the docmentation said "calculateWithVelocities" is inaccurate for values 
+      ffOutput = ffElevate.calculate(nextVelocity); // the docmentation said "calculateWithVelocities" is inaccurate for
+                                                    // values
                                                     // around 0
     }
     var leftpidOutput = pid.calculate(encoderPosition, this.elevatorSetpoint);
 
-
-    leftElevatorMotor.set(ffOutput + leftpidOutput);
-    rightElevatorMotor.set(-ffOutput - leftpidOutput);
-
+    leftElevatorMotor.set(-ffOutput - leftpidOutput);
+    rightElevatorMotor.set(ffOutput + leftpidOutput);
 
     SmartDashboard.putNumber("Elevator velocity", nextVelocity);
     SmartDashboard.putNumber("Elevator PID output left", leftpidOutput);

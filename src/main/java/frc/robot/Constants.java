@@ -62,8 +62,8 @@ public final class Constants {
         public static int desiredMax;
         public static int leftElevatorMotorID = 41;
         public static int rightElevatorMotorID = 42;
-        public static double[] elevatorPID = new double[] { 0.00005, 0, 0 }; // p is .08
-        public static double[] elevatorSGV = new double[] { 0, .03, 0.018, 0 }; // v is .0002
+        public static double[] elevatorPID = new double[] { 0.08, 0, 0 }; // p is .08
+        public static double[] elevatorSGV = new double[] { 0, 0, 0, 0 }; // v is .0002
         public static double maxVelocity = 100; // in mps
         public static double maxAccel = 40; // in mps/s
         public static double elevatorPIDTolerance;

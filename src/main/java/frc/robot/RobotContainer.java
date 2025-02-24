@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.Arm.ManualArm;
 import frc.robot.commands.Arm.ToAngle;
 import frc.robot.commands.Elevator.ElevateLevel;
+import frc.robot.commands.Elevator.ElevateManual;
 // import frc.robot.commands.Elevator.ElevateManual;
 import frc.robot.commands.Elevator.ElevateTest;
 //import frc.robot.commands.Intake.IntakeIn;
@@ -101,15 +102,17 @@ public class RobotContainer {
         /* OPERATOR CONTROLS */
         // joysticks
         arm.setDefaultCommand(new ManualArm(() -> operator.getLeftY(), arm));
-        // elevator.setDefaultCommand(new ElevateManual(() -> operator.getRightY(), elevator));
-        //operator.leftTrigger().whileTrue(new WristMove(() -> operator.getLeftTriggerAxis(), wrist));
-        //operator.rightTrigger().whileTrue(new WristMove(() -> -operator.getRightTriggerAxis(), wrist));
+        elevator.setDefaultCommand(new ElevateManual(() -> operator.getRightY(), elevator));
+        // operator.leftTrigger().whileTrue(new WristMove(() ->
+        // operator.getLeftTriggerAxis(), wrist));
+        // operator.rightTrigger().whileTrue(new WristMove(() ->
+        // -operator.getRightTriggerAxis(), wrist));
 
         // buttons
-       // operator.x().whileTrue(new IntakeIn(intake));
-        //operator.b().whileTrue(new IntakeOut(intake));
-        operator.y().onTrue(new ElevateLevel(elevator, () -> 7));
-        operator.a().onTrue(new ElevateLevel(elevator, () -> 5));
+        // operator.x().whileTrue(new IntakeIn(intake));
+        // operator.b().whileTrue(new IntakeOut(intake));
+        operator.y().whileTrue(new ElevateLevel(elevator, () -> 7));
+        operator.a().whileTrue(new ElevateLevel(elevator, () -> 5));
         // operator.x().onTrue(new SequentialCommandGroup(new ToAngle()
         // Units.degreesToRadians(40),
         // ));
