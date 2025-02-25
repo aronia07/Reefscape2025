@@ -49,6 +49,8 @@ public class ElevateLevel extends Command {
         elevator_y.setMode(ElevateMode.UP);
         } else if (level == 7) {
         elevator_y.setMode(ElevateMode.TEST);
+        } else if (level == 8) {
+            elevator_y.setMode(ElevateMode.MANUAL);
         }
 
         initialState = elevator_y.getCurrentState();

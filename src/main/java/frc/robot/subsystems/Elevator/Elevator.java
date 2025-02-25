@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.ElevatorConstants.ElevateMode;
+import frc.robot.commands.Elevator.ElevateLevel;
 
 public class Elevator extends SubsystemBase {
 
@@ -41,6 +42,7 @@ public class Elevator extends SubsystemBase {
   private double nextNextVelocity = 0.0;
   public double elevatorSetpoint = 0.05;
   private double positionRateOfChange = 0;
+  private double changingSetpoint = 0;
 
   // private double leftPower = 0;
   // private double rightPower = 0;
@@ -56,6 +58,7 @@ public class Elevator extends SubsystemBase {
   private LoggedTunableNumber elevatorG = new LoggedTunableNumber("elevatorG", ElevatorConstants.elevatorSGV[1]);
   private LoggedTunableNumber elevatorV = new LoggedTunableNumber("elevatorV", ElevatorConstants.elevatorSGV[2]);
   private LoggedTunableNumber elevatorA = new LoggedTunableNumber("elevatorA", ElevatorConstants.elevatorSGV[3]);
+  private LoggedTunableNumber elevatorLevel = new LoggedTunableNumber("elevator setpoint", elevatorSetpoint);
 
   public Elevator() {
     setupMotors();
@@ -216,6 +219,7 @@ public class Elevator extends SubsystemBase {
         elevatorSetpoint = ElevatorConstants.HPsetpoint;
         break;
       case MANUAL:
+        this.elevatorSetpoint = elevatorLevel.get();
         break;
       case TEST:
         elevatorSetpoint = ElevatorConstants.test;

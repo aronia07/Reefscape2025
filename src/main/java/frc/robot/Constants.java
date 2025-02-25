@@ -39,12 +39,17 @@ public final class Constants {
     public static final class WristConstants {
         public static int wristMotorID = 51;
         public static int absoluteEncoderPort = 3;
-        public static double[] wristPID = { 0, 0, 0 };
+        public static double[] wristPID = { 0.55, 0, 0 };
         public static int maxVelocity = 9;
-        public static int maxAccel;
+        public static int maxAccel = 0;
         public static double[] wristFF = { 0, 0, 0 };
         public static double wristGearRatio = 0;
-        public static Rotation2d wristOffset;
+        public static Rotation2d wristOffset = new Rotation2d(Units.degreesToRadians(-59.7-18.8));
+        
+        
+        public static final Rotation2d wristMax = Rotation2d.fromDegrees(90); 
+        public static final Rotation2d wristMin = Rotation2d.fromDegrees(-65);
+        public static final Rotation2d tolernace = Rotation2d.fromDegrees(0.5); 
     }
 
     public static final class IntakeConstants {

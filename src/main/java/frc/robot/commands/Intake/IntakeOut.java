@@ -8,12 +8,12 @@ public class IntakeOut extends Command {
 
   public IntakeOut(Intake intake) {
     m_intake = intake;
-    addRequirements(intake);
+    // addRequirements(intake);
   }
 
   @Override
   public void initialize() {
-    m_intake.setSpeed(-0.5);
+    m_intake.setSpeed(-0.15);
   }
 
   @Override

@@ -23,7 +23,7 @@ public class Intake extends SubsystemBase {
     private static SparkMaxConfig intakeConfig = new SparkMaxConfig();
     private static SparkMaxConfig deflectorConfig = new SparkMaxConfig();
 
-    private static DigitalInput beamBreak = new DigitalInput(0);
+    // private static DigitalInput beamBreak = new DigitalInput(0);
    // private static SparkClosedLoopController pid = intake.getClosedLoopController();
     private static LoggedTunableNumber kP = new LoggedTunableNumber("Intake P", IntakeConstants.intakePID[0]);
     private static LoggedTunableNumber kI = new LoggedTunableNumber("Intake I", IntakeConstants.intakePID[1]);
@@ -69,20 +69,25 @@ public class Intake extends SubsystemBase {
     public void pulse(Timer timer, double pulseWidth) {
         timer.reset();
 
-        if(beamBreak.get()){
-            while(timer.get() <= pulseWidth){
-                deflector.set(0.5);
-            }
-        }
+        // if(beamBreak.get()){
+        //     while(timer.get() <= pulseWidth){
+        //         deflector.set(0.5);
+        //     }
+        // }
     }
 
 
     public void setSpeed(double value) {
         intake.set(value);
     }
-
+    public void setActualSpeed(double value) {
+        deflector.set(value);
+    }
     public void stop () {
         intake.set(0);
+    }
+    public void stopIntake () {
+        deflector.set(0);
     }
 
     @Override
