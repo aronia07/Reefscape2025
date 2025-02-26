@@ -13,11 +13,11 @@ public class ActualIntake extends Command {
 
   @Override
   public void initialize() {
-    m_intake.setActualSpeed(-0.15);
+    //m_intake.setActualSpeed(-0.15);
   }
 
   @Override
   public void end(boolean interrupted) {
-    m_intake.stopIntake();
+    //m_intake.stopIntake();
   }
 }

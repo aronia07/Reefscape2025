@@ -115,8 +115,11 @@ public class RobotContainer {
         // -operator.getRightTriggerAxis(), wrist));
 
         // buttons
-        operator.x().whileTrue(new IntakeIn(intake));
+        operator.rightBumper().whileTrue(new IntakeIn(intake));
+        operator.leftBumper().whileTrue(new IntakeOut(intake));
+
         operator.b().whileTrue(new ActualIntake(intake));
+        
         operator.y().whileTrue(new ElevateLevel(elevator, () -> 7));
         operator.a().whileTrue(new ElevateLevel(elevator, () -> 8));
 

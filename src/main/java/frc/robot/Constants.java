@@ -53,9 +53,8 @@ public final class Constants {
     }
 
     public static final class IntakeConstants {
-        public static int intakeID = 61;
-        public static int deflectorID = 62;
-        public static int[] intakePID = { 0, 0, 0 };
+        public static int leaderID = 61;  //was the intake
+        public static int followerID = 62; //was the deflector
     }
 
     public static final class ElevatorConstants {

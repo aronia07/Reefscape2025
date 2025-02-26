@@ -18,16 +18,14 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 public class Intake extends SubsystemBase {
-    private static SparkMax intake = new SparkMax(IntakeConstants.intakeID, MotorType.kBrushless); 
-    private static SparkMax deflector = new SparkMax(IntakeConstants.deflectorID, MotorType.kBrushless);
-    private static SparkMaxConfig intakeConfig = new SparkMaxConfig();
-    private static SparkMaxConfig deflectorConfig = new SparkMaxConfig();
+    private static SparkMax leader = new SparkMax(IntakeConstants.leaderID, MotorType.kBrushless); 
+    private static SparkMax follower = new SparkMax(IntakeConstants.followerID, MotorType.kBrushless);
+    
+    private static SparkMaxConfig leaderConfig = new SparkMaxConfig();
+    private static SparkMaxConfig followerConfig = new SparkMaxConfig();
 
     // private static DigitalInput beamBreak = new DigitalInput(0);
    // private static SparkClosedLoopController pid = intake.getClosedLoopController();
-    private static LoggedTunableNumber kP = new LoggedTunableNumber("Intake P", IntakeConstants.intakePID[0]);
-    private static LoggedTunableNumber kI = new LoggedTunableNumber("Intake I", IntakeConstants.intakePID[1]);
-    private static LoggedTunableNumber kD = new LoggedTunableNumber("Intake D", IntakeConstants.intakePID[2]);
 
     private static Timer pulseTimer = new Timer();
 
@@ -37,7 +35,7 @@ public class Intake extends SubsystemBase {
         setupMotors();
         pulseTimer.reset();
 
-        // intakeConfig.closedLoop
+        // leaderConfig.closedLoop
         //     .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
         //     .pid(kP.get(), kI.get(), kD.get());
         // pid.setReference(0, ControlType.kVelocity);   
@@ -45,15 +43,15 @@ public class Intake extends SubsystemBase {
 
     public void setupMotors() {
         /* Applying Configs */
-        intakeConfig.inverted(false)
+        leaderConfig.inverted(false)
             .idleMode(IdleMode.kCoast)
             .smartCurrentLimit(20, 20);
-        deflectorConfig.inverted(false)
+        followerConfig.inverted(true)
             .idleMode(IdleMode.kBrake)
             .smartCurrentLimit(50, 50);
         
-        intake.configure(intakeConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        deflector.configure(deflectorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        leader.configure(leaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        follower.configure(followerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
     
     // /* Function for updating pid values from dashboard */
@@ -62,7 +60,7 @@ public class Intake extends SubsystemBase {
     //     if (!Constants.enableTunableValues)
     //         return;
     //     if(kP.hasChanged() || kI.hasChanged() || kD.hasChanged()){
-    //         intakeConfig.closedLoop.pid(kP.get(), kI.get(), kD.get());
+    //         leaderConfig.closedLoop.pid(kP.get(), kI.get(), kD.get());
     //     }
     // }
 
@@ -78,17 +76,22 @@ public class Intake extends SubsystemBase {
 
 
     public void setSpeed(double value) {
-        intake.set(value);
+        leader.set(value);
+        follower.set(value);
     }
-    public void setActualSpeed(double value) {
-        deflector.set(value);
-    }
+
+    // public void setActualSpeed(double value) {
+    //     deflector.set(value);
+    // }
+
     public void stop () {
-        intake.set(0);
+        leader.set(0);
+        follower.set(0);
     }
-    public void stopIntake () {
-        deflector.set(0);
-    }
+
+    // public void stopIntake () {
+    //     deflector.set(0);
+    // }
 
     @Override
     public void periodic() {
