@@ -16,6 +16,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -26,6 +27,7 @@ import frc.robot.commands.Elevator.ElevateManual;
 import frc.robot.commands.Elevator.ElevateTest;
 import frc.robot.commands.Intake.ActualIntake;
 import frc.robot.commands.Intake.IntakeIn;
+import frc.robot.commands.Wrist.ToWristAngle;
 import frc.robot.commands.Wrist.WristMove;
 import frc.robot.commands.Intake.IntakeOut;
 import frc.robot.commands.Wrist.WristMove;
@@ -108,21 +110,20 @@ public class RobotContainer {
         //elevator.setDefaultCommand(new ElevateManual(() -> operator.getRightY(), elevator));
         wrist.setDefaultCommand(new WristMove(() -> operator.getRightY(), wrist));
 
-        
-        // operator.leftTrigger().whileTrue(new WristMove(() ->
-        // operator.getLeftTriggerAxis(), wrist));
-        // operator.rightTrigger().whileTrue(new WristMove(() ->
-        // -operator.getRightTriggerAxis(), wrist));
 
         // buttons
         operator.rightBumper().whileTrue(new IntakeIn(intake));
         operator.leftBumper().whileTrue(new IntakeOut(intake));
 
-        operator.b().whileTrue(new ActualIntake(intake));
+        operator.b().whileTrue(new ToAngle(() -> Units.degreesToRadians(71.4), arm));
         
-        operator.y().whileTrue(new ElevateLevel(elevator, () -> 7));
-        operator.a().whileTrue(new ElevateLevel(elevator, () -> 8));
+        operator.y().toggleOnTrue(new ElevateLevel(elevator, () -> 7));
 
+        operator.rightTrigger().whileTrue(new ParallelCommandGroup(
+            new ToAngle(() -> Units.degreesToRadians(71.4), arm),
+            new ElevateLevel(elevator, () -> 3),
+            new ToWristAngle(() -> Units.degreesToRadians(8.5), wrist)
+        ));
         // operator.x().onTrue(new SequentialCommandGroup(new ToAngle()
         // Units.degreesToRadians(40),
         // ));

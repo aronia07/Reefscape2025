@@ -44,11 +44,11 @@ public class Intake extends SubsystemBase {
     public void setupMotors() {
         /* Applying Configs */
         leaderConfig.inverted(false)
-            .idleMode(IdleMode.kCoast)
+            .idleMode(IdleMode.kBrake)
             .smartCurrentLimit(20, 20);
         followerConfig.inverted(true)
             .idleMode(IdleMode.kBrake)
-            .smartCurrentLimit(50, 50);
+            .smartCurrentLimit(80, 80);
         
         leader.configure(leaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         follower.configure(followerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
@@ -76,7 +76,7 @@ public class Intake extends SubsystemBase {
 
 
     public void setSpeed(double value) {
-        leader.set(value);
+        // leader.set(value);
         follower.set(value);
     }
 

@@ -45,7 +45,8 @@ public final class Constants {
         public static double[] wristFF = { 0, 0, 0 };
         public static double wristGearRatio = 0;
         public static Rotation2d wristOffset = new Rotation2d(Units.degreesToRadians(-59.7-18.8));
-        
+        public static final Rotation2d maxVelocityPerSecond = Rotation2d.fromDegrees(30); // was 500
+        public static final Rotation2d maxAcceleration = Rotation2d.fromDegrees(48);
         
         public static final Rotation2d wristMax = Rotation2d.fromDegrees(90); 
         public static final Rotation2d wristMin = Rotation2d.fromDegrees(-65);
@@ -59,18 +60,18 @@ public final class Constants {
 
     public static final class ElevatorConstants {
         public static double min = .5;
-        public static double max = 17.5;
+        public static double max = 18;
         public static double homingCurrentThreshold = 10;
         public static double selfHomeSpeedVoltage;
         public static int desiredMin;
         public static int desiredMax;
         public static int leftElevatorMotorID = 41;
         public static int rightElevatorMotorID = 42;
-        public static double[] elevatorPID = new double[] { 0.08, 0, 0 }; // p is .08
-        public static double[] elevatorSGV = new double[] { 0, 0, 0, 0 }; // v is .0002
+        public static double[] elevatorPID = new double[] { 0.085, 0, 0 }; // p is a little aggressive
+        public static double[] elevatorSGV = new double[] { 0, 0.015, 0.0009, 0 }; // g needs testing
         public static double maxVelocity = 100; // in mps
         public static double maxAccel = 40; // in mps/s
-        public static double elevatorPIDTolerance;
+        public static double elevatorTolerance;
 
         public static enum ElevateMode {
             UP,
@@ -88,10 +89,10 @@ public final class Constants {
 
         public static double LevelOneSetpoint;
         public static double LevelTwoSetpoint;
-        public static double LevelThreeSetpoint;
+        public static double LevelThreeSetpoint = 5.8;
         public static double LevelFourSetpoint;
         public static double HPsetpoint;
-        public static double test = 5;
+        public static double test = 12;
 
     }
 
@@ -108,8 +109,8 @@ public final class Constants {
         public static final Rotation2d tolernace = Rotation2d.fromDegrees(1); // How much the arm's exact angle can be
                                                                               // off by
 
-        public static final Rotation2d maxVelocityPerSecond = Rotation2d.fromDegrees(1); // was 500
-        public static final Rotation2d maxAcceleration = Rotation2d.fromDegrees(1); // was 250
+        public static final Rotation2d maxVelocityPerSecond = Rotation2d.fromDegrees(360); // was 500
+        public static final Rotation2d maxAcceleration = Rotation2d.fromDegrees(360); // was 250
 
         public static double[] armSGV = new double[] { 0.0, 0.0, 0.0 }; // Static, Gravity, and Velocity gains
         public static double[] armPID = new double[] { 1.5, 0, 0f }; // Arm PID values

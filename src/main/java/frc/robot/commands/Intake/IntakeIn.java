@@ -13,7 +13,7 @@ public class IntakeIn extends Command {
 
   @Override
   public void initialize() {
-    m_intake.setSpeed(0.15);
+    m_intake.setSpeed(0.4);
   }
 
   @Override
