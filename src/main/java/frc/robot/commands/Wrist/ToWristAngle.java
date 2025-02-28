@@ -26,8 +26,8 @@ public class ToWristAngle extends Command {
   //Trapezoid Motion Profiler
   private TrapezoidProfile m_profiler = new TrapezoidProfile(
       new TrapezoidProfile.Constraints(
-          Constants.ArmConstants.maxVelocityPerSecond.getRadians(),
-          Constants.ArmConstants.maxAcceleration.getRadians()));
+          Constants.WristConstants.maxVelocityPerSecond.getRadians(),
+          Constants.WristConstants.maxAcceleration.getRadians()));
 
   public ToWristAngle(DoubleSupplier targetAngle, Wrist wrist) {
     this.m_angleSupplier = targetAngle; 
@@ -61,13 +61,14 @@ public class ToWristAngle extends Command {
   @Override
   //Returns true if the profiler has reached its goal
   public boolean isFinished() {
-    // return m_profiler.isFinished(m_timer.get()) && m_arm.atSetpoint();
+    // return m_profiler.isFinished(m_timer.get()) && wrist_y.atSetpoint();
     return m_profiler.isFinished(m_timer.get());
   }
 
   @Override
   public void end(boolean interrupted) {
     m_timer.stop(); //Stops timer
+    wrist_y.setGoal(Rotation2d.fromRadians(Units.degreesToRadians(70)));
   }
 
 }

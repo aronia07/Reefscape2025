@@ -235,7 +235,7 @@ public class Elevator extends SubsystemBase {
         elevatorSetpoint = ElevatorConstants.test;
         break;
       case OFF:
-        elevatorSetpoint = 1;
+        elevatorSetpoint = 1.5;
         break;
       case HOMING:
         if (leftElevatorMotor.getOutputCurrent() >= ElevatorConstants.homingCurrentThreshold) {

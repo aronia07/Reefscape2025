@@ -72,6 +72,9 @@ public class RobotContainer {
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
+    // public void idle() {
+    //     getIdleCommands().schedule();
+    // }
     private void configureBindings() {
         // Nperte that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
@@ -94,19 +97,23 @@ public class RobotContainer {
         // CHANGED: changed from back/start+x/y to pov buttons
         // Note that each routine should be run exactly once in a single log.
         // d-pad
-        driver.povUp().whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-        driver.povDown().whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-        driver.povLeft().whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-        driver.povRight().whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+        // driver.povUp().whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+        // driver.povDown().whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+        // driver.povLeft().whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+        // driver.povRight().whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
         // reset the field-centric heading on left bumper press
-        driver.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
-
+        driver.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+        driver.rightBumper().whileTrue(new ParallelCommandGroup(
+            new ToWristAngle(() -> Units.degreesToRadians(88), wrist),
+            new ToAngle(() -> Units.degreesToRadians(66), arm),
+            new IntakeIn(intake)
+        ));
         // drivetrain.registerTelemetry(logger::telemeterize);
 
         /* OPERATOR CONTROLS */
         // joysticks
-        arm.setDefaultCommand(new ManualArm(() -> operator.getLeftY(), arm));
+        arm.setDefaultCommand(new ManualArm(() -> -operator.getLeftY(), arm));
         //elevator.setDefaultCommand(new ElevateManual(() -> operator.getRightY(), elevator));
         wrist.setDefaultCommand(new WristMove(() -> operator.getRightY(), wrist));
 
@@ -115,11 +122,19 @@ public class RobotContainer {
         operator.rightBumper().whileTrue(new IntakeIn(intake));
         operator.leftBumper().whileTrue(new IntakeOut(intake));
 
-        operator.b().whileTrue(new ToAngle(() -> Units.degreesToRadians(71.4), arm));
+        // operator.b().whileTrue(new ToAngle(() -> Units.degreesToRadians(71.4), arm));
         
         operator.y().toggleOnTrue(new ElevateLevel(elevator, () -> 7));
+        operator.a().toggleOnTrue(new ElevateLevel(elevator, () -> 3));
 
-        operator.rightTrigger().whileTrue(new ParallelCommandGroup(
+        operator.b().whileTrue(new SequentialCommandGroup(
+            new ToWristAngle(() -> Units.degreesToRadians(-35), wrist),
+            new ParallelCommandGroup(
+                new ToAngle(() -> Units.degreesToRadians(90), arm),
+                new ElevateLevel(elevator, () -> 3))
+        ));
+
+        operator.b().and(operator.rightTrigger()).whileTrue(new ParallelCommandGroup(
             new ToAngle(() -> Units.degreesToRadians(71.4), arm),
             new ElevateLevel(elevator, () -> 3),
             new ToWristAngle(() -> Units.degreesToRadians(8.5), wrist)
@@ -137,8 +152,17 @@ public class RobotContainer {
     }
 
     public void getIdleCommands() {
-        // new ToAngle(() -> 0, arm);
+    //    return new SequentialCommandGroup(
+    //         new ToWristAngle(() -> Units.degreesToRadians(70), wrist),
+    //         // new ElevateLevel(elevator, () -> 5),
+    //         new ToAngle(() -> Units.degreesToRadians(60), arm)
+        // );
+
+        //arm 60
+        //elevator 0
+        // wrist 70
     }
+
 
     public Command getAutonomousCommand() {
         return Commands.print("No autonomous command configured");

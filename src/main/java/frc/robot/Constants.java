@@ -39,14 +39,14 @@ public final class Constants {
     public static final class WristConstants {
         public static int wristMotorID = 51;
         public static int absoluteEncoderPort = 3;
-        public static double[] wristPID = { 0.55, 0, 0 };
+        public static double[] wristPID = { 0.625, 0, 0 };
         public static int maxVelocity = 9;
         public static int maxAccel = 0;
         public static double[] wristFF = { 0, 0, 0 };
         public static double wristGearRatio = 0;
         public static Rotation2d wristOffset = new Rotation2d(Units.degreesToRadians(-59.7-18.8));
-        public static final Rotation2d maxVelocityPerSecond = Rotation2d.fromDegrees(30); // was 500
-        public static final Rotation2d maxAcceleration = Rotation2d.fromDegrees(48);
+        public static final Rotation2d maxVelocityPerSecond = Rotation2d.fromDegrees(460); // was 500
+        public static final Rotation2d maxAcceleration = Rotation2d.fromDegrees(460);
         
         public static final Rotation2d wristMax = Rotation2d.fromDegrees(90); 
         public static final Rotation2d wristMin = Rotation2d.fromDegrees(-65);
@@ -109,11 +109,11 @@ public final class Constants {
         public static final Rotation2d tolernace = Rotation2d.fromDegrees(1); // How much the arm's exact angle can be
                                                                               // off by
 
-        public static final Rotation2d maxVelocityPerSecond = Rotation2d.fromDegrees(360); // was 500
-        public static final Rotation2d maxAcceleration = Rotation2d.fromDegrees(360); // was 250
+        public static final Rotation2d maxVelocityPerSecond = Rotation2d.fromDegrees(400); // was 500
+        public static final Rotation2d maxAcceleration = Rotation2d.fromDegrees(400); // was 250
 
-        public static double[] armSGV = new double[] { 0.0, 0.0, 0.0 }; // Static, Gravity, and Velocity gains
-        public static double[] armPID = new double[] { 1.5, 0, 0f }; // Arm PID values
+        public static double[] armSGV = new double[] { 0.0, 0.001, 0.0 }; // Static, Gravity, and Velocity gains
+        public static double[] armPID = new double[] { 1.47, 0, 0f }; // Arm PID values
 
         // Arm's polynomial regression (useed to predict distances from speaker)
         // public static final PolynomialRegression

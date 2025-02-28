@@ -101,10 +101,7 @@
             }
           ]
         }
-      ],
-      "window": {
-        "visible": false
-      }
+      ]
     },
     "Plot <1>": {
       "plots": [
@@ -202,7 +199,7 @@
             0.0,
             0.8500000238418579
           ],
-          "height": 232,
+          "height": 547,
           "series": [
             {
               "color": [
