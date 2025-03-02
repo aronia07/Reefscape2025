@@ -34,7 +34,10 @@
       "/SmartDashboard/Module 0": "Mechanism2d",
       "/SmartDashboard/Module 1": "Mechanism2d",
       "/SmartDashboard/Module 2": "Mechanism2d",
-      "/SmartDashboard/Module 3": "Mechanism2d"
+      "/SmartDashboard/Module 3": "Mechanism2d",
+      "/SmartDashboard/Wrist Down": "Command",
+      "/SmartDashboard/Wrist Neuteral": "Command",
+      "/SmartDashboard/Wrist Up": "Command"
     },
     "windows": {
       "/SmartDashboard/Arm down": {
@@ -79,7 +82,7 @@
             0.0,
             0.8500000238418579
           ],
-          "height": 319,
+          "height": 455,
           "series": [
             {
               "color": [
@@ -112,7 +115,7 @@
             0.0,
             0.8500000238418579
           ],
-          "height": 340,
+          "height": 462,
           "series": [
             {
               "color": [
@@ -152,7 +155,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     },
     "Plot <2>": {
       "plots": [
@@ -163,7 +169,7 @@
             0.0,
             0.8500000238418579
           ],
-          "height": 358,
+          "height": 332,
           "series": [
             {
               "color": [
@@ -199,7 +205,7 @@
             0.0,
             0.8500000238418579
           ],
-          "height": 547,
+          "height": 448,
           "series": [
             {
               "color": [

@@ -89,10 +89,10 @@ public final class Constants {
 
         public static double LevelOneSetpoint;
         public static double LevelTwoSetpoint;
-        public static double LevelThreeSetpoint = 5.8;
-        public static double LevelFourSetpoint;
+        public static double LevelThreeSetpoint = 5.3;
+        public static double LevelFourSetpoint = 19;
         public static double HPsetpoint;
-        public static double test = 12;
+        public static double test = 16;
 
     }
 

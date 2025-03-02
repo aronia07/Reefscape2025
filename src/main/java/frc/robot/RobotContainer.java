@@ -72,9 +72,10 @@ public class RobotContainer {
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
-    // public void idle() {
-    //     getIdleCommands().schedule();
-    // }
+    public void idle() {
+        getIdleCommands().schedule();
+    }
+
     private void configureBindings() {
         // Nperte that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
@@ -106,7 +107,7 @@ public class RobotContainer {
         driver.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
         driver.rightBumper().whileTrue(new ParallelCommandGroup(
             new ToWristAngle(() -> Units.degreesToRadians(88), wrist),
-            new ToAngle(() -> Units.degreesToRadians(66), arm),
+            new ToAngle(() -> Units.degreesToRadians(62), arm),
             new IntakeIn(intake)
         ));
         // drivetrain.registerTelemetry(logger::telemeterize);
@@ -124,21 +125,27 @@ public class RobotContainer {
 
         // operator.b().whileTrue(new ToAngle(() -> Units.degreesToRadians(71.4), arm));
         
-        operator.y().toggleOnTrue(new ElevateLevel(elevator, () -> 7));
-        operator.a().toggleOnTrue(new ElevateLevel(elevator, () -> 3));
-
-        operator.b().whileTrue(new SequentialCommandGroup(
+        operator.y().whileTrue(new SequentialCommandGroup(
             new ToWristAngle(() -> Units.degreesToRadians(-35), wrist),
             new ParallelCommandGroup(
-                new ToAngle(() -> Units.degreesToRadians(90), arm),
+                new ToAngle(() -> Units.degreesToRadians(85), arm),
+                new ElevateLevel(elevator, () -> 4))
+        ).finallyDo(this::idle));
+        // operator.a().toggleOnTrue(new ElevateLevel(elevator, () -> 3));
+
+        operator.b().whileTrue(new SequentialCommandGroup(
+            new ToWristAngle(() -> Units.degreesToRadians(-21), wrist),
+            new ParallelCommandGroup(
+                new ToAngle(() -> Units.degreesToRadians(80), arm),
                 new ElevateLevel(elevator, () -> 3))
-        ));
+        ).finallyDo(this::idle));
 
         operator.b().and(operator.rightTrigger()).whileTrue(new ParallelCommandGroup(
             new ToAngle(() -> Units.degreesToRadians(71.4), arm),
             new ElevateLevel(elevator, () -> 3),
             new ToWristAngle(() -> Units.degreesToRadians(8.5), wrist)
-        ));
+        ).finallyDo(this::idle));
+
         // operator.x().onTrue(new SequentialCommandGroup(new ToAngle()
         // Units.degreesToRadians(40),
         // ));
@@ -151,12 +158,12 @@ public class RobotContainer {
 
     }
 
-    public void getIdleCommands() {
-    //    return new SequentialCommandGroup(
-    //         new ToWristAngle(() -> Units.degreesToRadians(70), wrist),
-    //         // new ElevateLevel(elevator, () -> 5),
-    //         new ToAngle(() -> Units.degreesToRadians(60), arm)
-        // );
+    public Command getIdleCommands() {
+       return new SequentialCommandGroup(
+            new ToWristAngle(() -> Units.degreesToRadians(70), wrist),
+            // new ElevateLevel(elevator, () -> 5),
+            new ToAngle(() -> Units.degreesToRadians(60), arm)
+        );
 
         //arm 60
         //elevator 0
@@ -173,6 +180,11 @@ public class RobotContainer {
         SmartDashboard.putData("Elevator test", new ElevateTest(elevator));
         SmartDashboard.putData("Elevate", new ElevateLevel(elevator, () -> 7));
         SmartDashboard.putData("Go down", new ElevateLevel(elevator, () -> 5));
+
+
+        SmartDashboard.putData("Wrist Up", new ToWristAngle(() -> 70, wrist));
+        SmartDashboard.putData("Wrist Down", new ToWristAngle(() -> -35, wrist));
+        SmartDashboard.putData("Wrist Neuteral", new ToWristAngle(() -> 0, wrist));
 
         // SmartDashboard.putData("Arm up", new ToAngle(() ->
         // Units.degreesToRadians(90), arm));

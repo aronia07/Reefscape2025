@@ -12,8 +12,8 @@ public class IntakeOut extends Command {
   }
 
   @Override
-  public void initialize() {
-    m_intake.setSpeed(-0.4);
+  public void execute() {
+    m_intake.outTake(-0.4);
   }
 
   @Override

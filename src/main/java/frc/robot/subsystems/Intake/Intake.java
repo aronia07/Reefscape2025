@@ -2,6 +2,7 @@ package frc.robot.subsystems.Intake;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.LoggedTunableNumber;
 import frc.robot.Constants;
@@ -24,7 +25,7 @@ public class Intake extends SubsystemBase {
     private static SparkMaxConfig leaderConfig = new SparkMaxConfig();
     private static SparkMaxConfig followerConfig = new SparkMaxConfig();
 
-    // private static DigitalInput beamBreak = new DigitalInput(0);
+    private static DigitalInput beamBreak = new DigitalInput(1);
    // private static SparkClosedLoopController pid = intake.getClosedLoopController();
 
     private static Timer pulseTimer = new Timer();
@@ -53,16 +54,6 @@ public class Intake extends SubsystemBase {
         leader.configure(leaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         follower.configure(followerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
-    
-    // /* Function for updating pid values from dashboard */
-    // // .
-    // public static void checkTunableValues() {
-    //     if (!Constants.enableTunableValues)
-    //         return;
-    //     if(kP.hasChanged() || kI.hasChanged() || kD.hasChanged()){
-    //         leaderConfig.closedLoop.pid(kP.get(), kI.get(), kD.get());
-    //     }
-    // }
 
     public void pulse(Timer timer, double pulseWidth) {
         timer.reset();
@@ -74,27 +65,29 @@ public class Intake extends SubsystemBase {
         // }
     }
 
-
-    public void setSpeed(double value) {
-        // leader.set(value);
-        follower.set(value);
+    public void hpIntake(double value) {
+        if(beamBreak.get()){
+            follower.set(value);
+        } else {
+           // leader.set(value);
+            follower.set(0);
+        }
+        
     }
 
-    // public void setActualSpeed(double value) {
-    //     deflector.set(value);
-    // }
+    //Outtakes through the black wheels
+    public void outTake(double value) {
+        follower.set(value);
+        
+    }
 
     public void stop () {
         leader.set(0);
         follower.set(0);
     }
 
-    // public void stopIntake () {
-    //     deflector.set(0);
-    // }
-
     @Override
     public void periodic() {
-
+        SmartDashboard.putBoolean("BeAMY", beamBreak.get());
     }
 }

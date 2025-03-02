@@ -3,17 +3,17 @@ package frc.robot.commands.Intake;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Intake.Intake;
 
-public class IntakeIn extends Command {
+public class IntakeOut2 extends Command {
     protected final Intake m_intake;
 
-  public IntakeIn(Intake intake) {
+  public IntakeOut2(Intake intake) {
     m_intake = intake;
     // addRequirements(intake);
   }
 
   @Override
   public void execute() {
-    m_intake.hpIntake(0.4);
+    m_intake.outTake(0.4);
   }
 
   @Override
