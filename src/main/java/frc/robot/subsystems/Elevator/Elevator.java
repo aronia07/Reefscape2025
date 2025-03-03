@@ -1,7 +1,6 @@
 package frc.robot.subsystems.Elevator;
 
 import com.revrobotics.RelativeEncoder;
-import com.revrobotics.servohub.ServoHub.ResetMode;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -9,7 +8,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -18,7 +17,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.ElevatorConstants.ElevateMode;
-import frc.robot.commands.Elevator.ElevateLevel;
 
 public class Elevator extends SubsystemBase {
 
@@ -28,8 +26,10 @@ public class Elevator extends SubsystemBase {
   private SparkMaxConfig leftConfig = new SparkMaxConfig();
   private SparkMaxConfig rightConfig = new SparkMaxConfig();
 
-  private PIDController pid = new PIDController(ElevatorConstants.elevatorPID[0], ElevatorConstants.elevatorPID[1],
-      ElevatorConstants.elevatorPID[2]);
+  // private PIDController pid = new PIDController(ElevatorConstants.elevatorPID[0], ElevatorConstants.elevatorPID[1],
+  //     ElevatorConstants.elevatorPID[2]);
+  private ProfiledPIDController pid = new ProfiledPIDController(ElevatorConstants.elevatorPID[0], ElevatorConstants.elevatorPID[1],
+      ElevatorConstants.elevatorPID[2], new TrapezoidProfile.Constraints(ElevatorConstants.maxVelocity, ElevatorConstants.maxAccel));
   private ElevatorFeedforward ffElevate = new ElevatorFeedforward(ElevatorConstants.elevatorSGV[0],
       ElevatorConstants.elevatorSGV[1], ElevatorConstants.elevatorSGV[2], ElevatorConstants.elevatorSGV[3]);
 

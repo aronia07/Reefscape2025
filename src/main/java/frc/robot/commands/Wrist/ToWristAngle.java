@@ -2,7 +2,6 @@ package frc.robot.commands.Wrist;
 
 import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
@@ -10,7 +9,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
-import frc.robot.subsystems.Arm.Arm;
 import frc.robot.subsystems.Wrist.Wrist;
 
 public class ToWristAngle extends Command {
@@ -31,7 +29,7 @@ public class ToWristAngle extends Command {
 
   public ToWristAngle(DoubleSupplier targetAngle, Wrist wrist) {
     this.m_angleSupplier = targetAngle; 
-    this.wrist_y = wrist;//Arm subsystem
+    this.wrist_y = wrist;//wrist subsystem
     ///Add a dependency to prevent it from running simulataneously wth other arm commands
   }
 

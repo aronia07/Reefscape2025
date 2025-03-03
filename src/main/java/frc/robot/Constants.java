@@ -10,8 +10,10 @@ import org.opencv.core.Point;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
@@ -23,8 +25,11 @@ public final class Constants {
 
     public static final class VisionConstants {
         /* camera stuff */
-        public static Transform3d kRobotToCam = null;
+        public static Transform3d kRobotToCam = new Transform3d(
+            new Translation3d(-Units.inchesToMeters(11.41), 0, Units.inchesToMeters(6.6)), 
+            new Rotation3d(0, Units.degreesToRadians(67), 0)); //TODO: edit yaw
         public static String cameraName = "orangepi";
+        public static String camera2Name = "USB_Camera(1)";
         /* standard deviations for vision calculations */
         public static Vector<N3> kSingleTagStdDevs = VecBuilder.fill(2, 2, 4);
         public static Vector<N3> kMultiTagStdDevs = VecBuilder.fill(1, 1, 1);
@@ -36,6 +41,13 @@ public final class Constants {
 
     }
 
+    public static final class AutoConstants {
+        public static double kMaxSpeedMetersPerSecond;
+        public static double kMaxAccelerationMetersPerSecondSquared;
+        public static double kMaxAngularSpeedRadiansPerSecond;
+        public static double kMaxAngularSpeedRadiansPerSecondSquared;
+    }
+
     public static final class WristConstants {
         public static int wristMotorID = 51;
         public static int absoluteEncoderPort = 3;
@@ -44,7 +56,7 @@ public final class Constants {
         public static int maxAccel = 0;
         public static double[] wristFF = { 0, 0, 0 };
         public static double wristGearRatio = 0;
-        public static Rotation2d wristOffset = new Rotation2d(Units.degreesToRadians(-59.7-18.8));
+        public static Rotation2d wristOffset = new Rotation2d(Units.degreesToRadians(92.164372)); //-59.7-18.8
         public static final Rotation2d maxVelocityPerSecond = Rotation2d.fromDegrees(460); // was 500
         public static final Rotation2d maxAcceleration = Rotation2d.fromDegrees(460);
         

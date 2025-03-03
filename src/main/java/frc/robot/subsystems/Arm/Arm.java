@@ -5,15 +5,9 @@ package frc.robot.subsystems.Arm;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.SparkBase;
-import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
-
-//import com.revrobotics.CANSparkBase.IdleMode;
-
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-//import frc.lib.util.
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.PIDController;
@@ -25,7 +19,6 @@ import frc.lib.util.CANSparkMaxUtil;
 import frc.lib.util.LoggedTunableNumber;
 import frc.lib.util.CANSparkMaxUtil.Usage;
 import frc.robot.Constants;
-import frc.robot.subsystems.Arm.Encoders.ArmEncoder;
 import frc.robot.subsystems.Arm.Encoders.ArmEncoderThroughbore;
 
 public class Arm extends SubsystemBase {

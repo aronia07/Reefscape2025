@@ -1,12 +1,10 @@
 package frc.robot.commands.Elevator;
 
-import java.lang.annotation.ElementType;
 import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.ElevatorConstants;
@@ -25,6 +23,7 @@ public class ElevateLevel extends Command {
         elevator_y = elevator;
         this.levelSupplier = doubleSupplier;
 
+        addRequirements(elevator_y);
     }
 
     @Override
@@ -84,16 +83,16 @@ public class ElevateLevel extends Command {
     @Override
     public void execute() {
         
-        var nextState = profiler_y.calculate(timer_y.get(),
-                initialState,
-                new TrapezoidProfile.State(elevator_y.getSetpoint(), 0));
+        // var nextState = profiler_y.calculate(timer_y.get(),
+        //         initialState,
+        //         new TrapezoidProfile.State(elevator_y.getSetpoint(), 0));
 
         // var nextNextState = profiler_y.calculate(timer_y.get() + 0.02,
         //         initialState,
         //         new TrapezoidProfile.State(elevator_y.getSetpoint(), 0));
 
         // elevator_y.runState(nextState, nextNextState);
-        elevator_y.runState(nextState);
+        // elevator_y.runState(nextState);
     }
 
     @Override

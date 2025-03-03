@@ -27,6 +27,7 @@ import frc.robot.Constants.VisionConstants;
 
 public class Vision extends SubsystemBase {
   private final PhotonCamera camera;
+  private final PhotonCamera camera2;
   private double lastEstTimestamp = 0;
   private final PhotonPoseEstimator photonPoseEstimator;
   public Optional<EstimatedRobotPose> latestVision = Optional.empty();
@@ -35,6 +36,7 @@ public class Vision extends SubsystemBase {
   public Vision() {
     kFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
     camera = new PhotonCamera(Constants.VisionConstants.cameraName);
+    camera2 = new PhotonCamera(Constants.VisionConstants.camera2Name);
     photonPoseEstimator = new PhotonPoseEstimator(kFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
         Constants.VisionConstants.kRobotToCam);
     photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
