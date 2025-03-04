@@ -1,6 +1,6 @@
 package frc.robot.subsystems.Lights;
 
-//import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 //LED Imports
@@ -55,13 +55,13 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
     // Note: Other default patterns could be used instead!
     running_AnimatedPattern = false;
     animatedPattern = null;
-    //setDefaultCommand(runPattern(LEDPattern.solid(Color.kBlack), false).withName("Off"));
+    setDefaultCommand(LED_Reset().withName("LED_Reset"));
+    // setDefaultCommand(runPattern(LEDPattern.solid(Color.kBlack), false).withName("Off"));
   }
 
   /**
    * Disable LED strip - Terminates all patterns and stops the LED strip.
    */
-
   public void LED_Disable() {
     runPattern(LEDPattern.solid(Color.kBlack), false);
     m_led.stop();
@@ -70,8 +70,8 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
   /**
    * Resetting LED strip - LES set to solid black.
    */
-  public void LED_Reset() {
-    runPattern(LEDPattern.solid(Color.kBlack), false);
+  public Command LED_Reset() {
+    return run(() -> runPattern(LEDPattern.solid(Color.kBlack), false));
   }
 
   /**
@@ -128,7 +128,7 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
   }
 
   /**
-   * A function that runs a pattern on the entire LED strip.
+   * A command that runs a pattern on the entire LED strip.
    * It also controls whether the pattern is animated or not
    * using the running_AnimatedPattern flag and animatedPattern.
    * 
@@ -148,7 +148,7 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
       pattern.applyTo(m_ledbuffer);
       m_led.setData(m_ledbuffer);
     }
-    //return run(() -> pattern.applyTo(m_ledbuffer));
+    // return run(() -> pattern.applyTo(m_ledbuffer));
   }
 }
 
