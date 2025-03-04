@@ -142,7 +142,7 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
     if (animated) {
       animatedPattern = pattern;
       running_AnimatedPattern = true;
-    } else if (!animated) {
+    } else {
       animatedPattern = null;
       running_AnimatedPattern = false;
       pattern.applyTo(m_ledbuffer);
