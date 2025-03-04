@@ -13,7 +13,7 @@ public class IntakeIn extends Command {
 
   @Override
   public void execute() {
-    m_intake.hpIntake(0.4);
+    m_intake.hpIntake(-0.4);
   }
 
   @Override

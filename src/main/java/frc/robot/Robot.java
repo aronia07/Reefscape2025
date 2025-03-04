@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -18,6 +19,11 @@ public class Robot extends TimedRobot {
   public Robot() {
     
     m_robotContainer = new RobotContainer();
+  }
+
+  @Override
+  public void robotInit() {
+     PortForwarder.add(5800, "photonvision.local", 5800);
   }
 
   @Override

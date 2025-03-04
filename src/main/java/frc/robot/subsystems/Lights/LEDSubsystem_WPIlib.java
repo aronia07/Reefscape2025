@@ -80,7 +80,9 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
    */
   public void LED_SolidColor(Color color) {
     running_AnimatedPattern = false;
-    runPattern(LEDPattern.solid(color), false);
+    LEDPattern pattern = LEDPattern.solid(Color.kRed);
+    pattern.applyTo(m_ledbuffer);
+    m_led.setData(m_ledbuffer);
   }
 
   /**

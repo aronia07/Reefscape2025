@@ -8,11 +8,14 @@ public class Modify extends Command {
   protected final Intake m_intake;
   private BooleanSupplier booleanSupplier;
   public static boolean modified;
-  private void modifyTrue() {
-      modified = true;
-  }
-  private void modifyFalse() {
-      modified = false;
+  // private void modifyTrue() {
+  //     modified = true;
+  // }
+  // private void modifyFalse() {
+  //     modified = false;
+  // }
+  private void modifyIT(boolean state) {
+    modified = state;
   }
   
   public Modify(Intake intake, BooleanSupplier booleanSupplier) {
@@ -23,11 +26,7 @@ public class Modify extends Command {
   @Override
   public void initialize() {
     boolean modificationState = booleanSupplier.getAsBoolean();
-    if (modificationState) {
-      modifyTrue();
-    } else {
-      modifyFalse();
-    }
+    modifyIT(modificationState);
   }
 
   @Override

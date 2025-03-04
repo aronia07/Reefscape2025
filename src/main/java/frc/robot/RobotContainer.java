@@ -15,6 +15,7 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -31,10 +32,12 @@ import frc.robot.commands.Wrist.WristMove;
 import frc.robot.commands.Intake.IntakeOut;
 import frc.robot.commands.Intake.IntakeOut2;
 import frc.robot.commands.Intake.Modify;
+import frc.robot.commands.Lights.WPIlib.SetSolidColor;
 import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Drive.TunerConstants;
 import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.Intake.Intake;
+import frc.robot.subsystems.Lights.LEDSubsystem_WPIlib;
 import frc.robot.subsystems.Wrist.Wrist;
 import frc.robot.subsystems.Arm.Arm;
 
@@ -44,6 +47,7 @@ public class RobotContainer {
     final Elevator elevator = new Elevator();
     final Intake intake = new Intake();
     final Wrist wrist = new Wrist();
+    final LEDSubsystem_WPIlib wpiLights = new LEDSubsystem_WPIlib();
     boolean isModified = Modify.modified;
     
     
@@ -112,7 +116,7 @@ public class RobotContainer {
         //HP Pickup
         driver.rightBumper().whileTrue(new ParallelCommandGroup(
             new ToWristAngle(() -> Units.degreesToRadians(88), wrist),
-            new ToAngle(() -> Units.degreesToRadians(62), arm),
+            new ToAngle(() -> Units.degreesToRadians(65), arm),
             new IntakeIn(intake)
         ));
         
@@ -121,7 +125,7 @@ public class RobotContainer {
         // joysticks
         arm.setDefaultCommand(new ManualArm(() -> -operator.getLeftY(), arm));
         //elevator.setDefaultCommand(new ElevateManual(() -> operator.getRightY(), elevator));
-        wrist.setDefaultCommand(new WristMove(() -> operator.getRightY(), wrist));
+        wrist.setDefaultCommand(new WristMove(() -> -operator.getRightY(), wrist));
 
 
         // buttons
@@ -133,7 +137,7 @@ public class RobotContainer {
         operator.rightBumper().whileTrue(new IntakeOut(intake));
         operator.leftBumper().whileTrue(new IntakeOut2(intake));
 
-        // operator.a().toggleOnTrue(new ElevateLevel(elevator, () -> 3));
+        operator.x().onTrue(new SetSolidColor(wpiLights, Color.kMagenta));
 
         //L4
         operator.y().whileTrue(new SequentialCommandGroup(
@@ -145,7 +149,7 @@ public class RobotContainer {
         
         //Modified L4
         operator.y().and(operator.rightTrigger()).whileTrue(new SequentialCommandGroup(
-            new ToWristAngle(() -> 10, wrist),
+            new ToWristAngle(() -> Units.degreesToRadians(10), wrist),
             new ParallelCommandGroup(
                 new ToAngle(() -> 75, arm),
                 new ElevateLevel(elevator, () -> 4))
@@ -153,7 +157,7 @@ public class RobotContainer {
 
         //L3
         operator.b().whileTrue(new SequentialCommandGroup(
-            new ToWristAngle(() -> Units.degreesToRadians(-21), wrist),
+            new ToWristAngle(() -> Units.degreesToRadians(-51), wrist),
             new ParallelCommandGroup(
                 new ToAngle(() -> Units.degreesToRadians(80), arm),
                 new ElevateLevel(elevator, () -> 3),
@@ -164,19 +168,19 @@ public class RobotContainer {
         operator.b().and(operator.rightTrigger()).whileTrue(new ParallelCommandGroup(
             new ToAngle(() -> Units.degreesToRadians(71.4), arm),
             new ElevateLevel(elevator, () -> 3),
-            new ToWristAngle(() -> Units.degreesToRadians(8.5), wrist),
+            new ToWristAngle(() -> Units.degreesToRadians(-19), wrist),
             new Modify(intake, () -> true)
         ).finallyDo(this::idle));
         
         //L2
         operator.a().whileTrue(new ParallelCommandGroup(
-            new ToAngle(() -> 70, arm),
-            new ToWristAngle(() -> -70, wrist)
+            new ToAngle(() -> Units.degreesToRadians(70), arm),
+            new ToWristAngle(() -> Units.degreesToRadians(-70), wrist)
         ).finallyDo(this::idle));
         
         //Modified L2
         operator.a().and(operator.rightTrigger()).whileTrue(new ParallelCommandGroup(
-            new ToAngle(() -> 45, arm)
+            new ToAngle(() -> Units.degreesToRadians(45), arm)
         ).finallyDo(this::idle));
 
         // d-pad
