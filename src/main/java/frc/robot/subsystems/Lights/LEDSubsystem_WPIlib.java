@@ -128,7 +128,7 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
   }
 
   /**
-   * A command that runs a pattern on the entire LED strip.
+   * A function that runs a pattern on the entire LED strip.
    * It also controls whether the pattern is animated or not
    * using the running_AnimatedPattern flag and animatedPattern.
    * 
