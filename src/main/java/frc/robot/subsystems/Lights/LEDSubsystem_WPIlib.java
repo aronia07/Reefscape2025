@@ -1,6 +1,6 @@
 package frc.robot.subsystems.Lights;
 
-import edu.wpi.first.wpilibj2.command.Command;
+//import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 //LED Imports
@@ -46,6 +46,7 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
     // m_right = m_ledbuffer.createView(kLength/2, kLength - 1).reversed(); //Right
     // side of the LED strip
     m_led.setLength(kLength);
+    m_led.setData(m_ledbuffer);
     m_led.start();
 
     // Set the default command to turn the strip off, otherwise the last colors
@@ -54,7 +55,7 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
     // Note: Other default patterns could be used instead!
     running_AnimatedPattern = false;
     animatedPattern = null;
-    setDefaultCommand(runPattern(LEDPattern.solid(Color.kBlack), false).withName("Off"));
+    //setDefaultCommand(runPattern(LEDPattern.solid(Color.kBlack), false).withName("Off"));
   }
 
   /**
@@ -79,10 +80,7 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
    * @param color the color of the pattern
    */
   public void LED_SolidColor(Color color) {
-    running_AnimatedPattern = false;
-    LEDPattern pattern = LEDPattern.solid(Color.kRed);
-    pattern.applyTo(m_ledbuffer);
-    m_led.setData(m_ledbuffer);
+    runPattern(LEDPattern.solid(color), false);
   }
 
   /**
@@ -125,8 +123,8 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
     // display
     if (running_AnimatedPattern) {
       animatedPattern.applyTo(m_ledbuffer);
+      m_led.setData(m_ledbuffer);
     }
-    m_led.setData(m_ledbuffer);
   }
 
   /**
@@ -140,15 +138,17 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
    * @implNote Recomended pattern input (rainbow): private final LEDPattern
    *           m_rainbow = LEDPattern.rainbow(255, 128);
    */
-  public Command runPattern(LEDPattern pattern, boolean animated) {
+  public void runPattern(LEDPattern pattern, boolean animated) {
     if (animated) {
       animatedPattern = pattern;
       running_AnimatedPattern = true;
     } else if (!animated) {
       animatedPattern = null;
       running_AnimatedPattern = false;
+      pattern.applyTo(m_ledbuffer);
+      m_led.setData(m_ledbuffer);
     }
-    return run(() -> pattern.applyTo(m_ledbuffer));
+    //return run(() -> pattern.applyTo(m_ledbuffer));
   }
 }
 
