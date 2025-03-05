@@ -203,6 +203,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         if (Utils.isSimulation()) {
             startSimThread();
         }
+        SmartDashboard.putData(TheField);
+
         // configureAutoBuilder();
     }
     /* Pathplanner and CTRE Swerve config */
@@ -291,16 +293,18 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public void updateVisionMeasurements() {
         var visionEst = vision.getEstimatedGlobalPose();
         visionEst.ifPresent(est -> {
-          if (Math.sqrt(Math.pow(est.estimatedPose.toPose2d().getX(), 2) + Math.pow(est.estimatedPose.toPose2d().getY(), 2)) 
-          > 4) {
-            return;
-          }
+        //   if (Math.sqrt(Math.pow(est.estimatedPose.toPose2d().getX(), 2) + Math.pow(est.estimatedPose.toPose2d().getY(), 2)) 
+        //   > 4) {
+        //     System.out.println("outofrange");
+        //     return;
+        //   }
         //   if (est.estimatedPose.toPose2d().getX() > 4) {
+        //     System.out.println("outofrange");
         //     return;
         //   }
           var estPose = est.estimatedPose.toPose2d();
           var estStdDevs = vision.getEstimationStdDevs(estPose);
-          this.addVisionMeasurement(est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
+          super.addVisionMeasurement(est.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(est.timestampSeconds), estStdDevs);
         });
       }
     /**
@@ -331,9 +335,15 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     @Override
     public void periodic() {
-        updateVisionMeasurements();
-        TheField.setRobotPose(getState().Pose);
+        // updateVisionMeasurements();
+        // var globalPose = vision.getEstimatedGlobalPose();
+        // if (vision.getEstimatedGlobalPose().isEmpty()){
+            
+        // } else {
+        //     TheField.setRobotPose(vision.getEstimatedGlobalPose().get().estimatedPose.toPose2d());
+        // }
         // logValues();
+        
         
         /*
          * Periodically try to apply the operator perspective.

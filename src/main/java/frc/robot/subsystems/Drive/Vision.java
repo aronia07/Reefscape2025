@@ -41,8 +41,8 @@ public class Vision extends SubsystemBase {
         Constants.VisionConstants.kRobotToCam);
     photonPoseEstimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
 
-    final Field2d TheField = new Field2d();
-    SmartDashboard.putData("Field", TheField);
+    // final Field2d TheField = new Field2d();
+    // SmartDashboard.putData("Field", TheField);
   }
 
   /**

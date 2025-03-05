@@ -18,6 +18,10 @@ public class SetSolidColor extends Command {
     public void initialize() {
         ledSubsystem.LED_SolidColor(color);
     }
+    @Override
+    public void execute(){
+        ledSubsystem.LED_SolidColor(color);
+    }
 
     @Override
     public boolean isFinished() {

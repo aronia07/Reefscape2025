@@ -13,6 +13,9 @@
     },
     "transitory": {
       "SmartDashboard": {
+        "Field": {
+          "open": true
+        },
         "TunableNumbers": {
           "open": true
         },
@@ -94,7 +97,7 @@
             0.0,
             0.8500000238418579
           ],
-          "height": 319,
+          "height": 455,
           "series": [
             {
               "color": [
@@ -116,7 +119,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     },
     "Plot <1>": {
       "plots": [
@@ -127,7 +133,7 @@
             0.0,
             0.8500000238418579
           ],
-          "height": 340,
+          "height": 462,
           "series": [
             {
               "color": [
@@ -167,7 +173,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     },
     "Plot <2>": {
       "plots": [
@@ -214,7 +223,7 @@
             0.0,
             0.8500000238418579
           ],
-          "height": 547,
+          "height": 448,
           "series": [
             {
               "color": [
@@ -236,7 +245,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     }
   }
 }

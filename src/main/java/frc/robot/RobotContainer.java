@@ -35,6 +35,7 @@ import frc.robot.commands.Intake.Modify;
 import frc.robot.commands.Lights.WPIlib.SetSolidColor;
 import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Drive.TunerConstants;
+import frc.robot.subsystems.Drive.Vision;
 import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.Lights.LEDSubsystem_WPIlib;
@@ -48,6 +49,7 @@ public class RobotContainer {
     final Intake intake = new Intake();
     final Wrist wrist = new Wrist();
     final LEDSubsystem_WPIlib wpiLights = new LEDSubsystem_WPIlib();
+    final Vision vision = new Vision();
     boolean isModified = Modify.modified;
     
     
@@ -84,7 +86,7 @@ public class RobotContainer {
         // Nperte that X is defined as forward according to WPILib convention,
         // and Y is defined as to the left according to WPILib convention.
         
-        // drivetrain.registerTelemetry(logger::telemeterize);
+        drivetrain.registerTelemetry(logger::telemeterize);
 
         /* DRIVER CONTROLS */
         // drive with joysticks
@@ -116,7 +118,7 @@ public class RobotContainer {
         //HP Pickup
         driver.rightBumper().whileTrue(new ParallelCommandGroup(
             new ToWristAngle(() -> Units.degreesToRadians(88), wrist),
-            new ToAngle(() -> Units.degreesToRadians(65), arm),
+            new ToAngle(() -> Units.degreesToRadians(62), arm),
             new IntakeIn(intake)
         ));
         

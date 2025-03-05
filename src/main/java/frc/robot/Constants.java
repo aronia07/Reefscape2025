@@ -91,6 +91,10 @@ public final class Constants {
         public static int followerID = 62; //was the deflector
     }
 
+    public static final class ClimberConstants{
+        
+    }
+
     public static final class ElevatorConstants {
         public static double min = .5;
         public static double max = 18;
