@@ -8,10 +8,13 @@ import static edu.wpi.first.units.Units.*;
 
 import java.util.function.DoubleSupplier;
 
+import javax.sound.midi.Sequencer;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -19,11 +22,14 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.Constants.ElevatorConstants.ElevateMode;
 import frc.robot.commands.Arm.ManualArm;
 import frc.robot.commands.Arm.ToAngle;
+import frc.robot.commands.Drive.DriveToLocation;
 import frc.robot.commands.Elevator.ElevateLevel;
 import frc.robot.commands.Elevator.ElevateManual;
 import frc.robot.commands.Intake.IntakeIn;
@@ -50,9 +56,12 @@ public class RobotContainer {
     final Wrist wrist = new Wrist();
     final LEDSubsystem_WPIlib wpiLights = new LEDSubsystem_WPIlib();
     final Vision vision = new Vision();
-    boolean isModified = Modify.modified;
+    public static boolean isModified = false;
     
-    
+    public static Command switchOuttake(boolean modification) {
+        isModified = modification;
+        return Commands.none();
+    }
     public RobotContainer() {
         configureBindings();
         configureTestCommands();
@@ -77,6 +86,7 @@ public class RobotContainer {
     private final CommandXboxController operator = new CommandXboxController(1);
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+    
 
     public void idle() {
         getIdleCommands().schedule();
@@ -107,6 +117,9 @@ public class RobotContainer {
         // CHANGED: changed from back/start+x/y to pov buttons
         // Note that each routine should be run exactly once in a single log.
         // d-pad
+        driver.povRight().whileTrue(
+        new ProxyCommand(
+            DriveToLocation.driveTo(new Pose2d(1.5768705606460571, 6.266633987426758, new Rotation2d()), drivetrain)));
         // driver.povUp().whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
         // driver.povDown().whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
         // driver.povLeft().whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
@@ -117,11 +130,10 @@ public class RobotContainer {
 
         //HP Pickup
         driver.rightBumper().whileTrue(new ParallelCommandGroup(
-            new ToWristAngle(() -> Units.degreesToRadians(88), wrist),
-            new ToAngle(() -> Units.degreesToRadians(62), arm),
+            new ToWristAngle(() -> Units.degreesToRadians(-77), wrist),
+            new ToAngle(() -> Units.degreesToRadians(37), arm),
             new IntakeIn(intake)
         ));
-        
 
         /* OPERATOR CONTROLS */
         // joysticks
@@ -131,7 +143,7 @@ public class RobotContainer {
 
 
         // buttons
-        if(isModified) {
+        if(!isModified) {
             operator.leftTrigger().whileTrue(new IntakeOut(intake));
         } else {
             operator.leftTrigger().whileTrue(new IntakeOut2(intake));
@@ -145,44 +157,56 @@ public class RobotContainer {
         operator.y().whileTrue(new SequentialCommandGroup(
             new ToWristAngle(() -> Units.degreesToRadians(-35), wrist),
             new ParallelCommandGroup(
-                new ToAngle(() -> Units.degreesToRadians(85), arm),
-                new ElevateLevel(elevator, () -> 4))
+                new ToAngle(() -> Units.degreesToRadians(87), arm),
+                new ElevateLevel(elevator, ElevateMode.L4))
         ).finallyDo(this::idle));
         
+
+
         //Modified L4
         operator.y().and(operator.rightTrigger()).whileTrue(new SequentialCommandGroup(
             new ToWristAngle(() -> Units.degreesToRadians(10), wrist),
             new ParallelCommandGroup(
                 new ToAngle(() -> 75, arm),
-                new ElevateLevel(elevator, () -> 4))
+                new ElevateLevel(elevator, ElevateMode.L4))
         ).finallyDo(this::idle));
 
         //L3
         operator.b().whileTrue(new SequentialCommandGroup(
-            new ToWristAngle(() -> Units.degreesToRadians(-51), wrist),
+            new ToWristAngle(() -> Units.degreesToRadians(-48), wrist),
             new ParallelCommandGroup(
-                new ToAngle(() -> Units.degreesToRadians(80), arm),
-                new ElevateLevel(elevator, () -> 3),
-                new Modify(intake, () -> false))
+                new ToAngle(() -> Units.degreesToRadians(86), arm),
+                new ElevateLevel(elevator, ElevateMode.L3))
         ).finallyDo(this::idle));
 
         //Modified L3
         operator.b().and(operator.rightTrigger()).whileTrue(new ParallelCommandGroup(
             new ToAngle(() -> Units.degreesToRadians(71.4), arm),
-            new ElevateLevel(elevator, () -> 3),
-            new ToWristAngle(() -> Units.degreesToRadians(-19), wrist),
-            new Modify(intake, () -> true)
+            new ElevateLevel(elevator, ElevateMode.L3),
+            new ToWristAngle(() -> Units.degreesToRadians(-19), wrist)
         ).finallyDo(this::idle));
         
         //L2
-        operator.a().whileTrue(new ParallelCommandGroup(
-            new ToAngle(() -> Units.degreesToRadians(70), arm),
-            new ToWristAngle(() -> Units.degreesToRadians(-70), wrist)
+        operator.a().whileTrue(new SequentialCommandGroup(
+            new ToWristAngle(() -> Units.degreesToRadians(-66.7), wrist),
+            new ProxyCommand(RobotContainer.switchOuttake(false)),
+            new ParallelCommandGroup(
+                new ToAngle(() -> Units.degreesToRadians(70), arm),
+                new ElevateLevel(elevator, ElevateMode.L2))
         ).finallyDo(this::idle));
         
         //Modified L2
         operator.a().and(operator.rightTrigger()).whileTrue(new ParallelCommandGroup(
             new ToAngle(() -> Units.degreesToRadians(45), arm)
+        ).finallyDo(this::idle));
+        
+        //L1
+        operator.x().whileTrue(new SequentialCommandGroup(
+            new ToWristAngle(() -> Units.degreesToRadians(-74), wrist),
+            new ProxyCommand(RobotContainer.switchOuttake(true)),
+            new ParallelCommandGroup(
+                new ToAngle(() -> Units.degreesToRadians(12.4), arm),
+                new ElevateLevel(elevator, ElevateMode.L1))
         ).finallyDo(this::idle));
 
         // d-pad
@@ -194,7 +218,7 @@ public class RobotContainer {
     }
 
     public Command getIdleCommands() {
-       return new SequentialCommandGroup(
+       return new ParallelCommandGroup(
             new ToWristAngle(() -> Units.degreesToRadians(70), wrist),
             // new ElevateLevel(elevator, () -> 5),
             new ToAngle(() -> Units.degreesToRadians(60), arm)
@@ -212,9 +236,9 @@ public class RobotContainer {
     }
 
     public void configureTestCommands() {
-        SmartDashboard.putBoolean("is it modified", isModified);
-        SmartDashboard.putData("Elevate", new ElevateLevel(elevator, () -> 7));
-        SmartDashboard.putData("Go down", new ElevateLevel(elevator, () -> 5));
+        SmartDashboard.putBoolean("is it modified", Intake.modified);
+        SmartDashboard.putData("Elevate", new ElevateLevel(elevator, ElevateMode.TEST));
+        SmartDashboard.putData("Go down", new ElevateLevel(elevator, ElevateMode.DOWN));
 
         SmartDashboard.putData("Wrist Up", new ToWristAngle(() -> 70, wrist));
         SmartDashboard.putData("Wrist Down", new ToWristAngle(() -> -35, wrist));

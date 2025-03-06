@@ -66,7 +66,6 @@ public class ToWristAngle extends Command {
   @Override
   public void end(boolean interrupted) {
     m_timer.stop(); //Stops timer
-    wrist_y.setGoal(Rotation2d.fromRadians(Units.degreesToRadians(70)));
   }
 
 }

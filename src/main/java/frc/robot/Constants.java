@@ -63,9 +63,9 @@ public final class Constants {
     }
 
     public static final class AutoConstants {
-        public static double kMaxSpeedMetersPerSecond;
+        public static double kMaxSpeedMetersPerSecond = 4.53;
         public static double kMaxAccelerationMetersPerSecondSquared;
-        public static double kMaxAngularSpeedRadiansPerSecond;
+        public static double kMaxAngularSpeedRadiansPerSecond = Units.rotationsPerMinuteToRadiansPerSecond(0.75*(1/60));
         public static double kMaxAngularSpeedRadiansPerSecondSquared;
     }
 
@@ -81,8 +81,8 @@ public final class Constants {
         public static final Rotation2d maxVelocityPerSecond = Rotation2d.fromDegrees(460); // was 500
         public static final Rotation2d maxAcceleration = Rotation2d.fromDegrees(460);
         
-        public static final Rotation2d wristMax = Rotation2d.fromDegrees(90); 
-        public static final Rotation2d wristMin = Rotation2d.fromDegrees(-65);
+        public static final Rotation2d wristMax = Rotation2d.fromDegrees(86); 
+        public static final Rotation2d wristMin = Rotation2d.fromDegrees(-76);
         public static final Rotation2d tolernace = Rotation2d.fromDegrees(0.5); 
     }
 
@@ -124,8 +124,8 @@ public final class Constants {
             HOMING
         }
 
-        public static double LevelOneSetpoint;
-        public static double LevelTwoSetpoint;
+        public static double LevelOneSetpoint = 1;
+        public static double LevelTwoSetpoint = 1;
         public static double LevelThreeSetpoint = 5.3;
         public static double LevelFourSetpoint = 19;
         public static double HPsetpoint;

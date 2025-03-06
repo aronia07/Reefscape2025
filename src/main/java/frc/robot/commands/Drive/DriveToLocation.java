@@ -36,6 +36,6 @@ public class DriveToLocation {
       var tagPose = swerve.vision.kFieldLayout.getTagPose(closestTag.get().getFiducialId());
       var targetPose = tagPose.get().toPose2d().plus(distance);
   
-      return DriveToLocation.driveTo(targetPose, swerve);
+      return driveTo(targetPose, swerve);
     }
   }

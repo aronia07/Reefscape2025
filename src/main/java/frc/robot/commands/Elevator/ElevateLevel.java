@@ -14,14 +14,14 @@ import frc.robot.subsystems.Elevator.Elevator;
 public class ElevateLevel extends Command {
     protected final Elevator elevator_y;
     private State initialState;
-    private IntSupplier levelSupplier;
+    private ElevateMode level;
     private TrapezoidProfile profiler_y = new TrapezoidProfile(
             new TrapezoidProfile.Constraints(ElevatorConstants.maxVelocity, ElevatorConstants.maxAccel));
     private Timer timer_y = new Timer();
 
-    public ElevateLevel(Elevator elevator, IntSupplier doubleSupplier) {
+    public ElevateLevel(Elevator elevator, ElevateMode mode) {
         elevator_y = elevator;
-        this.levelSupplier = doubleSupplier;
+        this.level = mode;
 
         addRequirements(elevator_y);
     }
@@ -31,32 +31,37 @@ public class ElevateLevel extends Command {
         timer_y.reset();
         timer_y.start();
 
-        int level = levelSupplier.getAsInt();
-        switch(level){
-        case 1:
-            elevator_y.setMode(ElevateMode.L1);
-            break;
-        case 2:
-            elevator_y.setMode(ElevateMode.L2);
-            break;
-        case 3:
-            elevator_y.setMode(ElevateMode.L3);
-            break;
-        case 4:
-            elevator_y.setMode(ElevateMode.L4);
-            break;
-        case 5:
-            elevator_y.setMode(ElevateMode.DOWN);
-            break;
-        case 6:
-            elevator_y.setMode(ElevateMode.UP);
-            break;
-        case 7:
-            elevator_y.setMode(ElevateMode.TEST);
-            break;
-        default:
-            break;
+        switch (level) {
+            case UP:
+                break;
+            case DOWN:
+                elevator_y.elevatorSetpoint = 1;
+                break;
+            case L1:
+                elevator_y.elevatorSetpoint = ElevatorConstants.LevelOneSetpoint;
+                break;
+            case L2:
+                elevator_y.elevatorSetpoint = ElevatorConstants.LevelTwoSetpoint;
+                break;
+            case L3:
+                elevator_y.elevatorSetpoint = ElevatorConstants.LevelThreeSetpoint;
+                break;
+            case L4:
+                elevator_y.elevatorSetpoint = ElevatorConstants.LevelFourSetpoint;
+                break;
+            case HP:
+                elevator_y.elevatorSetpoint = ElevatorConstants.HPsetpoint;
+                break;
+            case TEST:
+                elevator_y.elevatorSetpoint = ElevatorConstants.test;
+                break;
+            case OFF:
+                elevator_y.elevatorSetpoint = 1;
+                break;
+            default:
+                break;
         }
+
         // if (level == 4) {
         // elevator_y.setMode(ElevateMode.L4);
         // } if (level == 3) {
@@ -74,7 +79,7 @@ public class ElevateLevel extends Command {
         // } if (level == 7) {
         // elevator_y.setMode(ElevateMode.TEST);
         // } if (level == 8) {
-        //     elevator_y.setMode(ElevateMode.MANUAL);
+        // elevator_y.setMode(ElevateMode.MANUAL);
         // }
 
         initialState = elevator_y.getCurrentState();
@@ -82,14 +87,14 @@ public class ElevateLevel extends Command {
 
     @Override
     public void execute() {
-        
+
         // var nextState = profiler_y.calculate(timer_y.get(),
-        //         initialState,
-        //         new TrapezoidProfile.State(elevator_y.getSetpoint(), 0));
+        // initialState,
+        // new TrapezoidProfile.State(elevator_y.getSetpoint(), 0));
 
         // var nextNextState = profiler_y.calculate(timer_y.get() + 0.02,
-        //         initialState,
-        //         new TrapezoidProfile.State(elevator_y.getSetpoint(), 0));
+        // initialState,
+        // new TrapezoidProfile.State(elevator_y.getSetpoint(), 0));
 
         // elevator_y.runState(nextState, nextNextState);
         // elevator_y.runState(nextState);

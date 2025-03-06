@@ -26,7 +26,7 @@ public class Intake extends SubsystemBase {
    // private static SparkClosedLoopController pid = intake.getClosedLoopController();
 
     private static Timer pulseTimer = new Timer();
-
+    public static boolean modified = false;
 
     public Intake() {
         
@@ -44,22 +44,12 @@ public class Intake extends SubsystemBase {
         leaderConfig.inverted(false)
             .idleMode(IdleMode.kBrake)
             .smartCurrentLimit(20, 20);
-        followerConfig.inverted(true)
+        followerConfig.inverted(false)
             .idleMode(IdleMode.kBrake)
             .smartCurrentLimit(80, 80);
         
         leader.configure(leaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         follower.configure(followerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    }
-
-    public void pulse(Timer timer, double pulseWidth) {
-        timer.reset();
-
-        // if(beamBreak.get()){
-        //     while(timer.get() <= pulseWidth){
-        //         deflector.set(0.5);
-        //     }
-        // }
     }
 
     public void hpIntake(double value) {
@@ -71,7 +61,9 @@ public class Intake extends SubsystemBase {
         }
         
     }
-
+    public void setModify(boolean yesOrNo) {
+        
+    }
     //Outtakes through the black wheels
     public void outTake(double value) {
         follower.set(value);
@@ -85,6 +77,5 @@ public class Intake extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putBoolean("BeAMY", beamBreak.get());
     }
 }

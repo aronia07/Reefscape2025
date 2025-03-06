@@ -211,7 +211,7 @@ public class Elevator extends SubsystemBase {
       case UP:
         break;
       case DOWN:
-        elevatorSetpoint = 2;
+        elevatorSetpoint = 1;
         break;
       case L1:
         elevatorSetpoint = ElevatorConstants.LevelOneSetpoint;
@@ -235,7 +235,7 @@ public class Elevator extends SubsystemBase {
         elevatorSetpoint = ElevatorConstants.test;
         break;
       case OFF:
-        elevatorSetpoint = 1.5;
+        elevatorSetpoint = 1;
         break;
       case HOMING:
         if (leftElevatorMotor.getOutputCurrent() >= ElevatorConstants.homingCurrentThreshold) {
@@ -259,18 +259,18 @@ public class Elevator extends SubsystemBase {
 
   @Override
   public void periodic() {
-    handleLeft();
+    // handleLeft();
     encoderPosition = encoderRight.getPosition();
     logValues();
     checkTunableValues();
-    // switch (isLeftOutOfBounds()) {
-    //   case BADBADBAD:
-    //     // leftElevatorMotor.setVoltage(0);
-    //     // System.out.println("BADDBADBADBAD");
-    //     break;
-    //   default:
-    //     break;
-    // }
+    switch (isLeftOutOfBounds()) {
+      case BADBADBAD:
+        leftElevatorMotor.setVoltage(0);
+        // System.out.println("BADDBADBADBAD");
+        break;
+      default:
+        break;
+    }
 
     // var ffOutput = ffElevate.calculateWithVelocities(nextVelocity, nextNextVelocity);
 
