@@ -106,8 +106,8 @@ public final class Constants {
         public static int rightElevatorMotorID = 42;
         public static double[] elevatorPID = new double[] { 0.085, 0, 0 }; // p is a little aggressive
         public static double[] elevatorSGV = new double[] { 0, 0.015, 0.0009, 0 }; // g needs testing
-        public static double maxVelocity = 100; // in mps
-        public static double maxAccel = 40; // in mps/s
+        public static double maxVelocity = 75; // in mps //was 100
+        public static double maxAccel = 30; // in mps/s //was 40
         public static double elevatorTolerance;
 
         public static enum ElevateMode {
