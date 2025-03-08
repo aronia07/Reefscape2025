@@ -28,8 +28,8 @@ public class ElevateLevel extends Command {
 
     @Override
     public void initialize() {
-        timer_y.reset();
-        timer_y.start();
+        // timer_y.reset();
+        // timer_y.start();
 
         switch (level) {
             case UP:
@@ -102,7 +102,7 @@ public class ElevateLevel extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        timer_y.stop();
+        // timer_y.stop();
         elevator_y.elevatorSetpoint = 1;
     }
 

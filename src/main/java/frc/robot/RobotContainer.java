@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.ElevatorConstants.ElevateMode;
 import frc.robot.commands.Arm.ManualArm;
 import frc.robot.commands.Arm.ToAngle;
+import frc.robot.commands.Climber.Climb;
 import frc.robot.commands.Drive.DriveToLocation;
 import frc.robot.commands.Elevator.ElevateLevel;
 import frc.robot.commands.Elevator.ElevateManual;
@@ -47,6 +48,7 @@ import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.Lights.LEDSubsystem_WPIlib;
 import frc.robot.subsystems.Wrist.Wrist;
 import frc.robot.subsystems.Arm.Arm;
+import frc.robot.subsystems.Climber.Climber;
 
 public class RobotContainer {
     /* Subsystems */
@@ -55,7 +57,8 @@ public class RobotContainer {
     final Intake intake = new Intake();
     final Wrist wrist = new Wrist();
     final LEDSubsystem_WPIlib wpiLights = new LEDSubsystem_WPIlib();
-    // final Vision vision = new Vision();
+    final Climber climber = new Climber();
+    final Vision vision = new Vision();
     public static boolean isModified = false;
     
     public static Command switchOuttake(boolean modification) {
@@ -210,6 +213,8 @@ public class RobotContainer {
         // ).finallyDo(this::idle));
 
         // d-pad
+        operator.povDown().whileTrue(new Climb(climber, () -> .2));
+        operator.povUp().whileTrue(new Climb(climber, () -> -.2));
 
     }
 
