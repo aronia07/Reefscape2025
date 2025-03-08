@@ -21,7 +21,7 @@ import edu.wpi.first.math.util.Units;
 
 public final class Constants {
 
-    public static boolean enableTunableValues = true;
+    public static boolean enableTunableValues = false;
     public static class LightsConstants {
         public static int port = 2;
         public static int length = 40;
@@ -47,8 +47,8 @@ public final class Constants {
     public static final class VisionConstants {
         /* camera stuff */
         public static Transform3d kRobotToCam = new Transform3d(
-            new Translation3d(-Units.inchesToMeters(11.41), 0, Units.inchesToMeters(6.6)), 
-            new Rotation3d(0, Units.degreesToRadians(67), 0)); //TODO: edit yaw
+            new Translation3d(0, -Units.inchesToMeters(11.41), Units.inchesToMeters(6.6)), 
+            new Rotation3d(0, Units.degreesToRadians(23), 0)); //TODO: edit yaw
         public static String cameraName = "orangepi";
         public static String camera2Name = "USB_Camera(1)";
         /* standard deviations for vision calculations */
@@ -64,9 +64,9 @@ public final class Constants {
 
     public static final class AutoConstants {
         public static double kMaxSpeedMetersPerSecond = 4.53;
-        public static double kMaxAccelerationMetersPerSecondSquared;
+        public static double kMaxAccelerationMetersPerSecondSquared = 6.1 ;
         public static double kMaxAngularSpeedRadiansPerSecond = Units.rotationsPerMinuteToRadiansPerSecond(0.75*(1/60));
-        public static double kMaxAngularSpeedRadiansPerSecondSquared;
+        public static double kMaxAngularSpeedRadiansPerSecondSquared = Units.degreesToRadians(862);
     }
 
     public static final class WristConstants {

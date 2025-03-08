@@ -51,14 +51,14 @@ public class Elevator extends SubsystemBase {
   // private boolean isRightDone = false;
 
   /* Tunable Values */
-  private LoggedTunableNumber elevatorP = new LoggedTunableNumber("elevatorP", ElevatorConstants.elevatorPID[0]);
-  private LoggedTunableNumber elevatorI = new LoggedTunableNumber("elevatorI", ElevatorConstants.elevatorPID[1]);
-  private LoggedTunableNumber elevatorD = new LoggedTunableNumber("elevatorD", ElevatorConstants.elevatorPID[2]);
-  private LoggedTunableNumber elevatorS = new LoggedTunableNumber("elevatorS", ElevatorConstants.elevatorSGV[0]);
-  private LoggedTunableNumber elevatorG = new LoggedTunableNumber("elevatorG", ElevatorConstants.elevatorSGV[1]);
-  private LoggedTunableNumber elevatorV = new LoggedTunableNumber("elevatorV", ElevatorConstants.elevatorSGV[2]);
-  private LoggedTunableNumber elevatorA = new LoggedTunableNumber("elevatorA", ElevatorConstants.elevatorSGV[3]);
-  private LoggedTunableNumber elevatorLevel = new LoggedTunableNumber("changing setpoint", elevatorSetpoint);
+  // private LoggedTunableNumber elevatorP = new LoggedTunableNumber("elevatorP", ElevatorConstants.elevatorPID[0]);
+  // private LoggedTunableNumber elevatorI = new LoggedTunableNumber("elevatorI", ElevatorConstants.elevatorPID[1]);
+  // private LoggedTunableNumber elevatorD = new LoggedTunableNumber("elevatorD", ElevatorConstants.elevatorPID[2]);
+  // private LoggedTunableNumber elevatorS = new LoggedTunableNumber("elevatorS", ElevatorConstants.elevatorSGV[0]);
+  // private LoggedTunableNumber elevatorG = new LoggedTunableNumber("elevatorG", ElevatorConstants.elevatorSGV[1]);
+  // private LoggedTunableNumber elevatorV = new LoggedTunableNumber("elevatorV", ElevatorConstants.elevatorSGV[2]);
+  // private LoggedTunableNumber elevatorA = new LoggedTunableNumber("elevatorA", ElevatorConstants.elevatorSGV[3]);
+  // private LoggedTunableNumber elevatorLevel = new LoggedTunableNumber("changing setpoint", elevatorSetpoint);
 
   public Elevator() {
     setupMotors();
@@ -151,15 +151,15 @@ public class Elevator extends SubsystemBase {
   }
 
   public void checkTunableValues() {
-    if (Constants.enableTunableValues) {
+    // if (Constants.enableTunableValues) {
 
-      if (elevatorP.hasChanged() || elevatorI.hasChanged() || elevatorD.hasChanged()) {
-        pid.setPID(elevatorP.get(), elevatorI.get(), elevatorD.get());
-      }
-      if (elevatorS.hasChanged() || elevatorG.hasChanged() || elevatorV.hasChanged() || elevatorA.hasChanged()) {
-        ffElevate = new ElevatorFeedforward(elevatorS.get(), elevatorG.get(), elevatorV.get(), elevatorA.get());
-      }
-    }
+    //   if (elevatorP.hasChanged() || elevatorI.hasChanged() || elevatorD.hasChanged()) {
+    //     pid.setPID(elevatorP.get(), elevatorI.get(), elevatorD.get());
+    //   }
+    //   if (elevatorS.hasChanged() || elevatorG.hasChanged() || elevatorV.hasChanged() || elevatorA.hasChanged()) {
+    //     ffElevate = new ElevatorFeedforward(elevatorS.get(), elevatorG.get(), elevatorV.get(), elevatorA.get());
+    //   }
+    // }
   }
 
   // public boolean isDone() {
@@ -194,64 +194,52 @@ public class Elevator extends SubsystemBase {
    * Logic for the elevator command, switches through modes to
    * control elevator
    */
-  private void handleLeft() {
-    // case HOMING:
-    // if (leftClimberMotor.getOutputCurrent() >=
-    // ClimberConstants.homingCurrentThreshold) {
-    // if (timer.get() < 1)
-    // return;
-    // stopLeft();
-    // isLeftDone = true;
-    // encoderRight.setPosition(0);
-    // } else {
-    // setLeft(ClimberConstants.selfHomeSpeedVoltage);
-    // }
-    // break;
-    switch (elevateMode) {
-      case UP:
-        break;
-      case DOWN:
-        elevatorSetpoint = 1;
-        break;
-      case L1:
-        elevatorSetpoint = ElevatorConstants.LevelOneSetpoint;
-        break;
-      case L2:
-        elevatorSetpoint = ElevatorConstants.LevelTwoSetpoint;
-        break;
-      case L3:
-        elevatorSetpoint = ElevatorConstants.LevelThreeSetpoint;
-        break;
-      case L4:
-        elevatorSetpoint = ElevatorConstants.LevelFourSetpoint;
-        break;
-      case HP:
-        elevatorSetpoint = ElevatorConstants.HPsetpoint;
-        break;
-      case MANUAL:
-        this.elevatorSetpoint = elevatorLevel.get();
-        break;
-      case TEST:
-        elevatorSetpoint = ElevatorConstants.test;
-        break;
-      case OFF:
-        elevatorSetpoint = 1;
-        break;
-      case HOMING:
-        if (leftElevatorMotor.getOutputCurrent() >= ElevatorConstants.homingCurrentThreshold) {
-          if (timer.get() < 1)
-            return;
-          leftElevatorMotor.setVoltage(0);
-          isLeftDone = true;
-          encoderRight.setPosition(0);
-        } else {
-          leftElevatorMotor.setVoltage(ElevatorConstants.selfHomeSpeedVoltage);
-        }
-        break;
-      default:
-        break;
-    }
-  }
+  // private void handleLeft() {
+  //   switch (elevateMode) {
+  //     case UP:
+  //       break;
+  //     case DOWN:
+  //       elevatorSetpoint = 1;
+  //       break;
+  //     case L1:
+  //       elevatorSetpoint = ElevatorConstants.LevelOneSetpoint;
+  //       break;
+  //     case L2:
+  //       elevatorSetpoint = ElevatorConstants.LevelTwoSetpoint;
+  //       break;
+  //     case L3:
+  //       elevatorSetpoint = ElevatorConstants.LevelThreeSetpoint;
+  //       break;
+  //     case L4:
+  //       elevatorSetpoint = ElevatorConstants.LevelFourSetpoint;
+  //       break;
+  //     case HP:
+  //       elevatorSetpoint = ElevatorConstants.HPsetpoint;
+  //       break;
+  //     case MANUAL:
+  //       // this.elevatorSetpoint = elevatorLevel.get();
+  //       break;
+  //     case TEST:
+  //       elevatorSetpoint = ElevatorConstants.test;
+  //       break;
+  //     case OFF:
+  //       elevatorSetpoint = 1;
+  //       break;
+  //     case HOMING:
+  //       if (leftElevatorMotor.getOutputCurrent() >= ElevatorConstants.homingCurrentThreshold) {
+  //         if (timer.get() < 1)
+  //           return;
+  //         leftElevatorMotor.setVoltage(0);
+  //         isLeftDone = true;
+  //         encoderRight.setPosition(0);
+  //       } else {
+  //         leftElevatorMotor.setVoltage(ElevatorConstants.selfHomeSpeedVoltage);
+  //       }
+  //       break;
+  //     default:
+  //       break;
+  //   }
+  // }
 
   public boolean atGoal() {
     return Math.abs(encoderRight.getPosition() - elevatorSetpoint) < ElevatorConstants.elevatorTolerance;
@@ -259,10 +247,8 @@ public class Elevator extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // handleLeft();
     encoderPosition = encoderRight.getPosition();
     logValues();
-    checkTunableValues();
     switch (isLeftOutOfBounds()) {
       case BADBADBAD:
         leftElevatorMotor.setVoltage(0);

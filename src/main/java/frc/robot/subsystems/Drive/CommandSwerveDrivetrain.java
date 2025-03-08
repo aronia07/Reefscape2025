@@ -205,7 +205,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
         SmartDashboard.putData(TheField);
 
-        // configureAutoBuilder();
+        configureAutoBuilder();
     }
     /* Pathplanner and CTRE Swerve config */
     @SuppressWarnings("unused")
@@ -335,7 +335,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     @Override
     public void periodic() {
-        // updateVisionMeasurements();
+        updateVisionMeasurements();
         // var globalPose = vision.getEstimatedGlobalPose();
         // if (vision.getEstimatedGlobalPose().isEmpty()){
             

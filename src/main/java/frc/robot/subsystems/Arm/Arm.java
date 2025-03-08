@@ -48,12 +48,12 @@ public class Arm extends SubsystemBase {
   private Rotation2d goal = new Rotation2d();
 
   // Tunable values 
-  private LoggedTunableNumber armP = new LoggedTunableNumber("armP", Constants.ArmConstants.armPID[0]);
-  private LoggedTunableNumber armI = new LoggedTunableNumber("armI", Constants.ArmConstants.armPID[1]);
-  private LoggedTunableNumber armD = new LoggedTunableNumber("armD", Constants.ArmConstants.armPID[2]);
-  private LoggedTunableNumber armS = new LoggedTunableNumber("armS", Constants.ArmConstants.armSGV[0]);
-  private LoggedTunableNumber armG = new LoggedTunableNumber("armG", Constants.ArmConstants.armSGV[1]);
-  private LoggedTunableNumber armV = new LoggedTunableNumber("armV", Constants.ArmConstants.armSGV[2]);
+  // private LoggedTunableNumber armP = new LoggedTunableNumber("armP", Constants.ArmConstants.armPID[0]);
+  // private LoggedTunableNumber armI = new LoggedTunableNumber("armI", Constants.ArmConstants.armPID[1]);
+  // private LoggedTunableNumber armD = new LoggedTunableNumber("armD", Constants.ArmConstants.armPID[2]);
+  // private LoggedTunableNumber armS = new LoggedTunableNumber("armS", Constants.ArmConstants.armSGV[0]);
+  // private LoggedTunableNumber armG = new LoggedTunableNumber("armG", Constants.ArmConstants.armSGV[1]);
+  // private LoggedTunableNumber armV = new LoggedTunableNumber("armV", Constants.ArmConstants.armSGV[2]);
 
 
   public Arm() {
@@ -98,13 +98,13 @@ public class Arm extends SubsystemBase {
     if (!Constants.enableTunableValues)
       return;
 
-    if (armP.hasChanged() || armI.hasChanged() || armD.hasChanged()) {
-      pid.setPID(armP.get(), armI.get(), armD.get());
-    }
+    // if (armP.hasChanged() || armI.hasChanged() || armD.hasChanged()) {
+    //   pid.setPID(armP.get(), armI.get(), armD.get());
+    // }
 
-    if (armS.hasChanged() || armG.hasChanged() || armV.hasChanged()) {
-      ffModel = new ArmFeedforward(armS.get(), armG.get(), armV.get());
-    }
+    // if (armS.hasChanged() || armG.hasChanged() || armV.hasChanged()) {
+    //   ffModel = new ArmFeedforward(armS.get(), armG.get(), armV.get());
+    // }
   }
 
   //Sets the arm's goal
@@ -173,7 +173,7 @@ public class Arm extends SubsystemBase {
 
     encoderPosition = encoder.getAbsolutePosition();  //Finds the exact position of the encoder
     logValues();  //Logs values to SmartDashboard/Glass
-    checkTunableValues(); //Updates PID and FF values
+    // checkTunableValues(); //Updates PID and FF values
 
 
     var ffOutput = ffModel.calculate(setpoint.getRadians(), velocity.getRadians()); //Calculates Feedforward output

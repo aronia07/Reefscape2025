@@ -23,7 +23,7 @@ public class Modify {
   //   // this.booleanSupplier = booleanSupplier;
   // }
   public static Command switchOuttake(boolean modification) {
-    robotContainer.isModified = modification;
+    RobotContainer.isModified = modification;
     return Commands.none();
     }
 

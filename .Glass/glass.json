@@ -12,8 +12,20 @@
       }
     },
     "transitory": {
+      "DriveState": {
+        "Pose2d##v_/DriveState/Pose": {
+          "open": true
+        },
+        "SwerveModuleState[]##v_/DriveState/ModuleStates": {
+          "open": true
+        },
+        "open": true
+      },
       "SmartDashboard": {
         "Field": {
+          "open": true
+        },
+        "Module 2": {
           "open": true
         },
         "TunableNumbers": {
@@ -38,6 +50,8 @@
       "/SmartDashboard/Module 1": "Mechanism2d",
       "/SmartDashboard/Module 2": "Mechanism2d",
       "/SmartDashboard/Module 3": "Mechanism2d",
+      "/SmartDashboard/PathPlanner": "Alerts",
+      "/SmartDashboard/Vision field": "Field2d",
       "/SmartDashboard/Wrist Down": "Command",
       "/SmartDashboard/Wrist Neuteral": "Command",
       "/SmartDashboard/Wrist Up": "Command"

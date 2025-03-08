@@ -13,10 +13,10 @@ import frc.robot.subsystems.Elevator.Elevator;
 
 public class ElevateLevel extends Command {
     protected final Elevator elevator_y;
-    private State initialState;
+    // private State initialState;
     private ElevateMode level;
-    private TrapezoidProfile profiler_y = new TrapezoidProfile(
-            new TrapezoidProfile.Constraints(ElevatorConstants.maxVelocity, ElevatorConstants.maxAccel));
+    // private TrapezoidProfile profiler_y = new TrapezoidProfile(
+    //         new TrapezoidProfile.Constraints(ElevatorConstants.maxVelocity, ElevatorConstants.maxAccel));
     private Timer timer_y = new Timer();
 
     public ElevateLevel(Elevator elevator, ElevateMode mode) {
@@ -82,7 +82,7 @@ public class ElevateLevel extends Command {
         // elevator_y.setMode(ElevateMode.MANUAL);
         // }
 
-        initialState = elevator_y.getCurrentState();
+        // initialState = elevator_y.getCurrentState();
     }
 
     @Override
@@ -103,7 +103,7 @@ public class ElevateLevel extends Command {
     @Override
     public void end(boolean interrupted) {
         timer_y.stop();
-        elevator_y.setMode(ElevateMode.OFF);
+        elevator_y.elevatorSetpoint = 1;
     }
 
 }

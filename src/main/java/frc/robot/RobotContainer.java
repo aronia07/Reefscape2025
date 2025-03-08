@@ -55,11 +55,11 @@ public class RobotContainer {
     final Intake intake = new Intake();
     final Wrist wrist = new Wrist();
     final LEDSubsystem_WPIlib wpiLights = new LEDSubsystem_WPIlib();
-    final Vision vision = new Vision();
+    // final Vision vision = new Vision();
     public static boolean isModified = false;
     
     public static Command switchOuttake(boolean modification) {
-        isModified = modification;
+        RobotContainer.isModified = modification;
         return Commands.none();
     }
     public RobotContainer() {
@@ -119,7 +119,7 @@ public class RobotContainer {
         // d-pad
         driver.povRight().whileTrue(
         new ProxyCommand(
-            DriveToLocation.driveTo(new Pose2d(1.5768705606460571, 6.266633987426758, new Rotation2d()), drivetrain)));
+            DriveToLocation.driveTo(new Pose2d(3.14, 4.208, new Rotation2d()), drivetrain)));
         // driver.povUp().whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
         // driver.povDown().whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
         // driver.povLeft().whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
@@ -133,7 +133,7 @@ public class RobotContainer {
             new ToWristAngle(() -> Units.degreesToRadians(-77), wrist),
             new ToAngle(() -> Units.degreesToRadians(37), arm),
             new IntakeIn(intake)
-        ));
+        ).finallyDo(this::idle));
 
         /* OPERATOR CONTROLS */
         // joysticks
@@ -201,13 +201,13 @@ public class RobotContainer {
         ).finallyDo(this::idle));
         
         //L1
-        operator.x().whileTrue(new SequentialCommandGroup(
-            new ToWristAngle(() -> Units.degreesToRadians(-74), wrist),
-            new ProxyCommand(RobotContainer.switchOuttake(true)),
-            new ParallelCommandGroup(
-                new ToAngle(() -> Units.degreesToRadians(12.4), arm),
-                new ElevateLevel(elevator, ElevateMode.L1))
-        ).finallyDo(this::idle));
+        // operator.x().whileTrue(new SequentialCommandGroup(
+        //     new ToWristAngle(() -> Units.degreesToRadians(-74), wrist),
+        //     new ProxyCommand(RobotContainer.switchOuttake(true)),
+        //     new ParallelCommandGroup(
+        //         new ToAngle(() -> Units.degreesToRadians(12.4), arm),
+        //         new ElevateLevel(elevator, ElevateMode.L1))
+        // ).finallyDo(this::idle));
 
         // d-pad
 

@@ -45,7 +45,7 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
     // strip
     // m_right = m_ledbuffer.createView(kLength/2, kLength - 1).reversed(); //Right
     // side of the LED strip
-    m_led.setLength(kLength);
+    m_led.setLength(m_ledbuffer.getLength());
     m_led.setData(m_ledbuffer);
     m_led.start();
 
@@ -55,8 +55,11 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
     // Note: Other default patterns could be used instead!
     running_AnimatedPattern = false;
     animatedPattern = null;
-    setDefaultCommand(LED_Reset().withName("LED_Reset"));
+    //setDefaultCommand(LED_Reset().withName("LED_Reset"));
     // setDefaultCommand(runPattern(LEDPattern.solid(Color.kBlack), false).withName("Off"));
+
+    LED_SolidColor(Color.kRed);
+    System.out.println("Correctly set color!!!!!!!!!!!!!");
   }
 
   /**
@@ -70,8 +73,8 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
   /**
    * Resetting LED strip - LES set to solid black.
    */
-  public Command LED_Reset() {
-    return run(() -> runPattern(LEDPattern.solid(Color.kBlack), false));
+  public void LED_Reset() {
+    runPattern(LEDPattern.solid(Color.kBlack), false);
   }
 
   /**
@@ -147,6 +150,7 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
       running_AnimatedPattern = false;
       pattern.applyTo(m_ledbuffer);
       m_led.setData(m_ledbuffer);
+      System.out.println("And executed proprely!!!!! Animated:" + running_AnimatedPattern);
     }
     // return run(() -> pattern.applyTo(m_ledbuffer));
   }

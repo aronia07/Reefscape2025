@@ -48,9 +48,9 @@ public class Wrist extends SubsystemBase {
   private Rotation2d goal = new Rotation2d();
 
   // Tunable values 
-  private LoggedTunableNumber wristP = new LoggedTunableNumber("wristP", Constants.WristConstants.wristPID[0]);
-  private LoggedTunableNumber wristI = new LoggedTunableNumber("wristI", Constants.WristConstants.wristPID[1]);
-  private LoggedTunableNumber wristD = new LoggedTunableNumber("wristD", Constants.WristConstants.wristPID[2]);
+  // private LoggedTunableNumber wristP = new LoggedTunableNumber("wristP", Constants.WristConstants.wristPID[0]);
+  // private LoggedTunableNumber wristI = new LoggedTunableNumber("wristI", Constants.WristConstants.wristPID[1]);
+  // private LoggedTunableNumber wristD = new LoggedTunableNumber("wristD", Constants.WristConstants.wristPID[2]);
   // private LoggedTunableNumber wristS = new LoggedTunableNumber("wrist", Constants.WristConstants.wristSGV[0]);
   // private LoggedTunableNumber wristG = new LoggedTunableNumber("wrist", Constants.WristConstants.wristSGV[1]);
   // private LoggedTunableNumber wristV = new LoggedTunableNumber("wrist", Constants.WristConstants.wristSGV[2]);
@@ -90,12 +90,12 @@ public class Wrist extends SubsystemBase {
   //Checks to see if the PID and SGV values have changed. 
   //Updates the value if it's been changed
   public void checkTunableValues() {
-    if (!Constants.enableTunableValues)
-      return;
+    // if (!Constants.enableTunableValues)
+    //   return;
 
-    if (wristP.hasChanged() || wristI.hasChanged() || wristD.hasChanged()) {
-      pid.setPID(wristP.get(), wristI.get(), wristD.get());
-    }
+    // if (wristP.hasChanged() || wristI.hasChanged() || wristD.hasChanged()) {
+    //   pid.setPID(wristP.get(), wristI.get(), wristD.get());
+    // }
 
     // if (armS.hasChanged() || armG.hasChanged() || armV.hasChanged()) {
     //   ffModel = new ArmFeedforward(armS.get(), armG.get(), armV.get());
@@ -168,7 +168,7 @@ public class Wrist extends SubsystemBase {
 
     encoderPosition = encoder.getAbsolutePosition();  //Finds the exact position of the encoder
     logValues();  //Logs values to SmartDashboard/Glass
-    checkTunableValues(); //Updates PID and FF values
+    // checkTunableValues(); //Updates PID and FF values
 
    // var ffOutput = ffModel.calculate(setpoint.getRadians(), velocity.getRadians()); //Calculates Feedforward output
     var pidOutput = pid.calculate(getEncoderPosition().getRadians(), setpoint.getRadians());  //calculates PID output
