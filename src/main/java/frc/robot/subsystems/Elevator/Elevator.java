@@ -40,7 +40,7 @@ public class Elevator extends SubsystemBase {
   public double encoderPosition;
   private double nextVelocity = 0.0;
   private double nextNextVelocity = 0.0;
-  public double elevatorSetpoint = 0.05;
+  public double elevatorSetpoint = 0.5;
   private double positionRateOfChange = 0;
   private double changingSetpoint = 0;
 
