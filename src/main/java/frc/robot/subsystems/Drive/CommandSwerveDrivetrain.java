@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import org.photonvision.targeting.PhotonTrackedTarget;
@@ -13,15 +14,22 @@ import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.ctre.phoenix6.swerve.jni.SwerveJNI.DriveState;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.util.PathPlannerLogging;
+import com.revrobotics.spark.config.SmartMotionConfig;
 
+import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -32,8 +40,13 @@ import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.DeferredCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.VisionConstants;
+import frc.robot.FieldConstants.AlignmentConstants;
 import frc.robot.subsystems.Drive.TunerConstants.TunerSwerveDrivetrain;
 
 /**
@@ -51,14 +64,14 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     //for robot centric path following
     private final SwerveRequest.ApplyRobotSpeeds m_pathApplyRobotSpeeds = new SwerveRequest.ApplyRobotSpeeds();
     //the field
-    private Field2d TheField = new Field2d();
+    public Field2d TheField = new Field2d();
     
 
     /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
     private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.kZero;
     /* Red alliance sees forward as 180 degrees (toward blue alliance wall) */
     // TODO: If later you change your mind and dont want to flip controls, change either red or blue to match the other
-    private static final Rotation2d kRedAlliancePerspectiveRotation = Rotation2d.k180deg;
+    private static final Rotation2d kRedAlliancePerspectiveRotation = Rotation2d.kZero;
     /* Keep track if we've ever applied the operator perspective before or not */
     private boolean m_hasAppliedOperatorPerspective = false;
 
@@ -67,6 +80,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private final SwerveRequest.SysIdSwerveSteerGains m_steerCharacterization = new SwerveRequest.SysIdSwerveSteerGains();
     private final SwerveRequest.SysIdSwerveRotation m_rotationCharacterization = new SwerveRequest.SysIdSwerveRotation();
 
+    private boolean isRedAlliance() {
+        var alliance = DriverStation.getAlliance();
+        return alliance.isPresent() ? alliance.get() == DriverStation.Alliance.Red : false;
+    }
     /* SysId routine for characterizing translation. This is used to find PID gains for the drive motors. */
     private final SysIdRoutine m_sysIdRoutineTranslation = new SysIdRoutine(
         new SysIdRoutine.Config(
@@ -204,11 +221,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             startSimThread();
         }
         SmartDashboard.putData(TheField);
-
+        TheField.setRobotPose(getState().Pose);
         configureAutoBuilder();
     }
     /* Pathplanner and CTRE Swerve config */
-    @SuppressWarnings("unused")
     private void configureAutoBuilder() {
         try {
             var config = RobotConfig.fromGUISettings();
@@ -254,6 +270,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
       return;
 
     lastActivePathPose = poses.get(poses.size() - 1);
+
+    PathfindingCommand.warmupCommand().schedule();
     }
 
     /**
@@ -329,16 +347,80 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             result = Optional.of(target);
         }
     }
-
     return result;
-  }
+    }
+
+    int closestTargetID = getClosestTag().get().getFiducialId();
+
+    Transform2d leftApriltagOffset = new Transform2d(
+        -(VisionConstants.bumperToBumper)/2,
+        AlignmentConstants.left_aprilTagOffsets.getOrDefault(closestTargetID, 0.0),
+        new Rotation2d(0)
+    );
+    Transform2d rightApriltagOffset = new Transform2d(
+        -(VisionConstants.bumperToBumper)/2,
+        AlignmentConstants.right_aprilTagOffsets.getOrDefault(closestTargetID, 0.0),
+        new Rotation2d(0)
+    );
+
+    Pose2d estimatedLeftPOSE =
+            (vision.kFieldLayout.getTagPose(closestTargetID))
+                .map(Pose3d::toPose2d)
+                .orElse(new Pose2d())
+                .transformBy(
+                    new Transform2d(
+                            leftApriltagOffset.getTranslation().rotateBy(Rotation2d.fromDegrees(180)),
+                            Rotation2d.fromDegrees(180))
+                        .inverse());
+    Pose2d estimatedRightPOSE =
+    (vision.kFieldLayout.getTagPose(closestTargetID))
+        .map(Pose3d::toPose2d)
+        .orElse(new Pose2d())
+        .transformBy(
+            new Transform2d(
+                    leftApriltagOffset.getTranslation().rotateBy(Rotation2d.fromDegrees(180)),
+                    Rotation2d.fromDegrees(180))
+                .inverse());
+    Pose2d leftPose = estimatedLeftPOSE;
+    Pose2d rightPose = estimatedRightPOSE;
+    public Command reefAlign(boolean leftAlign) {
+        return new DeferredCommand(
+            () -> {
+            if (leftPose == null || rightPose == null) {
+                return new InstantCommand();
+            }
+            //   List<Pose2d> tagSide = leftAlign ? VisionConstants.leftReefList : VisionConstants.rightReefList;
+            Pose2d goalPose = leftAlign ? leftPose : rightPose;
+            
+            SmartDashboard.putNumber("Swerve/Attempted Pose X", goalPose.getX());
+            SmartDashboard.putNumber("Swerve/Attempted Pose Y", goalPose.getY());
+            
+            return AutoBuilder.pathfindToPose(goalPose, 
+            new PathConstraints(AutoConstants.kMaxSpeedMetersPerSecond,
+            AutoConstants.kMaxAccelerationMetersPerSecondSquared,
+            AutoConstants.kMaxAngularSpeedRadiansPerSecond,
+            AutoConstants.kMaxAngularSpeedRadiansPerSecondSquared), 0.0);
+            },
+            Set.of(this));
+    }
+    public Pose2d getTargetPose(boolean left) {
+        Pose2d targetPose = new Pose2d();
+        if(left){
+            targetPose = getState().Pose.nearest(
+                isRedAlliance() ? AlignmentConstants.leftREDReefList : AlignmentConstants.leftBLUEReefList);
+        } else {
+            targetPose = getState().Pose.nearest(
+                isRedAlliance() ? AlignmentConstants.rightREDReefList : AlignmentConstants.rightBLUEReefList);
+        }
+        return targetPose;
+    }
+
 
     @Override
     public void periodic() {
-        updateVisionMeasurements();
+        // updateVisionMeasurements();
         // var globalPose = vision.getEstimatedGlobalPose();
         // if (vision.getEstimatedGlobalPose().isEmpty()){
-            
         // } else {
         //     TheField.setRobotPose(vision.getEstimatedGlobalPose().get().estimatedPose.toPose2d());
         // }

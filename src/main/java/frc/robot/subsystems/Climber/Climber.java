@@ -22,7 +22,7 @@ public class Climber extends SubsystemBase{
         climberEncoder.setPosition(0);
     }
     public void setupMotors() {
-        climberConfig.smartCurrentLimit(40, 40)
+        climberConfig.smartCurrentLimit(80, 80)
         .inverted(false)
         .idleMode(IdleMode.kBrake)
         .voltageCompensation(12);

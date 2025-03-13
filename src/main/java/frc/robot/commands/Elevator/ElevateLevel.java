@@ -17,7 +17,7 @@ public class ElevateLevel extends Command {
     private ElevateMode level;
     // private TrapezoidProfile profiler_y = new TrapezoidProfile(
     //         new TrapezoidProfile.Constraints(ElevatorConstants.maxVelocity, ElevatorConstants.maxAccel));
-    private Timer timer_y = new Timer();
+    // private Timer timer_y = new Timer();
 
     public ElevateLevel(Elevator elevator, ElevateMode mode) {
         elevator_y = elevator;
@@ -58,6 +58,18 @@ public class ElevateLevel extends Command {
             case OFF:
                 elevator_y.elevatorSetpoint = 1;
                 break;
+            case RESET:
+                elevator_y.SET(0);
+                break;
+            case HOMING:
+            if (elevator_y.leftElevatorMotor.getOutputCurrent() >= ElevatorConstants.homingCurrentThreshold) {
+                elevator_y.leftElevatorMotor.setVoltage(0);
+                elevator_y.rightElevatorMotor.setVoltage(0);
+                elevator_y.SET(0);;
+                      } else {
+                        elevator_y.leftElevatorMotor.setVoltage(ElevatorConstants.selfHomeSpeedVoltage);
+                        elevator_y.rightElevatorMotor.setVoltage(ElevatorConstants.selfHomeSpeedVoltage);
+                      }
             default:
                 break;
         }

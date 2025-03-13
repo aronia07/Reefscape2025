@@ -20,8 +20,8 @@ import frc.robot.Constants.ElevatorConstants.ElevateMode;
 
 public class Elevator extends SubsystemBase {
 
-  private SparkMax leftElevatorMotor = new SparkMax(ElevatorConstants.leftElevatorMotorID, MotorType.kBrushless);
-  private SparkMax rightElevatorMotor = new SparkMax(ElevatorConstants.rightElevatorMotorID, MotorType.kBrushless);
+  public SparkMax leftElevatorMotor = new SparkMax(ElevatorConstants.leftElevatorMotorID, MotorType.kBrushless);
+  public SparkMax rightElevatorMotor = new SparkMax(ElevatorConstants.rightElevatorMotorID, MotorType.kBrushless);
 
   private SparkMaxConfig leftConfig = new SparkMaxConfig();
   private SparkMaxConfig rightConfig = new SparkMaxConfig();

@@ -1,5 +1,6 @@
 package frc.robot.subsystems.Drive;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,7 +35,7 @@ public class Vision extends SubsystemBase {
   public AprilTagFieldLayout kFieldLayout;
 
   public Vision() {
-    kFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
+    kFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
     camera = new PhotonCamera(Constants.VisionConstants.cameraName);
     camera2 = new PhotonCamera(Constants.VisionConstants.camera2Name);
     photonPoseEstimator = new PhotonPoseEstimator(kFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,

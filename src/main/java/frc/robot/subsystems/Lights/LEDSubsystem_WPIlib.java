@@ -59,7 +59,7 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
     // setDefaultCommand(runPattern(LEDPattern.solid(Color.kBlack), false).withName("Off"));
 
     LED_SolidColor(Color.kRed);
-    System.out.println("Correctly set color!!!!!!!!!!!!!");
+    // System.out.println("Correctly set color!!!!!!!!!!!!!");
   }
 
   /**
@@ -150,7 +150,7 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
       running_AnimatedPattern = false;
       pattern.applyTo(m_ledbuffer);
       m_led.setData(m_ledbuffer);
-      System.out.println("And executed proprely!!!!! Animated:" + running_AnimatedPattern);
+      // System.out.println("And executed proprely!!!!! Animated:" + running_AnimatedPattern);
     }
     // return run(() -> pattern.applyTo(m_ledbuffer));
   }

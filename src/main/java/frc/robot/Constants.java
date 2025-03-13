@@ -3,11 +3,16 @@ package frc.robot;
 import edu.wpi.first.math.Vector;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.opencv.core.Point;
 
+import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -46,6 +51,7 @@ public final class Constants {
       }
     public static final class VisionConstants {
         /* camera stuff */
+        public static double bumperToBumper = 33.25;
         public static Transform3d kRobotToCam = new Transform3d(
             new Translation3d(0, -Units.inchesToMeters(11.41), Units.inchesToMeters(6.6)), 
             new Rotation3d(0, Units.degreesToRadians(23), 0)); //TODO: edit yaw
@@ -59,7 +65,7 @@ public final class Constants {
         /* pose of reefs for alignment */
         public static Optional<Pose3d> blueReefPose;
         public static Optional<Pose3d> redReefPose;
-
+        
     }
 
     public static final class AutoConstants {
@@ -101,16 +107,16 @@ public final class Constants {
         public static double min = .5;
         public static double max = 18;
         public static double homingCurrentThreshold = 10;
-        public static double selfHomeSpeedVoltage;
+        public static double selfHomeSpeedVoltage = 10;
         public static int desiredMin;
         public static int desiredMax;
         public static int leftElevatorMotorID = 41;
         public static int rightElevatorMotorID = 42;
         public static double[] elevatorPID = new double[] { 0.085, 0, 0 }; // p is a little aggressive
         public static double[] elevatorSGV = new double[] { 0, 0.015, 0.0009, 0 }; // g needs testing
-        public static double maxVelocity = 100; // in mps
-        public static double maxAccel = 40; // in mps/s
-        public static double elevatorTolerance;
+        public static double maxVelocity = 150; // in mps
+        public static double maxAccel = 150; // in mps/s
+        public static double elevatorTolerance = .3;
 
         public static enum ElevateMode {
             UP,
@@ -123,7 +129,8 @@ public final class Constants {
             OFF,
             MANUAL,
             TEST,
-            HOMING
+            HOMING,
+            RESET
         }
 
         public static double LevelOneSetpoint = 1;

@@ -172,14 +172,14 @@ public class Arm extends SubsystemBase {
   public void periodic() {
 
     encoderPosition = encoder.getAbsolutePosition();  //Finds the exact position of the encoder
-    logValues();  //Logs values to SmartDashboard/Glass
+    // logValues();  //Logs values to SmartDashboard/Glass
     // checkTunableValues(); //Updates PID and FF values
 
 
     var ffOutput = ffModel.calculate(setpoint.getRadians(), velocity.getRadians()); //Calculates Feedforward output
     var pidOutput = pid.calculate(getEncoderPosition().getRadians(), setpoint.getRadians());  //calculates PID output
 
-    SmartDashboard.putNumber("ffoutput arm", ffOutput); //Displays the FF output calculated above on Smartdahsboard/Glass
+    // SmartDashboard.putNumber("ffoutput arm", ffOutput); //Displays the FF output calculated above on Smartdahsboard/Glass
 
     //PID+FF output on the leader and follower motors
     leader.set(ffOutput + pidOutput);

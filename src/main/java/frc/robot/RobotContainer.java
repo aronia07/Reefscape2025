@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.DeferredCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -39,6 +40,7 @@ import frc.robot.commands.Wrist.WristMove;
 import frc.robot.commands.Intake.IntakeOut;
 import frc.robot.commands.Intake.IntakeOut2;
 import frc.robot.commands.Intake.Modify;
+import frc.robot.commands.Lights.WPIlib.RunPattern;
 import frc.robot.commands.Lights.WPIlib.SetSolidColor;
 import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Drive.TunerConstants;
@@ -115,29 +117,36 @@ public class RobotContainer {
         driver.a().whileTrue(drivetrain.applyRequest(() -> brake));
         driver.b().whileTrue(drivetrain
                 .applyRequest(() -> point.withModuleDirection(new Rotation2d(-driver.getLeftY(), -driver.getLeftX()))));
-
+        driver.x().whileTrue(
+            new ProxyCommand(
+                DriveToLocation.driveTo(vision.kFieldLayout.getTagPose(
+                    drivetrain.getClosestTag().get().getFiducialId()).get().toPose2d(), drivetrain)));
         // Run SysId routines when holding back/start and X/Y.
         // CHANGED: changed from back/start+x/y to pov buttons
         // Note that each routine should be run exactly once in a single log.
         // d-pad
-        driver.povRight().whileTrue(
-        new ProxyCommand(
-            DriveToLocation.driveTo(new Pose2d(3.14, 4.208, new Rotation2d()), drivetrain)));
+       
         // driver.povUp().whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
         // driver.povDown().whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
         // driver.povLeft().whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
         // driver.povRight().whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
-
+        //Bumpers and Triggers
         // reset the field-centric heading on left bumper press
         driver.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
         //HP Pickup
         driver.rightBumper().whileTrue(new ParallelCommandGroup(
             new ToWristAngle(() -> Units.degreesToRadians(-77), wrist),
-            new ToAngle(() -> Units.degreesToRadians(37), arm),
+            new ToAngle(() -> Units.degreesToRadians(35), arm),
             new IntakeIn(intake)
         ).finallyDo(this::idle));
-
+        
+        //353 inspired align
+        driver.leftTrigger().whileTrue(drivetrain.reefAlign(true));
+        //9659 inspired align
+        driver.rightTrigger().whileTrue(
+            drivetrain.defer(() -> DriveToLocation.driveTo(drivetrain.getTargetPose(false), drivetrain))
+        );
         /* OPERATOR CONTROLS */
         // joysticks
         arm.setDefaultCommand(new ManualArm(() -> -operator.getLeftY(), arm));
@@ -146,17 +155,21 @@ public class RobotContainer {
 
 
         // buttons
-        if(!isModified) {
-            operator.leftTrigger().whileTrue(new IntakeOut(intake));
-        } else {
-            operator.leftTrigger().whileTrue(new IntakeOut2(intake));
-        }
+        // if(!isModified) {
+        //     operator.leftTrigger().whileTrue(new IntakeOut(intake));
+        // } else {
+        //     operator.leftTrigger().whileTrue(new IntakeOut2(intake));
+        // }
         operator.rightBumper().whileTrue(new IntakeOut(intake));
         operator.leftBumper().whileTrue(new IntakeOut2(intake));
+        // modified outtake
+        operator.rightBumper().and(operator.b()).and(operator.rightTrigger()).whileTrue(
+            new IntakeOut2(intake)
+        );
 
-        operator.x().onTrue(new SetSolidColor(wpiLights, Color.kMagenta));
+        // operator.x().onTrue(new SetSolidColor(wpiLights, Color.kMagenta));
 
-        //L4
+        // L4
         operator.y().whileTrue(new SequentialCommandGroup(
             new ToWristAngle(() -> Units.degreesToRadians(-35), wrist),
             new ParallelCommandGroup(
@@ -166,7 +179,7 @@ public class RobotContainer {
         
 
 
-        //Modified L4
+        // Modified L4
         operator.y().and(operator.rightTrigger()).whileTrue(new SequentialCommandGroup(
             new ToWristAngle(() -> Units.degreesToRadians(10), wrist),
             new ParallelCommandGroup(
@@ -174,7 +187,7 @@ public class RobotContainer {
                 new ElevateLevel(elevator, ElevateMode.L4))
         ).finallyDo(this::idle));
 
-        //L3
+        // L3
         operator.b().whileTrue(new SequentialCommandGroup(
             new ToWristAngle(() -> Units.degreesToRadians(-48), wrist),
             new ParallelCommandGroup(
@@ -182,35 +195,39 @@ public class RobotContainer {
                 new ElevateLevel(elevator, ElevateMode.L3))
         ).finallyDo(this::idle));
 
-        //Modified L3
+        // L3 Algae Removal
         operator.b().and(operator.rightTrigger()).whileTrue(new ParallelCommandGroup(
-            new ToAngle(() -> Units.degreesToRadians(71.4), arm),
+            new ToAngle(() -> Units.degreesToRadians(-53), arm),
             new ElevateLevel(elevator, ElevateMode.L3),
-            new ToWristAngle(() -> Units.degreesToRadians(-19), wrist)
+            new ToWristAngle(() -> Units.degreesToRadians(87), wrist)
         ).finallyDo(this::idle));
         
-        //L2
+        // L2
         operator.a().whileTrue(new SequentialCommandGroup(
-            new ToWristAngle(() -> Units.degreesToRadians(-66.7), wrist),
+            new ToWristAngle(() -> Units.degreesToRadians(-61.5), wrist),
             new ProxyCommand(RobotContainer.switchOuttake(false)),
             new ParallelCommandGroup(
                 new ToAngle(() -> Units.degreesToRadians(70), arm),
                 new ElevateLevel(elevator, ElevateMode.L2))
         ).finallyDo(this::idle));
         
-        //Modified L2
-        operator.a().and(operator.rightTrigger()).whileTrue(new ParallelCommandGroup(
-            new ToAngle(() -> Units.degreesToRadians(45), arm)
+        // L2 Algae Removal
+        operator.a().and(operator.rightTrigger()).whileTrue(new SequentialCommandGroup(
+            new ToWristAngle(() -> Units.degreesToRadians(-72), wrist),
+            new ProxyCommand(RobotContainer.switchOuttake(false)),
+            new ParallelCommandGroup(
+                new ToAngle(() -> Units.degreesToRadians(87), arm),
+                new ElevateLevel(elevator, ElevateMode.L2))
         ).finallyDo(this::idle));
         
         //L1
-        // operator.x().whileTrue(new SequentialCommandGroup(
-        //     new ToWristAngle(() -> Units.degreesToRadians(-74), wrist),
-        //     new ProxyCommand(RobotContainer.switchOuttake(true)),
-        //     new ParallelCommandGroup(
-        //         new ToAngle(() -> Units.degreesToRadians(12.4), arm),
-        //         new ElevateLevel(elevator, ElevateMode.L1))
-        // ).finallyDo(this::idle));
+        operator.x().whileTrue(new SequentialCommandGroup(
+            new ToWristAngle(() -> Units.degreesToRadians(-74), wrist),
+            new ProxyCommand(RobotContainer.switchOuttake(true)),
+            new ParallelCommandGroup(
+                new ToAngle(() -> Units.degreesToRadians(12.4), arm),
+                new ElevateLevel(elevator, ElevateMode.L1))
+        ).finallyDo(this::idle));
 
         // d-pad
         operator.povDown().whileTrue(new Climb(climber, () -> .2));
@@ -219,12 +236,11 @@ public class RobotContainer {
     }
 
     public void getDashboardCommand() {
-
     }
 
     public Command getIdleCommands() {
        return new ParallelCommandGroup(
-            new ToWristAngle(() -> Units.degreesToRadians(70), wrist),
+            new ToWristAngle(() -> Units.degreesToRadians(-77), wrist),
             // new ElevateLevel(elevator, () -> 5),
             new ToAngle(() -> Units.degreesToRadians(60), arm)
         );
@@ -252,6 +268,7 @@ public class RobotContainer {
     }
 
     public void disabledActions() {
+        new SetSolidColor(wpiLights, Color.kMagenta);
         // arm.resetI();
         // arm.runState(new
         // TrapezoidProfile.State(arm.getEncoderPosition().getRadians(), 0));
