@@ -58,13 +58,15 @@ public final class Constants {
         public static String cameraName = "orangepi";
         public static String camera2Name = "USB_Camera(1)";
         /* standard deviations for vision calculations */
-        public static Vector<N3> kSingleTagStdDevs = VecBuilder.fill(2, 2, 4);
+        public static Vector<N3> kSingleTagStdDevs = VecBuilder.fill(2, 2, 2);
         public static Vector<N3> kMultiTagStdDevs = VecBuilder.fill(1, 1, 1);
         public static Vector<N3> odoStdDEvs = VecBuilder.fill(.2, .2, .2);
         public static double odometryUpdateFrequency = 250;
         /* pose of reefs for alignment */
         public static Optional<Pose3d> blueReefPose;
         public static Optional<Pose3d> redReefPose;
+        public static double leftOffsetInches = 6;
+        public static double rightOffsetInches = 6;
         
     }
 
@@ -73,6 +75,16 @@ public final class Constants {
         public static double kMaxAccelerationMetersPerSecondSquared = 6.1 ;
         public static double kMaxAngularSpeedRadiansPerSecond = Units.rotationsPerMinuteToRadiansPerSecond(0.75*(1/60));
         public static double kMaxAngularSpeedRadiansPerSecondSquared = Units.degreesToRadians(862);
+
+        public static double robotMass = 44;
+        public static double robotMOI = 5.469;
+        public static double bumperWidth = .9;
+        public static double wheelRadius = 0.048;
+        public static double driveGearing = 6.746;
+        public static double maxDriveSpeed = 5.45;
+        public static double wheelFrictionCoefficient = 1.5;
+        public static double driveCurrentLimit = 60;
+        public static double moduleOffset = 0.349;
     }
 
     public static final class WristConstants {

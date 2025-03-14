@@ -119,8 +119,12 @@ public class RobotContainer {
                 .applyRequest(() -> point.withModuleDirection(new Rotation2d(-driver.getLeftY(), -driver.getLeftX()))));
         driver.x().whileTrue(
             new ProxyCommand(
-                DriveToLocation.driveTo(vision.kFieldLayout.getTagPose(
-                    drivetrain.getClosestTag().get().getFiducialId()).get().toPose2d(), drivetrain)));
+                DriveToLocation.driveTo(new Pose2d(
+                    vision.kFieldLayout.getTagPose(
+                        drivetrain.getClosestTag().get().getFiducialId()).get().toPose2d().getTranslation(),
+                    vision.kFieldLayout.getTagPose(
+                        drivetrain.getClosestTag().get().getFiducialId()).get().toPose2d().getRotation().unaryMinus()), 
+                    drivetrain)));
         // Run SysId routines when holding back/start and X/Y.
         // CHANGED: changed from back/start+x/y to pov buttons
         // Note that each routine should be run exactly once in a single log.
@@ -142,10 +146,13 @@ public class RobotContainer {
         ).finallyDo(this::idle));
         
         //353 inspired align
-        driver.leftTrigger().whileTrue(drivetrain.reefAlign(true));
+        // driver.leftTrigger().whileTrue(drivetrain.reefAlign(true));
         //9659 inspired align
+        driver.leftTrigger().whileTrue(
+            drivetrain.defer(() -> DriveToLocation.driveTo(drivetrain.addOffset(true), drivetrain))
+        );
         driver.rightTrigger().whileTrue(
-            drivetrain.defer(() -> DriveToLocation.driveTo(drivetrain.getTargetPose(false), drivetrain))
+            drivetrain.defer(() -> DriveToLocation.driveTo(drivetrain.getCenterReefPose(), drivetrain))
         );
         /* OPERATOR CONTROLS */
         // joysticks
@@ -163,7 +170,10 @@ public class RobotContainer {
         operator.rightBumper().whileTrue(new IntakeOut(intake));
         operator.leftBumper().whileTrue(new IntakeOut2(intake));
         // modified outtake
-        operator.rightBumper().and(operator.b()).and(operator.rightTrigger()).whileTrue(
+        operator.rightBumper().and(operator.x()).and(operator.rightTrigger()).whileTrue(
+            new IntakeOut2(intake)
+        );
+        operator.rightBumper().and(operator.a()).and(operator.rightTrigger()).whileTrue(
             new IntakeOut2(intake)
         );
 

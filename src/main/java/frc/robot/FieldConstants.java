@@ -9,6 +9,7 @@ import edu.wpi.first.math.util.Units;
 
 public class FieldConstants {
     public static class AlignmentConstants {
+        public static double aprilTagOffset;
         public static List<Pose2d> leftREDReefList = List.of(
             new Pose2d(), //
             new Pose2d(),

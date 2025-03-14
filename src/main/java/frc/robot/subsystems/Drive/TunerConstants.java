@@ -196,22 +196,11 @@ public class TunerConstants {
          * This should only be called once in your robot program,.
          */
         public static CommandSwerveDrivetrain createDrivetrain() {
-            // var visionEst = vision.getEstimatedGlobalPose();
-            // visionEst.ifPresent(est -> {
-            // if (Math.sqrt(Math.pow(est.estimatedPose.toPose2d().getX(), 2) + Math.pow(est.estimatedPose.toPose2d().getY(), 2)) 
-            // > 4) {
-            //     return;
-            // }
-            // //   if (est.estimatedPose.toPose2d().getX() > 4) {
-            // //     return;
-            // //   }
-            // var estPose = est.estimatedPose.toPose2d();
-            // var estStdDevs = vision.getEstimationStdDevs(estPose);
-            // .addVisionMeasurement(est.estimatedPose.toPose2d(), est.timestampSeconds, estStdDevs);
-            // });
         return new CommandSwerveDrivetrain(
-                    DrivetrainConstants, Constants.VisionConstants.odometryUpdateFrequency, 
-                    Constants.VisionConstants.odoStdDEvs, Constants.VisionConstants.kMultiTagStdDevs,
+                    DrivetrainConstants, 
+                    Constants.VisionConstants.odometryUpdateFrequency, 
+                    Constants.VisionConstants.odoStdDEvs, 
+                    Constants.VisionConstants.kMultiTagStdDevs,
                     FrontLeft, FrontRight, BackLeft, BackRight);
                 // (
                 //     DrivetrainConstants, FrontLeft, FrontRight, BackLeft, BackRight

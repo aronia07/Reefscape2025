@@ -2,11 +2,13 @@ package frc.robot.subsystems.Drive;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import org.opencv.core.Mat;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import com.ctre.phoenix6.SignalLogger;
@@ -32,6 +34,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
@@ -222,8 +225,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
         SmartDashboard.putData(TheField);
         TheField.setRobotPose(getState().Pose);
+        if (vision.getEstimatedGlobalPose().isEmpty()){
+            } else {
+                TheField.getObject("vision pls work").setPose(vision.getEstimatedGlobalPose().get().estimatedPose.toPose2d());
+            }
         configureAutoBuilder();
     }
+
     /* Pathplanner and CTRE Swerve config */
     private void configureAutoBuilder() {
         try {
@@ -350,20 +358,22 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     return result;
     }
 
-    int closestTargetID = getClosestTag().get().getFiducialId();
+    
+    public Command reefAlign(boolean leftAlign) {
+        int closestTargetID = getClosestTag().get().getFiducialId();
 
-    Transform2d leftApriltagOffset = new Transform2d(
-        -(VisionConstants.bumperToBumper)/2,
-        AlignmentConstants.left_aprilTagOffsets.getOrDefault(closestTargetID, 0.0),
-        new Rotation2d(0)
-    );
-    Transform2d rightApriltagOffset = new Transform2d(
-        -(VisionConstants.bumperToBumper)/2,
-        AlignmentConstants.right_aprilTagOffsets.getOrDefault(closestTargetID, 0.0),
-        new Rotation2d(0)
-    );
+        Transform2d leftApriltagOffset = new Transform2d(
+            -(VisionConstants.bumperToBumper)/2,
+            AlignmentConstants.left_aprilTagOffsets.getOrDefault(closestTargetID, 0.0),
+            new Rotation2d(0)
+        );
+        Transform2d rightApriltagOffset = new Transform2d(
+            -(VisionConstants.bumperToBumper)/2,
+            AlignmentConstants.right_aprilTagOffsets.getOrDefault(closestTargetID, 0.0),
+            new Rotation2d(0)
+        );
 
-    Pose2d estimatedLeftPOSE =
+        Pose2d estimatedLeftPOSE =
             (vision.kFieldLayout.getTagPose(closestTargetID))
                 .map(Pose3d::toPose2d)
                 .orElse(new Pose2d())
@@ -372,18 +382,17 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                             leftApriltagOffset.getTranslation().rotateBy(Rotation2d.fromDegrees(180)),
                             Rotation2d.fromDegrees(180))
                         .inverse());
-    Pose2d estimatedRightPOSE =
-    (vision.kFieldLayout.getTagPose(closestTargetID))
-        .map(Pose3d::toPose2d)
-        .orElse(new Pose2d())
-        .transformBy(
-            new Transform2d(
-                    leftApriltagOffset.getTranslation().rotateBy(Rotation2d.fromDegrees(180)),
-                    Rotation2d.fromDegrees(180))
-                .inverse());
-    Pose2d leftPose = estimatedLeftPOSE;
-    Pose2d rightPose = estimatedRightPOSE;
-    public Command reefAlign(boolean leftAlign) {
+        Pose2d estimatedRightPOSE =
+            (vision.kFieldLayout.getTagPose(closestTargetID))
+                .map(Pose3d::toPose2d)
+                .orElse(new Pose2d())
+                .transformBy(
+                    new Transform2d(
+                            rightApriltagOffset.getTranslation().rotateBy(Rotation2d.fromDegrees(180)),
+                            Rotation2d.fromDegrees(180))
+                        .inverse());
+        Pose2d leftPose = estimatedLeftPOSE;
+        Pose2d rightPose = estimatedRightPOSE;
         return new DeferredCommand(
             () -> {
             if (leftPose == null || rightPose == null) {
@@ -414,7 +423,53 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
         return targetPose;
     }
+    public Pose2d getCenterReefPose() {
+        Pose2d target;
+        int firstTag;
+        int endtag;
 
+        List<Pose2d> reefTagPoseList = new ArrayList<>(6);
+
+        if(isRedAlliance()){
+            firstTag = 6;
+            endtag = 12;
+        } else {
+            firstTag = 17;
+            endtag = 23;
+        }
+        for(int i = firstTag; i < endtag; i++) {
+            reefTagPoseList.add(vision.kFieldLayout.getTagPose(i).get().toPose2d());
+        }
+        Pose2d nearestPose = getState().Pose.nearest(reefTagPoseList);
+        double angle = nearestPose.getRotation().rotateBy(Rotation2d.k180deg).getRadians();
+
+        target = new Pose2d(
+            nearestPose.getX() + (-Units.inchesToMeters(VisionConstants.bumperToBumper/2)* Math.cos(angle)),
+            nearestPose.getY() + (-Units.inchesToMeters(VisionConstants.bumperToBumper/2) * Math.sin(angle)),
+            Rotation2d.fromRadians(angle));
+
+        return target;
+    }
+    public Pose2d addOffset(boolean left) {
+        double offset = Units.inchesToMeters(VisionConstants.leftOffsetInches);
+        Pose2d centerTarget = getCenterReefPose();
+        double angle = (Math.PI/2) - centerTarget.getRotation().getRadians();
+        Pose2d offsetTarget;
+        if(left) {
+            offsetTarget = new Pose2d(
+                centerTarget.getX() + (offset * Math.cos(angle)),
+                centerTarget.getY() + (-offset * Math.sin(angle)),
+                centerTarget.getRotation()
+            );
+        } else {
+            offsetTarget = new Pose2d(
+              centerTarget.getX() + (-offset * Math.sin(angle)),
+              centerTarget.getY() + (offset * Math.cos(angle)),
+              centerTarget.getRotation()
+          );
+        }
+        return offsetTarget;
+    }
 
     @Override
     public void periodic() {
