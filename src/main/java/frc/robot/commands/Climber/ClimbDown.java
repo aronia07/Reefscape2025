@@ -7,11 +7,11 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Climber.Climber;
 
-public class Climb extends Command {
+public class ClimbDown extends Command {
     protected final Climber climber_y;
     private DoubleSupplier powerSupplier;
 
-    public Climb(Climber climber, DoubleSupplier doubleSupplier) {
+    public ClimbDown(Climber climber, DoubleSupplier doubleSupplier) {
         this.climber_y = climber;
         this.powerSupplier = doubleSupplier;
     }
@@ -19,12 +19,12 @@ public class Climb extends Command {
     @Override
     public void execute() {
         double power = powerSupplier.getAsDouble();
-        climber_y.up(power);
+        climber_y.down(power);
     }
 
     @Override
     public void end(boolean interrupted) {
-        climber_y.up(0);
+        climber_y.down(0);
     }
 
 }

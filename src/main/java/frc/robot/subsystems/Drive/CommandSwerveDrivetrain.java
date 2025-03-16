@@ -61,20 +61,20 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private Notifier m_simNotifier = null;
     private double m_lastSimTime;
     public Vision vision = new Vision();
-    private Pose2d lastActivePathPose = new Pose2d(); 
-    //for field centric path following:
+    private Pose2d lastActivePathPose = new Pose2d();
+    // for field centric path following:
     private final SwerveRequest.ApplyFieldSpeeds m_pathApplyFieldSpeeds = new SwerveRequest.ApplyFieldSpeeds();
-    //for robot centric path following
+    // for robot centric path following
     private final SwerveRequest.ApplyRobotSpeeds m_pathApplyRobotSpeeds = new SwerveRequest.ApplyRobotSpeeds();
-    //the field
+    // the field
     public Field2d TheField = new Field2d();
-    
 
     /* Blue alliance sees forward as 0 degrees (toward red alliance wall) */
     private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.kZero;
     /* Red alliance sees forward as 180 degrees (toward blue alliance wall) */
-    // TODO: If later you change your mind and dont want to flip controls, change either red or blue to match the other
-    private static final Rotation2d kRedAlliancePerspectiveRotation = Rotation2d.kZero;
+    // TODO: If later you change your mind and dont want to flip controls, change
+    // either red or blue to match the other
+    private static final Rotation2d kRedAlliancePerspectiveRotation = Rotation2d.k180deg;
     /* Keep track if we've ever applied the operator perspective before or not */
     private boolean m_hasAppliedOperatorPerspective = false;
 
@@ -87,64 +87,64 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         var alliance = DriverStation.getAlliance();
         return alliance.isPresent() ? alliance.get() == DriverStation.Alliance.Red : false;
     }
-    /* SysId routine for characterizing translation. This is used to find PID gains for the drive motors. */
-    private final SysIdRoutine m_sysIdRoutineTranslation = new SysIdRoutine(
-        new SysIdRoutine.Config(
-            null,        // Use default ramp rate (1 V/s)
-            Volts.of(4), // Reduce dynamic step voltage to 4 V to prevent brownout
-            null,        // Use default timeout (10 s)
-            // Log state with SignalLogger class
-            state -> SignalLogger.writeString("SysIdTranslation_State", state.toString())
-        ),
-        new SysIdRoutine.Mechanism(
-            output -> setControl(m_translationCharacterization.withVolts(output)),
-            null,
-            this
-        )
-    );
 
-    /* SysId routine for characterizing steer. This is used to find PID gains for the steer motors. */
+    /*
+     * SysId routine for characterizing translation. This is used to find PID gains
+     * for the drive motors.
+     */
+    private final SysIdRoutine m_sysIdRoutineTranslation = new SysIdRoutine(
+            new SysIdRoutine.Config(
+                    null, // Use default ramp rate (1 V/s)
+                    Volts.of(4), // Reduce dynamic step voltage to 4 V to prevent brownout
+                    null, // Use default timeout (10 s)
+                    // Log state with SignalLogger class
+                    state -> SignalLogger.writeString("SysIdTranslation_State", state.toString())),
+            new SysIdRoutine.Mechanism(
+                    output -> setControl(m_translationCharacterization.withVolts(output)),
+                    null,
+                    this));
+
+    /*
+     * SysId routine for characterizing steer. This is used to find PID gains for
+     * the steer motors.
+     */
     private final SysIdRoutine m_sysIdRoutineSteer = new SysIdRoutine(
-        new SysIdRoutine.Config(
-            null,        // Use default ramp rate (1 V/s)
-            Volts.of(7), // Use dynamic voltage of 7 V
-            null,        // Use default timeout (10 s)
-            // Log state with SignalLogger class
-            state -> SignalLogger.writeString("SysIdSteer_State", state.toString())
-        ),
-        new SysIdRoutine.Mechanism(
-            volts -> setControl(m_steerCharacterization.withVolts(volts)),
-            null,
-            this
-        )
-    );
+            new SysIdRoutine.Config(
+                    null, // Use default ramp rate (1 V/s)
+                    Volts.of(7), // Use dynamic voltage of 7 V
+                    null, // Use default timeout (10 s)
+                    // Log state with SignalLogger class
+                    state -> SignalLogger.writeString("SysIdSteer_State", state.toString())),
+            new SysIdRoutine.Mechanism(
+                    volts -> setControl(m_steerCharacterization.withVolts(volts)),
+                    null,
+                    this));
 
     /*
      * SysId routine for characterizing rotation.
-     * This is used to find PID gains for the FieldCentricFacingAngle HeadingController.
-     * See the documentation of SwerveRequest.SysIdSwerveRotation for info on importing the log to SysId.
+     * This is used to find PID gains for the FieldCentricFacingAngle
+     * HeadingController.
+     * See the documentation of SwerveRequest.SysIdSwerveRotation for info on
+     * importing the log to SysId.
      */
     private final SysIdRoutine m_sysIdRoutineRotation = new SysIdRoutine(
-        new SysIdRoutine.Config(
-            /* This is in radians per second², but SysId only supports "volts per second" */
-            Volts.of(Math.PI / 6).per(Second),
-            /* This is in radians per second, but SysId only supports "volts" */
-            Volts.of(Math.PI),
-            null, // Use default timeout (10 s)
-            // Log state with SignalLogger class
-            state -> SignalLogger.writeString("SysIdRotation_State", state.toString())
-        ),
-        new SysIdRoutine.Mechanism(
-            output -> {
-                /* output is actually radians per second, but SysId only supports "volts" */
-                setControl(m_rotationCharacterization.withRotationalRate(output.in(Volts)));
-                /* also log the requested output for SysId */
-                SignalLogger.writeDouble("Rotational_Rate", output.in(Volts));
-            },
-            null,
-            this
-        )
-    );
+            new SysIdRoutine.Config(
+                    /* This is in radians per second², but SysId only supports "volts per second" */
+                    Volts.of(Math.PI / 6).per(Second),
+                    /* This is in radians per second, but SysId only supports "volts" */
+                    Volts.of(Math.PI),
+                    null, // Use default timeout (10 s)
+                    // Log state with SignalLogger class
+                    state -> SignalLogger.writeString("SysIdRotation_State", state.toString())),
+            new SysIdRoutine.Mechanism(
+                    output -> {
+                        /* output is actually radians per second, but SysId only supports "volts" */
+                        setControl(m_rotationCharacterization.withRotationalRate(output.in(Volts)));
+                        /* also log the requested output for SysId */
+                        SignalLogger.writeDouble("Rotational_Rate", output.in(Volts));
+                    },
+                    null,
+                    this));
 
     /* The SysId routine to test */
     private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineTranslation;
@@ -152,28 +152,31 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     /**
      * Constructs a CTRE SwerveDrivetrain using the specified constants.
      * <p>
-     * This constructs the underlying hardware devices, so users should not construct
-     * the devices themselves. If they need the devices, they can access them through
+     * This constructs the underlying hardware devices, so users should not
+     * construct
+     * the devices themselves. If they need the devices, they can access them
+     * through
      * getters in the classes.
      *
-     * @param drivetrainConstants   Drivetrain-wide constants for the swerve drive
-     * @param modules               Constants for each specific module
+     * @param drivetrainConstants Drivetrain-wide constants for the swerve drive
+     * @param modules             Constants for each specific module
      */
     public CommandSwerveDrivetrain(
-        SwerveDrivetrainConstants drivetrainConstants,
-        SwerveModuleConstants<?, ?, ?>... modules
-    ) {
+            SwerveDrivetrainConstants drivetrainConstants,
+            SwerveModuleConstants<?, ?, ?>... modules) {
         super(drivetrainConstants, modules);
-        if (Utils.isSimulation()) {
-            startSimThread();
-        }
+        // if (Utils.isSimulation()) {
+        // startSimThread();
+        // }
     }
 
     /**
      * Constructs a CTRE SwerveDrivetrain using the specified constants.
      * <p>
-     * This constructs the underlying hardware devices, so users should not construct
-     * the devices themselves. If they need the devices, they can access them through
+     * This constructs the underlying hardware devices, so users should not
+     * construct
+     * the devices themselves. If they need the devices, they can access them
+     * through
      * getters in the classes.
      *
      * @param drivetrainConstants     Drivetrain-wide constants for the swerve drive
@@ -183,52 +186,60 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      * @param modules                 Constants for each specific module
      */
     public CommandSwerveDrivetrain(
-        SwerveDrivetrainConstants drivetrainConstants,
-        double odometryUpdateFrequency,
-        SwerveModuleConstants<?, ?, ?>... modules
-    ) {
+            SwerveDrivetrainConstants drivetrainConstants,
+            double odometryUpdateFrequency,
+            SwerveModuleConstants<?, ?, ?>... modules) {
         super(drivetrainConstants, odometryUpdateFrequency, modules);
-        if (Utils.isSimulation()) {
-            startSimThread();
-        }
+        // if (Utils.isSimulation()) {
+        // startSimThread();
+        // }
     }
 
     /**
      * Constructs a CTRE SwerveDrivetrain using the specified constants.
      * <p>
-     * This constructs the underlying hardware devices, so users should not construct
-     * the devices themselves. If they need the devices, they can access them through
+     * This constructs the underlying hardware devices, so users should not
+     * construct
+     * the devices themselves. If they need the devices, they can access them
+     * through
      * getters in the classes.
      *
-     * @param drivetrainConstants       Drivetrain-wide constants for the swerve drive
+     * @param drivetrainConstants       Drivetrain-wide constants for the swerve
+     *                                  drive
      * @param odometryUpdateFrequency   The frequency to run the odometry loop. If
-     *                                  unspecified or set to 0 Hz, this is 250 Hz on
+     *                                  unspecified or set to 0 Hz, this is 250 Hz
+     *                                  on
      *                                  CAN FD, and 100 Hz on CAN 2.0.
-     * @param odometryStandardDeviation The standard deviation for odometry calculation
-     *                                  in the form [x, y, theta]ᵀ, with units in meters
+     * @param odometryStandardDeviation The standard deviation for odometry
+     *                                  calculation
+     *                                  in the form [x, y, theta]ᵀ, with units in
+     *                                  meters
      *                                  and radians
-     * @param visionStandardDeviation   The standard deviation for vision calculation
-     *                                  in the form [x, y, theta]ᵀ, with units in meters
+     * @param visionStandardDeviation   The standard deviation for vision
+     *                                  calculation
+     *                                  in the form [x, y, theta]ᵀ, with units in
+     *                                  meters
      *                                  and radians
      * @param modules                   Constants for each specific module
      */
     public CommandSwerveDrivetrain(
-        SwerveDrivetrainConstants drivetrainConstants,
-        double odometryUpdateFrequency,
-        Matrix<N3, N1> odometryStandardDeviation,
-        Matrix<N3, N1> visionStandardDeviation,
-        SwerveModuleConstants<?, ?, ?>... modules
-    ) {
-        super(drivetrainConstants, odometryUpdateFrequency, odometryStandardDeviation, visionStandardDeviation, modules);
-        if (Utils.isSimulation()) {
-            startSimThread();
-        }
+            SwerveDrivetrainConstants drivetrainConstants,
+            double odometryUpdateFrequency,
+            Matrix<N3, N1> odometryStandardDeviation,
+            Matrix<N3, N1> visionStandardDeviation,
+            SwerveModuleConstants<?, ?, ?>... modules) {
+        super(drivetrainConstants, odometryUpdateFrequency, odometryStandardDeviation, visionStandardDeviation,
+                modules);
+        // if (Utils.isSimulation()) {
+        // startSimThread();
+        // }
         SmartDashboard.putData(TheField);
         TheField.setRobotPose(getState().Pose);
-        if (vision.getEstimatedGlobalPose().isEmpty()){
-            } else {
-                TheField.getObject("vision pls work").setPose(vision.getEstimatedGlobalPose().get().estimatedPose.toPose2d());
-            }
+        if (vision.getEstimatedGlobalPose().isEmpty()) {
+        } else {
+            TheField.getObject("vision pls work")
+                    .setPose(vision.getEstimatedGlobalPose().get().estimatedPose.toPose2d());
+        }
         configureAutoBuilder();
     }
 
@@ -237,53 +248,53 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         try {
             var config = RobotConfig.fromGUISettings();
             AutoBuilder.configure(
-                () -> getState().Pose,   // Supplier of current robot pose
-                this::resetPose,         // Consumer for seeding pose against auto
-                () -> getState().Speeds, // Supplier of current robot speeds
-                // Consumer of ChassisSpeeds and feedforwards to drive the robot
-                (speeds, feedforwards) -> setControl(
-                    m_pathApplyRobotSpeeds.withSpeeds(speeds)
-                        .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
-                        .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())
-                ),
-                new PPHolonomicDriveController(
-                    //TODO: tune these values soon
-                    // PID constants for translation
-                    new PIDConstants(10, 0, 0),
-                    // PID constants for rotation
-                    new PIDConstants(7, 0, 0)
-                ),
-                config,
-                // Assume the path needs to be flipped for Red vs Blue, this is normally the case
-                () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
-                this // Subsystem for requirements
+                    () -> getState().Pose, // Supplier of current robot pose
+                    this::resetPose, // Consumer for seeding pose against auto
+                    () -> getState().Speeds, // Supplier of current robot speeds
+                    // Consumer of ChassisSpeeds and feedforwards to drive the robot
+                    (speeds, feedforwards) -> setControl(
+                            m_pathApplyRobotSpeeds.withSpeeds(speeds)
+                                    .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
+                                    .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())),
+                    new PPHolonomicDriveController(
+                            // TODO: tune these values soon
+                            // PID constants for translation
+                            new PIDConstants(2, 0, 0),
+                            // PID constants for rotation
+                            new PIDConstants(1.5, 0, 0)),
+                    config,
+                    // Assume the path needs to be flipped for Red vs Blue, this is normally the
+                    // case
+                    () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
+                    this // Subsystem for requirements
             );
-                PathPlannerLogging.setLogTargetPoseCallback(
-        (targetPose) -> {
-          TheField.getObject("pathplanner target pose").setPose(targetPose);
-        });
+            PathPlannerLogging.setLogTargetPoseCallback(
+                    (targetPose) -> {
+                        TheField.getObject("pathplanner target pose").setPose(targetPose);
+                    });
 
-    PathPlannerLogging.setLogActivePathCallback(this::handleActivePathLogger);
+            PathPlannerLogging.setLogActivePathCallback(this::handleActivePathLogger);
 
-    SmartDashboard.putData("Vision field", TheField);
+            SmartDashboard.putData("Vision field", TheField);
 
-    Timer.delay(4); // Let the can bus cool down
+            Timer.delay(4); // Let the can bus cool down
         } catch (Exception ex) {
-            DriverStation.reportError("Failed to load PathPlanner config and configure AutoBuilder", ex.getStackTrace());
+            DriverStation.reportError("Failed to load PathPlanner config and configure AutoBuilder",
+                    ex.getStackTrace());
         }
     }
 
     private void handleActivePathLogger(List<Pose2d> poses) {
-    if (poses.isEmpty())
-      return;
+        if (poses.isEmpty())
+            return;
 
-    lastActivePathPose = poses.get(poses.size() - 1);
+        lastActivePathPose = poses.get(poses.size() - 1);
 
-    PathfindingCommand.warmupCommand().schedule();
     }
 
     /**
-     * Returns a command that applies the specified control request to this swerve drivetrain.
+     * Returns a command that applies the specified control request to this swerve
+     * drivetrain.
      *
      * @param request Function returning the request to apply
      * @return Command to run
@@ -313,30 +324,35 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public Command sysIdDynamic(SysIdRoutine.Direction direction) {
         return m_sysIdRoutineToApply.dynamic(direction);
     }
+
     /**
      * Update the pose estimation and std devs with new vision data
      */
     public void updateVisionMeasurements() {
         var visionEst = vision.getEstimatedGlobalPose();
         visionEst.ifPresent(est -> {
-        //   if (Math.sqrt(Math.pow(est.estimatedPose.toPose2d().getX(), 2) + Math.pow(est.estimatedPose.toPose2d().getY(), 2)) 
-        //   > 4) {
-        //     System.out.println("outofrange");
-        //     return;
-        //   }
-        //   if (est.estimatedPose.toPose2d().getX() > 4) {
-        //     System.out.println("outofrange");
-        //     return;
-        //   }
-          var estPose = est.estimatedPose.toPose2d();
-          var estStdDevs = vision.getEstimationStdDevs(estPose);
-          super.addVisionMeasurement(est.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(est.timestampSeconds), estStdDevs);
+            // if (Math.sqrt(Math.pow(est.estimatedPose.toPose2d().getX(), 2) +
+            // Math.pow(est.estimatedPose.toPose2d().getY(), 2))
+            // > 4) {
+            // System.out.println("outofrange");
+            // return;
+            // }
+            // if (est.estimatedPose.toPose2d().getX() > 4) {
+            // System.out.println("outofrange");
+            // return;
+            // }
+            var estPose = est.estimatedPose.toPose2d();
+            var estStdDevs = vision.getEstimationStdDevs(estPose);
+            super.addVisionMeasurement(est.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(est.timestampSeconds),
+                    estStdDevs);
         });
-      }
+    }
+
     /**
      * Repeatedly check targets: if not too ambigious, compare with previous
      * closest target to determine which is closer and set
      * closest one as result
+     * 
      * @return result: The closest tag (if available)
      */
     public Optional<PhotonTrackedTarget> getClosestTag() {
@@ -346,83 +362,82 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         for (var target : targets) {
             if (target.getPoseAmbiguity() > 0.3) {
                 break;
+            }
+            if (result.isPresent()) {
+                if (result.get().getBestCameraToTarget().getTranslation().getNorm() > target.getBestCameraToTarget()
+                        .getTranslation().getNorm())
+                    result = Optional.of(target);
+            } else {
+                result = Optional.of(target);
+            }
         }
-        if (result.isPresent()) {
-            if (result.get().getBestCameraToTarget().getTranslation().getNorm() > target.getBestCameraToTarget()
-                .getTranslation().getNorm())
-            result = Optional.of(target);
-        } else {
-            result = Optional.of(target);
-        }
-    }
-    return result;
+        return result;
     }
 
-    
     public Command reefAlign(boolean leftAlign) {
         int closestTargetID = getClosestTag().get().getFiducialId();
 
         Transform2d leftApriltagOffset = new Transform2d(
-            -(VisionConstants.bumperToBumper)/2,
-            AlignmentConstants.left_aprilTagOffsets.getOrDefault(closestTargetID, 0.0),
-            new Rotation2d(0)
-        );
+                -(VisionConstants.bumperToBumper) / 2,
+                AlignmentConstants.left_aprilTagOffsets.getOrDefault(closestTargetID, 0.0),
+                new Rotation2d(0));
         Transform2d rightApriltagOffset = new Transform2d(
-            -(VisionConstants.bumperToBumper)/2,
-            AlignmentConstants.right_aprilTagOffsets.getOrDefault(closestTargetID, 0.0),
-            new Rotation2d(0)
-        );
+                -(VisionConstants.bumperToBumper) / 2,
+                AlignmentConstants.right_aprilTagOffsets.getOrDefault(closestTargetID, 0.0),
+                new Rotation2d(0));
 
-        Pose2d estimatedLeftPOSE =
-            (vision.kFieldLayout.getTagPose(closestTargetID))
+        Pose2d estimatedLeftPOSE = (vision.kFieldLayout.getTagPose(closestTargetID))
                 .map(Pose3d::toPose2d)
                 .orElse(new Pose2d())
                 .transformBy(
-                    new Transform2d(
-                            leftApriltagOffset.getTranslation().rotateBy(Rotation2d.fromDegrees(180)),
-                            Rotation2d.fromDegrees(180))
-                        .inverse());
-        Pose2d estimatedRightPOSE =
-            (vision.kFieldLayout.getTagPose(closestTargetID))
+                        new Transform2d(
+                                leftApriltagOffset.getTranslation().rotateBy(Rotation2d.fromDegrees(180)),
+                                Rotation2d.fromDegrees(180))
+                                .inverse());
+        Pose2d estimatedRightPOSE = (vision.kFieldLayout.getTagPose(closestTargetID))
                 .map(Pose3d::toPose2d)
                 .orElse(new Pose2d())
                 .transformBy(
-                    new Transform2d(
-                            rightApriltagOffset.getTranslation().rotateBy(Rotation2d.fromDegrees(180)),
-                            Rotation2d.fromDegrees(180))
-                        .inverse());
+                        new Transform2d(
+                                rightApriltagOffset.getTranslation().rotateBy(Rotation2d.fromDegrees(180)),
+                                Rotation2d.fromDegrees(180))
+                                .inverse());
         Pose2d leftPose = estimatedLeftPOSE;
         Pose2d rightPose = estimatedRightPOSE;
         return new DeferredCommand(
-            () -> {
-            if (leftPose == null || rightPose == null) {
-                return new InstantCommand();
-            }
-            //   List<Pose2d> tagSide = leftAlign ? VisionConstants.leftReefList : VisionConstants.rightReefList;
-            Pose2d goalPose = leftAlign ? leftPose : rightPose;
-            
-            SmartDashboard.putNumber("Swerve/Attempted Pose X", goalPose.getX());
-            SmartDashboard.putNumber("Swerve/Attempted Pose Y", goalPose.getY());
-            
-            return AutoBuilder.pathfindToPose(goalPose, 
-            new PathConstraints(AutoConstants.kMaxSpeedMetersPerSecond,
-            AutoConstants.kMaxAccelerationMetersPerSecondSquared,
-            AutoConstants.kMaxAngularSpeedRadiansPerSecond,
-            AutoConstants.kMaxAngularSpeedRadiansPerSecondSquared), 0.0);
-            },
-            Set.of(this));
+                () -> {
+                    if (leftPose == null || rightPose == null) {
+                        return new InstantCommand();
+                    }
+                    // List<Pose2d> tagSide = leftAlign ? VisionConstants.leftReefList :
+                    // VisionConstants.rightReefList;
+                    Pose2d goalPose = leftAlign ? leftPose : rightPose;
+
+                    SmartDashboard.putNumber("Swerve/Attempted Pose X", goalPose.getX());
+                    SmartDashboard.putNumber("Swerve/Attempted Pose Y", goalPose.getY());
+
+                    return AutoBuilder.pathfindToPose(goalPose,
+                            new PathConstraints(AutoConstants.kMaxSpeedMetersPerSecond,
+                                    AutoConstants.kMaxAccelerationMetersPerSecondSquared,
+                                    AutoConstants.kMaxAngularSpeedRadiansPerSecond,
+                                    AutoConstants.kMaxAngularSpeedRadiansPerSecondSquared),
+                            0.0);
+                },
+                Set.of(this));
     }
+
     public Pose2d getTargetPose(boolean left) {
         Pose2d targetPose = new Pose2d();
-        if(left){
+        if (left) {
             targetPose = getState().Pose.nearest(
-                isRedAlliance() ? AlignmentConstants.leftREDReefList : AlignmentConstants.leftBLUEReefList);
+                    isRedAlliance() ? AlignmentConstants.leftREDReefList : AlignmentConstants.leftBLUEReefList);
         } else {
             targetPose = getState().Pose.nearest(
-                isRedAlliance() ? AlignmentConstants.rightREDReefList : AlignmentConstants.rightBLUEReefList);
+                    isRedAlliance() ? AlignmentConstants.rightREDReefList : AlignmentConstants.rightBLUEReefList);
         }
         return targetPose;
     }
+
     public Pose2d getCenterReefPose() {
         Pose2d target;
         int firstTag;
@@ -430,43 +445,44 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
         List<Pose2d> reefTagPoseList = new ArrayList<>(6);
 
-        if(isRedAlliance()){
+        if (isRedAlliance()) {
             firstTag = 6;
             endtag = 12;
         } else {
             firstTag = 17;
             endtag = 23;
         }
-        for(int i = firstTag; i < endtag; i++) {
+        for (int i = firstTag; i < endtag; i++) {
             reefTagPoseList.add(vision.kFieldLayout.getTagPose(i).get().toPose2d());
         }
         Pose2d nearestPose = getState().Pose.nearest(reefTagPoseList);
         double angle = nearestPose.getRotation().rotateBy(Rotation2d.k180deg).getRadians();
 
         target = new Pose2d(
-            nearestPose.getX() + (-Units.inchesToMeters(VisionConstants.bumperToBumper/2)* Math.cos(angle)),
-            nearestPose.getY() + (-Units.inchesToMeters(VisionConstants.bumperToBumper/2) * Math.sin(angle)),
-            Rotation2d.fromRadians(angle));
+                nearestPose.getX() + (-Units.inchesToMeters(VisionConstants.bumperToBumper / 2) * Math.cos(angle)),
+                nearestPose.getY() + (-Units.inchesToMeters(VisionConstants.bumperToBumper / 2) * Math.sin(angle)),
+                Rotation2d.fromRadians(angle));
+        TheField.getObject("nearestpose").setPose(nearestPose);
+        TheField.getObject("target").setPose(target);
 
         return target;
     }
+
     public Pose2d addOffset(boolean left) {
         double offset = Units.inchesToMeters(VisionConstants.leftOffsetInches);
         Pose2d centerTarget = getCenterReefPose();
-        double angle = (Math.PI/2) - centerTarget.getRotation().getRadians();
+        double angle = (Math.PI / 2) - centerTarget.getRotation().getRadians();
         Pose2d offsetTarget;
-        if(left) {
+        if (!left) {
             offsetTarget = new Pose2d(
-                centerTarget.getX() + (offset * Math.cos(angle)),
-                centerTarget.getY() + (-offset * Math.sin(angle)),
-                centerTarget.getRotation()
-            );
+                    centerTarget.getX() + (offset * Math.cos(angle)),
+                    centerTarget.getY() + (-offset * Math.sin(angle)),
+                    centerTarget.getRotation());
         } else {
             offsetTarget = new Pose2d(
-              centerTarget.getX() + (-offset * Math.sin(angle)),
-              centerTarget.getY() + (offset * Math.cos(angle)),
-              centerTarget.getRotation()
-          );
+                    centerTarget.getX() + (-offset * Math.cos(angle)),
+                    centerTarget.getY() + (offset * Math.sin(angle)),
+                    centerTarget.getRotation());
         }
         return offsetTarget;
     }
@@ -477,30 +493,31 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         // var globalPose = vision.getEstimatedGlobalPose();
         // if (vision.getEstimatedGlobalPose().isEmpty()){
         // } else {
-        //     TheField.setRobotPose(vision.getEstimatedGlobalPose().get().estimatedPose.toPose2d());
+        // TheField.setRobotPose(vision.getEstimatedGlobalPose().get().estimatedPose.toPose2d());
         // }
         // logValues();
-        
+
         /*
          * Periodically try to apply the operator perspective.
-         * If we haven't applied the operator perspective before, then we should apply it regardless of DS state.
-         * This allows us to correct the perspective in case the robot code restarts mid-match.
-         * Otherwise, only check and apply the operator perspective if the DS is disabled.
-         * This ensures driving behavior doesn't change until an explicit disable event occurs during testing.
+         * If we haven't applied the operator perspective before, then we should apply
+         * it regardless of DS state.
+         * This allows us to correct the perspective in case the robot code restarts
+         * mid-match.
+         * Otherwise, only check and apply the operator perspective if the DS is
+         * disabled.
+         * This ensures driving behavior doesn't change until an explicit disable event
+         * occurs during testing.
          */
         if (!m_hasAppliedOperatorPerspective || DriverStation.isDisabled()) {
             DriverStation.getAlliance().ifPresent(allianceColor -> {
                 setOperatorPerspectiveForward(
-                    allianceColor == Alliance.Red
-                        ? kRedAlliancePerspectiveRotation
-                        : kBlueAlliancePerspectiveRotation
-                );
+                        allianceColor == Alliance.Red
+                                ? kRedAlliancePerspectiveRotation
+                                : kBlueAlliancePerspectiveRotation);
                 m_hasAppliedOperatorPerspective = true;
             });
         }
     }
-   
-    
 
     private void startSimThread() {
         m_lastSimTime = Utils.getCurrentTimeSeconds();

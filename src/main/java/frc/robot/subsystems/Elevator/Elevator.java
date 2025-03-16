@@ -26,10 +26,14 @@ public class Elevator extends SubsystemBase {
   private SparkMaxConfig leftConfig = new SparkMaxConfig();
   private SparkMaxConfig rightConfig = new SparkMaxConfig();
 
-  // private PIDController pid = new PIDController(ElevatorConstants.elevatorPID[0], ElevatorConstants.elevatorPID[1],
-  //     ElevatorConstants.elevatorPID[2]);
-  private ProfiledPIDController pid = new ProfiledPIDController(ElevatorConstants.elevatorPID[0], ElevatorConstants.elevatorPID[1],
-      ElevatorConstants.elevatorPID[2], new TrapezoidProfile.Constraints(ElevatorConstants.maxVelocity, ElevatorConstants.maxAccel));
+  // private PIDController pid = new
+  // PIDController(ElevatorConstants.elevatorPID[0],
+  // ElevatorConstants.elevatorPID[1],
+  // ElevatorConstants.elevatorPID[2]);
+  private ProfiledPIDController pid = new ProfiledPIDController(ElevatorConstants.elevatorPID[0],
+      ElevatorConstants.elevatorPID[1],
+      ElevatorConstants.elevatorPID[2],
+      new TrapezoidProfile.Constraints(ElevatorConstants.maxVelocity, ElevatorConstants.maxAccel));
   private ElevatorFeedforward ffElevate = new ElevatorFeedforward(ElevatorConstants.elevatorSGV[0],
       ElevatorConstants.elevatorSGV[1], ElevatorConstants.elevatorSGV[2], ElevatorConstants.elevatorSGV[3]);
 
@@ -51,14 +55,22 @@ public class Elevator extends SubsystemBase {
   // private boolean isRightDone = false;
 
   /* Tunable Values */
-  // private LoggedTunableNumber elevatorP = new LoggedTunableNumber("elevatorP", ElevatorConstants.elevatorPID[0]);
-  // private LoggedTunableNumber elevatorI = new LoggedTunableNumber("elevatorI", ElevatorConstants.elevatorPID[1]);
-  // private LoggedTunableNumber elevatorD = new LoggedTunableNumber("elevatorD", ElevatorConstants.elevatorPID[2]);
-  // private LoggedTunableNumber elevatorS = new LoggedTunableNumber("elevatorS", ElevatorConstants.elevatorSGV[0]);
-  // private LoggedTunableNumber elevatorG = new LoggedTunableNumber("elevatorG", ElevatorConstants.elevatorSGV[1]);
-  // private LoggedTunableNumber elevatorV = new LoggedTunableNumber("elevatorV", ElevatorConstants.elevatorSGV[2]);
-  // private LoggedTunableNumber elevatorA = new LoggedTunableNumber("elevatorA", ElevatorConstants.elevatorSGV[3]);
-  // private LoggedTunableNumber elevatorLevel = new LoggedTunableNumber("changing setpoint", elevatorSetpoint);
+  // private LoggedTunableNumber elevatorP = new LoggedTunableNumber("elevatorP",
+  // ElevatorConstants.elevatorPID[0]);
+  // private LoggedTunableNumber elevatorI = new LoggedTunableNumber("elevatorI",
+  // ElevatorConstants.elevatorPID[1]);
+  // private LoggedTunableNumber elevatorD = new LoggedTunableNumber("elevatorD",
+  // ElevatorConstants.elevatorPID[2]);
+  // private LoggedTunableNumber elevatorS = new LoggedTunableNumber("elevatorS",
+  // ElevatorConstants.elevatorSGV[0]);
+  // private LoggedTunableNumber elevatorG = new LoggedTunableNumber("elevatorG",
+  // ElevatorConstants.elevatorSGV[1]);
+  // private LoggedTunableNumber elevatorV = new LoggedTunableNumber("elevatorV",
+  // ElevatorConstants.elevatorSGV[2]);
+  // private LoggedTunableNumber elevatorA = new LoggedTunableNumber("elevatorA",
+  // ElevatorConstants.elevatorSGV[3]);
+  // private LoggedTunableNumber elevatorLevel = new LoggedTunableNumber("changing
+  // setpoint", elevatorSetpoint);
 
   public Elevator() {
     setupMotors();
@@ -100,14 +112,14 @@ public class Elevator extends SubsystemBase {
   }
 
   public void setSetpoint(double goal) {
-    if (encoderRight.getPosition() <= ElevatorConstants.min){
+    if (encoderRight.getPosition() <= ElevatorConstants.min) {
       this.elevatorSetpoint = ElevatorConstants.min;
-    } else if (encoderRight.getPosition() >= ElevatorConstants.max){
+    } else if (encoderRight.getPosition() >= ElevatorConstants.max) {
       this.elevatorSetpoint = ElevatorConstants.max;
     } else {
       this.elevatorSetpoint = goal;
     }
-    
+
   }
 
   public double getSetpoint() {
@@ -116,6 +128,10 @@ public class Elevator extends SubsystemBase {
 
   public void SET(double value) {
     encoderRight.setPosition(value);
+  }
+
+  public void reset() {
+    encoderRight.setPosition(0);
   }
 
   public double ActualPositionLeader() {
@@ -140,10 +156,11 @@ public class Elevator extends SubsystemBase {
     return new TrapezoidProfile.State(encoderRight.getPosition(), encoderRight.getVelocity());
   }
 
-  // public void runState(TrapezoidProfile.State state, TrapezoidProfile.State newState) {
-  //   elevatorSetpoint = state.position;
-  //   this.nextVelocity = state.velocity;
-  //   this.nextNextVelocity = newState.velocity;
+  // public void runState(TrapezoidProfile.State state, TrapezoidProfile.State
+  // newState) {
+  // elevatorSetpoint = state.position;
+  // this.nextVelocity = state.velocity;
+  // this.nextNextVelocity = newState.velocity;
   // }
   public void runState(TrapezoidProfile.State state) {
     elevatorSetpoint = state.position;
@@ -153,12 +170,15 @@ public class Elevator extends SubsystemBase {
   public void checkTunableValues() {
     // if (Constants.enableTunableValues) {
 
-    //   if (elevatorP.hasChanged() || elevatorI.hasChanged() || elevatorD.hasChanged()) {
-    //     pid.setPID(elevatorP.get(), elevatorI.get(), elevatorD.get());
-    //   }
-    //   if (elevatorS.hasChanged() || elevatorG.hasChanged() || elevatorV.hasChanged() || elevatorA.hasChanged()) {
-    //     ffElevate = new ElevatorFeedforward(elevatorS.get(), elevatorG.get(), elevatorV.get(), elevatorA.get());
-    //   }
+    // if (elevatorP.hasChanged() || elevatorI.hasChanged() ||
+    // elevatorD.hasChanged()) {
+    // pid.setPID(elevatorP.get(), elevatorI.get(), elevatorD.get());
+    // }
+    // if (elevatorS.hasChanged() || elevatorG.hasChanged() ||
+    // elevatorV.hasChanged() || elevatorA.hasChanged()) {
+    // ffElevate = new ElevatorFeedforward(elevatorS.get(), elevatorG.get(),
+    // elevatorV.get(), elevatorA.get());
+    // }
     // }
   }
 
@@ -195,50 +215,51 @@ public class Elevator extends SubsystemBase {
    * control elevator
    */
   // private void handleLeft() {
-  //   switch (elevateMode) {
-  //     case UP:
-  //       break;
-  //     case DOWN:
-  //       elevatorSetpoint = 1;
-  //       break;
-  //     case L1:
-  //       elevatorSetpoint = ElevatorConstants.LevelOneSetpoint;
-  //       break;
-  //     case L2:
-  //       elevatorSetpoint = ElevatorConstants.LevelTwoSetpoint;
-  //       break;
-  //     case L3:
-  //       elevatorSetpoint = ElevatorConstants.LevelThreeSetpoint;
-  //       break;
-  //     case L4:
-  //       elevatorSetpoint = ElevatorConstants.LevelFourSetpoint;
-  //       break;
-  //     case HP:
-  //       elevatorSetpoint = ElevatorConstants.HPsetpoint;
-  //       break;
-  //     case MANUAL:
-  //       // this.elevatorSetpoint = elevatorLevel.get();
-  //       break;
-  //     case TEST:
-  //       elevatorSetpoint = ElevatorConstants.test;
-  //       break;
-  //     case OFF:
-  //       elevatorSetpoint = 1;
-  //       break;
-  //     case HOMING:
-  //       if (leftElevatorMotor.getOutputCurrent() >= ElevatorConstants.homingCurrentThreshold) {
-  //         if (timer.get() < 1)
-  //           return;
-  //         leftElevatorMotor.setVoltage(0);
-  //         isLeftDone = true;
-  //         encoderRight.setPosition(0);
-  //       } else {
-  //         leftElevatorMotor.setVoltage(ElevatorConstants.selfHomeSpeedVoltage);
-  //       }
-  //       break;
-  //     default:
-  //       break;
-  //   }
+  // switch (elevateMode) {
+  // case UP:
+  // break;
+  // case DOWN:
+  // elevatorSetpoint = 1;
+  // break;
+  // case L1:
+  // elevatorSetpoint = ElevatorConstants.LevelOneSetpoint;
+  // break;
+  // case L2:
+  // elevatorSetpoint = ElevatorConstants.LevelTwoSetpoint;
+  // break;
+  // case L3:
+  // elevatorSetpoint = ElevatorConstants.LevelThreeSetpoint;
+  // break;
+  // case L4:
+  // elevatorSetpoint = ElevatorConstants.LevelFourSetpoint;
+  // break;
+  // case HP:
+  // elevatorSetpoint = ElevatorConstants.HPsetpoint;
+  // break;
+  // case MANUAL:
+  // // this.elevatorSetpoint = elevatorLevel.get();
+  // break;
+  // case TEST:
+  // elevatorSetpoint = ElevatorConstants.test;
+  // break;
+  // case OFF:
+  // elevatorSetpoint = 1;
+  // break;
+  // case HOMING:
+  // if (leftElevatorMotor.getOutputCurrent() >=
+  // ElevatorConstants.homingCurrentThreshold) {
+  // if (timer.get() < 1)
+  // return;
+  // leftElevatorMotor.setVoltage(0);
+  // isLeftDone = true;
+  // encoderRight.setPosition(0);
+  // } else {
+  // leftElevatorMotor.setVoltage(ElevatorConstants.selfHomeSpeedVoltage);
+  // }
+  // break;
+  // default:
+  // break;
+  // }
   // }
 
   public boolean atGoal() {
@@ -258,11 +279,13 @@ public class Elevator extends SubsystemBase {
         break;
     }
 
-    // var ffOutput = ffElevate.calculateWithVelocities(nextVelocity, nextNextVelocity);
+    // var ffOutput = ffElevate.calculateWithVelocities(nextVelocity,
+    // nextNextVelocity);
 
     // if (ffOutput < ffElevate.calculate(nextVelocity)) {
-      var ffOutput = ffElevate.calculate(nextVelocity); // the docmentation said "calculateWithVelocities" is inaccurate for
-                                                    // values around 0
+    var ffOutput = ffElevate.calculate(nextVelocity); // the docmentation said "calculateWithVelocities" is inaccurate
+                                                      // for
+    // values around 0
     // }
     var leftpidOutput = pid.calculate(encoderPosition, this.elevatorSetpoint);
 

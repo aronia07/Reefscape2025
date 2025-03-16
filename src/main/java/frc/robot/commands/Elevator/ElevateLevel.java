@@ -16,7 +16,8 @@ public class ElevateLevel extends Command {
     // private State initialState;
     private ElevateMode level;
     // private TrapezoidProfile profiler_y = new TrapezoidProfile(
-    //         new TrapezoidProfile.Constraints(ElevatorConstants.maxVelocity, ElevatorConstants.maxAccel));
+    // new TrapezoidProfile.Constraints(ElevatorConstants.maxVelocity,
+    // ElevatorConstants.maxAccel));
     // private Timer timer_y = new Timer();
 
     public ElevateLevel(Elevator elevator, ElevateMode mode) {
@@ -43,6 +44,9 @@ public class ElevateLevel extends Command {
             case L2:
                 elevator_y.elevatorSetpoint = ElevatorConstants.LevelTwoSetpoint;
                 break;
+            case L2AR:
+                elevator_y.elevatorSetpoint = ElevatorConstants.LevelTwoAlgaeSetpoint;
+                break;
             case L3:
                 elevator_y.elevatorSetpoint = ElevatorConstants.LevelThreeSetpoint;
                 break;
@@ -60,16 +64,18 @@ public class ElevateLevel extends Command {
                 break;
             case RESET:
                 elevator_y.SET(0);
+                elevator_y.reset();
                 break;
             case HOMING:
-            if (elevator_y.leftElevatorMotor.getOutputCurrent() >= ElevatorConstants.homingCurrentThreshold) {
-                elevator_y.leftElevatorMotor.setVoltage(0);
-                elevator_y.rightElevatorMotor.setVoltage(0);
-                elevator_y.SET(0);;
-                      } else {
-                        elevator_y.leftElevatorMotor.setVoltage(ElevatorConstants.selfHomeSpeedVoltage);
-                        elevator_y.rightElevatorMotor.setVoltage(ElevatorConstants.selfHomeSpeedVoltage);
-                      }
+                if (elevator_y.leftElevatorMotor.getOutputCurrent() >= ElevatorConstants.homingCurrentThreshold) {
+                    elevator_y.leftElevatorMotor.setVoltage(0);
+                    elevator_y.rightElevatorMotor.setVoltage(0);
+                    elevator_y.SET(0);
+                    ;
+                } else {
+                    elevator_y.leftElevatorMotor.setVoltage(ElevatorConstants.selfHomeSpeedVoltage);
+                    elevator_y.rightElevatorMotor.setVoltage(ElevatorConstants.selfHomeSpeedVoltage);
+                }
             default:
                 break;
         }
