@@ -1,8 +1,5 @@
 {
   "NetworkTables": {
-    "Persistent Values": {
-      "open": false
-    },
     "Retained Values": {
       "open": false
     },
@@ -18,8 +15,7 @@
         },
         "SwerveModuleState[]##v_/DriveState/ModuleStates": {
           "open": true
-        },
-        "open": true
+        }
       },
       "SmartDashboard": {
         "Field": {
@@ -58,21 +54,6 @@
       "/SmartDashboard/autos": "String Chooser"
     },
     "windows": {
-      "/SmartDashboard/Arm down": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/SmartDashboard/Arm up": {
-        "window": {
-          "visible": true
-        }
-      },
-      "/SmartDashboard/Elevate": {
-        "window": {
-          "visible": true
-        }
-      },
       "/SmartDashboard/Elevator test": {
         "window": {
           "visible": true
@@ -115,12 +96,13 @@
     },
     "visible": true
   },
-  "NetworkTables Log": {
-    "visible": true
-  },
   "NetworkTables Settings": {
     "mode": "Client (NT4)",
-    "serverTeam": "3161"
+    "serverTeam": "3161",
+    "visible": false
+  },
+  "NetworkTables View": {
+    "visible": false
   },
   "Plots": {
     "Plot <0>": {
@@ -132,7 +114,7 @@
             0.0,
             0.8500000238418579
           ],
-          "height": 455,
+          "height": 664,
           "series": [
             {
               "color": [
@@ -258,7 +240,7 @@
             0.0,
             0.8500000238418579
           ],
-          "height": -61,
+          "height": 901,
           "series": [
             {
               "color": [
@@ -280,7 +262,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     }
   }
 }

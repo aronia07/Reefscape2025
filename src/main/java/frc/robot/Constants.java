@@ -53,7 +53,7 @@ public final class Constants {
 
     public static final class VisionConstants {
         /* camera stuff */
-        public static double bumperToBumper = 33.25;
+        public static double bumperToBumper = 33.25; // should be chassis length TODO: TUNE PID THIS IS A BANDAID
         public static Transform3d kRobotToCam = new Transform3d(
                 new Translation3d(Units.inchesToMeters(19.41), 0, Units.inchesToMeters(6.6)),
                 new Rotation3d(0, Units.degreesToRadians(23), 0)); // TODO: edit yaw
@@ -67,8 +67,8 @@ public final class Constants {
         /* pose of reefs for alignment */
         public static Optional<Pose3d> blueReefPose;
         public static Optional<Pose3d> redReefPose;
-        public static double leftOffsetInches = 5.5;
-        public static double rightOffsetInches = 6;
+        public static double leftOffsetInches = 6;
+        public static double rightOffsetInches = 5.5;
 
     }
 
@@ -98,7 +98,7 @@ public final class Constants {
         public static int maxAccel = 0;
         public static double[] wristFF = { 0, 0, 0 };
         public static double wristGearRatio = 0;
-        public static Rotation2d wristOffset = new Rotation2d(Units.degreesToRadians(92.164372)); // -59.7-18.8
+        public static Rotation2d wristOffset = new Rotation2d(Units.degreesToRadians(94.464372)); // -59.7-18.8
         public static final Rotation2d maxVelocityPerSecond = Rotation2d.fromDegrees(460); // was 500
         public static final Rotation2d maxAcceleration = Rotation2d.fromDegrees(460);
 
@@ -114,8 +114,8 @@ public final class Constants {
 
     public static final class ClimberConstants {
         public static int climberMotorID = 25;
-        public static double climberMax = 29;
-        public static double climberMin = -90;
+        public static double climberMax = 315;
+        public static double climberMin = -97.7; // was -90
     }
 
     public static final class ElevatorConstants {
@@ -153,7 +153,7 @@ public final class Constants {
         public static double LevelTwoSetpoint = 1;
         public static double LevelTwoAlgaeSetpoint = 0.5;
         public static double LevelThreeSetpoint = 5.3;
-        public static double LevelFourSetpoint = 19;
+        public static double LevelFourSetpoint = 18.7;
         public static double HPsetpoint = -0.1;
         public static double test = 16;
 
@@ -165,7 +165,8 @@ public final class Constants {
         public static final int followerID = 32;
         public static final int encoderID = 0;
 
-        public static final Rotation2d offset = Rotation2d.fromDegrees(-18); // **WAS 88-90//How far away the arm is (at
+        public static final Rotation2d offset = Rotation2d.fromDegrees(-18); // **WAS 88-90//How far away the arm is
+                                                                             // (at
                                                                              // rest) from 0 degrees
         public static final Rotation2d max = Rotation2d.fromDegrees(90); // Max. value for the arm's angle
         public static final Rotation2d min = Rotation2d.fromDegrees(-10); // Min. value for the arm's angle

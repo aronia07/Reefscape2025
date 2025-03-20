@@ -40,6 +40,7 @@ import frc.robot.commands.Elevator.ElevateLevel;
 import frc.robot.commands.Elevator.ElevateManual;
 import frc.robot.commands.Elevator.ElevatorReset;
 import frc.robot.commands.Intake.IntakeIn;
+//import frc.robot.commands.Intake.IntakeNotifier;
 import frc.robot.commands.Wrist.ToWristAngle;
 import frc.robot.commands.Wrist.WristMove;
 import frc.robot.commands.Intake.IntakeOut;
@@ -137,6 +138,11 @@ public class RobotContainer {
                 driver.b().whileTrue(drivetrain
                                 .applyRequest(() -> point.withModuleDirection(
                                                 new Rotation2d(-driver.getLeftY(), -driver.getLeftX()))));
+                driver.x().whileTrue(new ParallelCommandGroup(
+                                new ToWristAngle(() -> Units.degreesToRadians(-77), wrist),
+                                new ToAngle(() -> Units.degreesToRadians(35), arm),
+                                new ElevateLevel(elevator, ElevateMode.L2),
+                                new IntakeIn(intake)).withTimeout(0.8));
                 // driver.x().whileTrue(
                 // new ProxyCommand(
                 // DriveToLocation.driveTo(new Pose2d(
@@ -161,7 +167,7 @@ public class RobotContainer {
                 // HP Pickup
                 driver.rightBumper().whileTrue(new ParallelCommandGroup(
                                 new ToWristAngle(() -> Units.degreesToRadians(-77), wrist),
-                                new ToAngle(() -> Units.degreesToRadians(35), arm),
+                                new ToAngle(() -> Units.degreesToRadians(34), arm),
                                 new IntakeIn(intake),
                                 new ElevateLevel(elevator, ElevateMode.HP)).finallyDo(this::idle));
 
@@ -197,7 +203,7 @@ public class RobotContainer {
                                 new IntakeOut2(intake));
 
                 operator.rightBumper().and(operator.b()).and(operator.rightTrigger()).whileTrue(
-                                new IntakeOut2(intake));
+                                new IntakeOut(intake));
 
                 operator.rightBumper().and(operator.a()).and(operator.rightTrigger()).whileTrue(
                                 new IntakeOut2(intake));
@@ -206,7 +212,7 @@ public class RobotContainer {
 
                 // L4
                 operator.y().whileTrue(new SequentialCommandGroup(
-                                new ToWristAngle(() -> Units.degreesToRadians(-35), wrist),
+                                new ToWristAngle(() -> Units.degreesToRadians(-40), wrist),
                                 new ParallelCommandGroup(
                                                 new ToAngle(() -> Units.degreesToRadians(87), arm),
                                                 new ElevateLevel(elevator, ElevateMode.L4)))
@@ -231,7 +237,7 @@ public class RobotContainer {
                 // L3 Algae Removal
                 operator.b().and(operator.rightTrigger()).whileTrue(new ParallelCommandGroup(
                                 new ToAngle(() -> Units.degreesToRadians(87), arm),
-                                new ElevateLevel(elevator, ElevateMode.L3),
+                                new ElevateLevel(elevator, ElevateMode.L1),
                                 new ToWristAngle(() -> Units.degreesToRadians(-53), wrist)).finallyDo(this::idle));
 
                 // L2
@@ -325,6 +331,7 @@ public class RobotContainer {
                 NamedCommands.registerCommand("hpIntake", new ParallelCommandGroup(
                                 new ToWristAngle(() -> Units.degreesToRadians(-77), wrist),
                                 new ToAngle(() -> Units.degreesToRadians(35), arm),
+                                new ElevateLevel(elevator, ElevateMode.L2),
                                 new IntakeIn(intake)).withTimeout(0.7));
 
                 NamedCommands.registerCommand("reset", new SequentialCommandGroup(

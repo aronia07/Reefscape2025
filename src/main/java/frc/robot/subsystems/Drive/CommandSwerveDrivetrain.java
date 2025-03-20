@@ -257,11 +257,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                                     .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
                                     .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())),
                     new PPHolonomicDriveController(
-                            // TODO: tune these values soon
+                            // TODO: TUNE THESE VALUES
                             // PID constants for translation
-                            new PIDConstants(2, 0, 0),
+                            new PIDConstants(6, 0, 0),
                             // PID constants for rotation
-                            new PIDConstants(1.5, 0, 0)),
+                            new PIDConstants(2, 0, 0)),
                     config,
                     // Assume the path needs to be flipped for Red vs Blue, this is normally the
                     // case
@@ -469,19 +469,20 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     public Pose2d addOffset(boolean left) {
-        double offset = Units.inchesToMeters(VisionConstants.leftOffsetInches);
+        double leftOffset = Units.inchesToMeters(VisionConstants.leftOffsetInches);
+        double rightOffset = Units.inchesToMeters(VisionConstants.rightOffsetInches);
         Pose2d centerTarget = getCenterReefPose();
         double angle = (Math.PI / 2) - centerTarget.getRotation().getRadians();
         Pose2d offsetTarget;
         if (!left) {
             offsetTarget = new Pose2d(
-                    centerTarget.getX() + (offset * Math.cos(angle)),
-                    centerTarget.getY() + (-offset * Math.sin(angle)),
+                    centerTarget.getX() + (rightOffset * Math.cos(angle)),
+                    centerTarget.getY() + (-rightOffset * Math.sin(angle)),
                     centerTarget.getRotation());
         } else {
             offsetTarget = new Pose2d(
-                    centerTarget.getX() + (-offset * Math.cos(angle)),
-                    centerTarget.getY() + (offset * Math.sin(angle)),
+                    centerTarget.getX() + (-leftOffset * Math.cos(angle)),
+                    centerTarget.getY() + (leftOffset * Math.sin(angle)),
                     centerTarget.getRotation());
         }
         return offsetTarget;

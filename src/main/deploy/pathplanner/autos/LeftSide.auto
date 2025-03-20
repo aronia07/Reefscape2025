@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "FirstAuto.0"
+            "pathName": "LeftScore1.0"
           }
         },
         {
@@ -18,12 +18,6 @@
                 "type": "named",
                 "data": {
                   "name": "outtake"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "reset"
                 }
               }
             ]
@@ -36,7 +30,7 @@
               {
                 "type": "path",
                 "data": {
-                  "pathName": "FirstAutoHP.0"
+                  "pathName": "LeftHP1.0"
                 }
               }
             ]
@@ -51,7 +45,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "FAHPScore.0"
+            "pathName": "LeftScore2.0"
           }
         },
         {
@@ -63,12 +57,6 @@
                 "data": {
                   "name": "outtake"
                 }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "reset"
-                }
               }
             ]
           }
@@ -76,7 +64,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "HP2.0"
+            "pathName": "LeftHP2.0"
           }
         },
         {
@@ -88,7 +76,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Score3.0"
+            "pathName": "LeftScore3.0"
           }
         },
         {

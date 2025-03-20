@@ -40,16 +40,17 @@ public class Climber extends SubsystemBase {
     }
 
     public void up(double value) {
-        if (climberEncoder.getPosition() < Constants.ClimberConstants.climberMax) {
-            climberMotor.set(value);
+        if (climberEncoder.getPosition() > Constants.ClimberConstants.climberMin) {
+            climberMotor.set(-value);
         } else {
             climberMotor.set(0);
         }
+
     }
 
     public void down(double value) {
-        if (climberEncoder.getPosition() > Constants.ClimberConstants.climberMin) {
-            climberMotor.set(-value);
+        if (climberEncoder.getPosition() < Constants.ClimberConstants.climberMax) {
+            climberMotor.set(value);
         } else {
             climberMotor.set(0);
         }
