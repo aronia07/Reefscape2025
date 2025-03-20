@@ -9,6 +9,18 @@ import frc.robot.Constants.IntakeConstants;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkMax;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfigurator;
+import com.ctre.phoenix6.controls.ControlRequest;
+import com.ctre.phoenix6.hardware.TalonFX;
+
+import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -16,28 +28,19 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 public class Intake extends SubsystemBase {
-    private static SparkMax leader = new SparkMax(IntakeConstants.leaderID, MotorType.kBrushless);
-    private static SparkMax follower = new SparkMax(IntakeConstants.followerID, MotorType.kBrushless);
 
-    private static SparkMaxConfig leaderConfig = new SparkMaxConfig();
-    private static SparkMaxConfig followerConfig = new SparkMaxConfig();
+    private static TalonFX intake = new TalonFX(0);
+    
+    private static MotorOutputConfigs intakeConfig = new MotorOutputConfigs();
 
     private static DigitalInput beamBreak = new DigitalInput(1);
-    // private static SparkClosedLoopController pid =
-    // intake.getClosedLoopController();
 
     private static Timer pulseTimer = new Timer();
     public static boolean modified = false;
 
     public Intake() {
-
         setupMotors();
         pulseTimer.reset();
-
-        // leaderConfig.closedLoop
-        // .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-        // .pid(kP.get(), kI.get(), kD.get());
-        // pid.setReference(0, ControlType.kVelocity);
     }
 
     public boolean hasCoral() {
@@ -45,24 +48,20 @@ public class Intake extends SubsystemBase {
     }
 
     public void setupMotors() {
-        /* Applying Configs */
-        leaderConfig.inverted(false)
-                .idleMode(IdleMode.kBrake)
-                .smartCurrentLimit(20, 20);
-        followerConfig.inverted(false)
-                .idleMode(IdleMode.kBrake)
-                .smartCurrentLimit(80, 80);
+        //Apply Configs
 
-        leader.configure(leaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        follower.configure(followerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        intake.setNeutralMode(NeutralModeValue.Brake);        
+        intakeConfig.Inverted = InvertedValue.Clockwise_Positive;
     }
 
     public void hpIntake(double value) {
         if (beamBreak.get()) {
-            follower.set(value);
+            //follower.set(value);
+            intake.set(value);
         } else {
             // leader.set(value);
-            follower.set(0);
+            //follower.set(0);
+            intake.set(0);
         }
 
     }
@@ -73,13 +72,17 @@ public class Intake extends SubsystemBase {
 
     // Outtakes through the black wheels
     public void outTake(double value) {
-        follower.set(value);
+        //follower.set(value);
+
+        intake.set(value);
 
     }
 
     public void stop() {
-        leader.set(0);
-        follower.set(0);
+        // leader.set(0);
+        // follower.set(0);
+
+        intake.set(0);
     }
 
     @Override
