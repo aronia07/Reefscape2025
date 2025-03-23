@@ -37,7 +37,7 @@ public class LEDSubsystem_LuminLabs extends SubsystemBase {
   // LED Strip Start
   public LEDSubsystem_LuminLabs() {
     cXAnimate.Connect(Port.kUSB1); // Connect to LED Controller
-    setDefaultCommand(LED_Reset().withName("LED_Reset"));
+    LED_ZoneColor("8x32TotalZone#1", colors.get("red"));
   }
 
   /**
@@ -52,8 +52,8 @@ public class LEDSubsystem_LuminLabs extends SubsystemBase {
   /**
    * Resetting LED strip - LES set to solid black.
    */
-  public Command LED_Reset() {
-    return run(() -> cXAnimate.leds.SetGroupColor("", colors.get("black"))); // Total Group
+  public void LED_Reset() {
+    cXAnimate.leds.SetGroupColor("", colors.get("black")); // Total Group
   }
 
   /**
@@ -73,7 +73,7 @@ public class LEDSubsystem_LuminLabs extends SubsystemBase {
    * @param color  the color of the pattern
    */
   public void LED_ZoneColor(String zoneID, Color color) {
-    cXAnimate.leds.SetGroupColor(zoneID, color);
+    cXAnimate.leds.SetColor(zoneID, color);
   }
 
   /**

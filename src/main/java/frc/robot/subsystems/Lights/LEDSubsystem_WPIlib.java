@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 //import edu.wpi.first.units.Units.*;
 import edu.wpi.first.wpilibj.LEDPattern;
 import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color.RGBChannel;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
@@ -28,7 +29,7 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
 
   // Setup
   private static final int kPort = 0; // PWM Port
-  private static final int kLength = 40; // LED strip length [# of LEDs]
+  private static final int kLength = 12; // LED strip length [# of LEDs]
   private static final Distance kLedSpacing = Meters.of(1 / 20); // LED strip LEDs density - [... LEDs per meter]
 
   private final AddressableLED m_led;
@@ -55,10 +56,11 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
     // Note: Other default patterns could be used instead!
     running_AnimatedPattern = false;
     animatedPattern = null;
-    //setDefaultCommand(LED_Reset().withName("LED_Reset"));
-    // setDefaultCommand(runPattern(LEDPattern.solid(Color.kBlack), false).withName("Off"));
+    // setDefaultCommand(LED_Reset().withName("LED_Reset"));
+    // setDefaultCommand(runPattern(LEDPattern.solid(Color.kBlack),
+    // false).withName("Off"));
 
-    LED_SolidColor(Color.kRed);
+    LED_SolidColor(255, 0, 0);
     // System.out.println("Correctly set color!!!!!!!!!!!!!");
   }
 
@@ -82,8 +84,12 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
    * 
    * @param color the color of the pattern
    */
-  public void LED_SolidColor(Color color) {
-    runPattern(LEDPattern.solid(color), false);
+  public void LED_SolidColor(int R, int G, int B) {
+    // runPattern(LEDPattern.solid(color), false);
+    for (int i = 0; i < kLength; i++) {
+      m_ledbuffer.setRGB(i, G, R, B);
+    }
+    m_led.setData(m_ledbuffer);
   }
 
   /**
@@ -150,7 +156,8 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
       running_AnimatedPattern = false;
       pattern.applyTo(m_ledbuffer);
       m_led.setData(m_ledbuffer);
-      // System.out.println("And executed proprely!!!!! Animated:" + running_AnimatedPattern);
+      // System.out.println("And executed proprely!!!!! Animated:" +
+      // running_AnimatedPattern);
     }
     // return run(() -> pattern.applyTo(m_ledbuffer));
   }

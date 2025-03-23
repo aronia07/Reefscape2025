@@ -26,6 +26,9 @@ import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import com.revrobotics.spark.config.SmartMotionConfig;
 
+import choreo.Choreo.TrajectoryLogger;
+import choreo.auto.AutoFactory;
+import choreo.trajectory.SwerveSample;
 import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -49,7 +52,6 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.VisionConstants;
-import frc.robot.FieldConstants.AlignmentConstants;
 import frc.robot.subsystems.Drive.TunerConstants.TunerSwerveDrivetrain;
 
 /**
@@ -284,6 +286,30 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
     }
 
+    public AutoFactory createAutoFactory(TrajectoryLogger<SwerveSample> trajlogger) {
+        return new AutoFactory(
+                () -> getState().Pose,
+                this::resetPose,
+                this::followPath,
+                true,
+                this,
+                trajlogger);
+    }
+
+    public AutoFactory createAutoFactory() {
+        return createAutoFactory((sample, isStart) -> {
+        });
+    }
+
+    public void followPath(SwerveSample target) {
+        AutoBuilder.pathfindToPose(target.getPose(),
+                new PathConstraints(AutoConstants.kMaxSpeedMetersPerSecond,
+                        AutoConstants.kMaxAccelerationMetersPerSecondSquared,
+                        AutoConstants.kMaxAngularSpeedRadiansPerSecond,
+                        AutoConstants.kMaxAngularSpeedRadiansPerSecondSquared),
+                0);
+    }
+
     private void handleActivePathLogger(List<Pose2d> poses) {
         if (poses.isEmpty())
             return;
@@ -374,69 +400,71 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return result;
     }
 
-    public Command reefAlign(boolean leftAlign) {
-        int closestTargetID = getClosestTag().get().getFiducialId();
+    // public Command reefAlign(boolean leftAlign) {
+    // int closestTargetID = getClosestTag().get().getFiducialId();
 
-        Transform2d leftApriltagOffset = new Transform2d(
-                -(VisionConstants.bumperToBumper) / 2,
-                AlignmentConstants.left_aprilTagOffsets.getOrDefault(closestTargetID, 0.0),
-                new Rotation2d(0));
-        Transform2d rightApriltagOffset = new Transform2d(
-                -(VisionConstants.bumperToBumper) / 2,
-                AlignmentConstants.right_aprilTagOffsets.getOrDefault(closestTargetID, 0.0),
-                new Rotation2d(0));
+    // Transform2d leftApriltagOffset = new Transform2d(
+    // -(VisionConstants.bumperToBumper) / 2,
+    // AlignmentConstants.left_aprilTagOffsets.getOrDefault(closestTargetID, 0.0),
+    // new Rotation2d(0));
+    // Transform2d rightApriltagOffset = new Transform2d(
+    // -(VisionConstants.bumperToBumper) / 2,
+    // AlignmentConstants.right_aprilTagOffsets.getOrDefault(closestTargetID, 0.0),
+    // new Rotation2d(0));
 
-        Pose2d estimatedLeftPOSE = (vision.kFieldLayout.getTagPose(closestTargetID))
-                .map(Pose3d::toPose2d)
-                .orElse(new Pose2d())
-                .transformBy(
-                        new Transform2d(
-                                leftApriltagOffset.getTranslation().rotateBy(Rotation2d.fromDegrees(180)),
-                                Rotation2d.fromDegrees(180))
-                                .inverse());
-        Pose2d estimatedRightPOSE = (vision.kFieldLayout.getTagPose(closestTargetID))
-                .map(Pose3d::toPose2d)
-                .orElse(new Pose2d())
-                .transformBy(
-                        new Transform2d(
-                                rightApriltagOffset.getTranslation().rotateBy(Rotation2d.fromDegrees(180)),
-                                Rotation2d.fromDegrees(180))
-                                .inverse());
-        Pose2d leftPose = estimatedLeftPOSE;
-        Pose2d rightPose = estimatedRightPOSE;
-        return new DeferredCommand(
-                () -> {
-                    if (leftPose == null || rightPose == null) {
-                        return new InstantCommand();
-                    }
-                    // List<Pose2d> tagSide = leftAlign ? VisionConstants.leftReefList :
-                    // VisionConstants.rightReefList;
-                    Pose2d goalPose = leftAlign ? leftPose : rightPose;
+    // Pose2d estimatedLeftPOSE = (vision.kFieldLayout.getTagPose(closestTargetID))
+    // .map(Pose3d::toPose2d)
+    // .orElse(new Pose2d())
+    // .transformBy(
+    // new Transform2d(
+    // leftApriltagOffset.getTranslation().rotateBy(Rotation2d.fromDegrees(180)),
+    // Rotation2d.fromDegrees(180))
+    // .inverse());
+    // Pose2d estimatedRightPOSE = (vision.kFieldLayout.getTagPose(closestTargetID))
+    // .map(Pose3d::toPose2d)
+    // .orElse(new Pose2d())
+    // .transformBy(
+    // new Transform2d(
+    // rightApriltagOffset.getTranslation().rotateBy(Rotation2d.fromDegrees(180)),
+    // Rotation2d.fromDegrees(180))
+    // .inverse());
+    // Pose2d leftPose = estimatedLeftPOSE;
+    // Pose2d rightPose = estimatedRightPOSE;
+    // return new DeferredCommand(
+    // () -> {
+    // if (leftPose == null || rightPose == null) {
+    // return new InstantCommand();
+    // }
+    // // List<Pose2d> tagSide = leftAlign ? VisionConstants.leftReefList :
+    // // VisionConstants.rightReefList;
+    // Pose2d goalPose = leftAlign ? leftPose : rightPose;
 
-                    SmartDashboard.putNumber("Swerve/Attempted Pose X", goalPose.getX());
-                    SmartDashboard.putNumber("Swerve/Attempted Pose Y", goalPose.getY());
+    // SmartDashboard.putNumber("Swerve/Attempted Pose X", goalPose.getX());
+    // SmartDashboard.putNumber("Swerve/Attempted Pose Y", goalPose.getY());
 
-                    return AutoBuilder.pathfindToPose(goalPose,
-                            new PathConstraints(AutoConstants.kMaxSpeedMetersPerSecond,
-                                    AutoConstants.kMaxAccelerationMetersPerSecondSquared,
-                                    AutoConstants.kMaxAngularSpeedRadiansPerSecond,
-                                    AutoConstants.kMaxAngularSpeedRadiansPerSecondSquared),
-                            0.0);
-                },
-                Set.of(this));
-    }
+    // return AutoBuilder.pathfindToPose(goalPose,
+    // new PathConstraints(AutoConstants.kMaxSpeedMetersPerSecond,
+    // AutoConstants.kMaxAccelerationMetersPerSecondSquared,
+    // AutoConstants.kMaxAngularSpeedRadiansPerSecond,
+    // AutoConstants.kMaxAngularSpeedRadiansPerSecondSquared),
+    // 0.0);
+    // },
+    // Set.of(this));
+    // }
 
-    public Pose2d getTargetPose(boolean left) {
-        Pose2d targetPose = new Pose2d();
-        if (left) {
-            targetPose = getState().Pose.nearest(
-                    isRedAlliance() ? AlignmentConstants.leftREDReefList : AlignmentConstants.leftBLUEReefList);
-        } else {
-            targetPose = getState().Pose.nearest(
-                    isRedAlliance() ? AlignmentConstants.rightREDReefList : AlignmentConstants.rightBLUEReefList);
-        }
-        return targetPose;
-    }
+    // public Pose2d getTargetPose(boolean left) {
+    // Pose2d targetPose = new Pose2d();
+    // if (left) {
+    // targetPose = getState().Pose.nearest(
+    // isRedAlliance() ? AlignmentConstants.leftREDReefList :
+    // AlignmentConstants.leftBLUEReefList);
+    // } else {
+    // targetPose = getState().Pose.nearest(
+    // isRedAlliance() ? AlignmentConstants.rightREDReefList :
+    // AlignmentConstants.rightBLUEReefList);
+    // }
+    // return targetPose;
+    // }
 
     public Pose2d getCenterReefPose() {
         Pose2d target;

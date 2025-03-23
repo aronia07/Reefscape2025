@@ -47,7 +47,7 @@ import frc.robot.commands.Intake.IntakeOut;
 import frc.robot.commands.Intake.IntakeOut2;
 import frc.robot.commands.Intake.Modify;
 import frc.robot.commands.Lights.WPIlib.RunPattern;
-import frc.robot.commands.Lights.WPIlib.SetSolidColor;
+//import frc.robot.commands.Lights.WPIlib.SetSolidColor;
 import frc.robot.subsystems.Drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.Drive.TunerConstants;
 import frc.robot.subsystems.Drive.Vision;
@@ -166,8 +166,8 @@ public class RobotContainer {
 
                 // HP Pickup
                 driver.rightBumper().whileTrue(new ParallelCommandGroup(
-                                new ToWristAngle(() -> Units.degreesToRadians(-77), wrist),
-                                new ToAngle(() -> Units.degreesToRadians(34), arm),
+                                new ToWristAngle(() -> Units.degreesToRadians(33), wrist),
+                                new ToAngle(() -> Units.degreesToRadians(-7.5), arm),
                                 new IntakeIn(intake),
                                 new ElevateLevel(elevator, ElevateMode.HP)).finallyDo(this::idle));
 
@@ -274,7 +274,7 @@ public class RobotContainer {
                 operator.povDown().whileTrue(new ClimbDown(climber, () -> 1));
                 operator.povUp().whileTrue(new Climb(climber, () -> 1));
 
-                operator.start().whileTrue(new ElevateLevel(elevator, ElevateMode.RESET));
+                operator.start().whileTrue(new ElevateLevel(elevator, ElevateMode.HP));
         }
 
         public void getDashboardCommand() {
@@ -313,7 +313,7 @@ public class RobotContainer {
         }
 
         public void disabledActions() {
-                new SetSolidColor(wpiLights, Color.kMagenta);
+                // new SetSolidColor(wpiLights, Color.kYellow);
                 // arm.resetI();
                 // arm.runState(new
                 // TrapezoidProfile.State(arm.getEncoderPosition().getRadians(), 0));

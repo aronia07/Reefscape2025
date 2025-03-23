@@ -29,8 +29,8 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 public class Intake extends SubsystemBase {
 
-    private static TalonFX intake = new TalonFX(0);
-    
+    private static TalonFX intake = new TalonFX(61);
+
     private static MotorOutputConfigs intakeConfig = new MotorOutputConfigs();
 
     private static DigitalInput beamBreak = new DigitalInput(1);
@@ -48,19 +48,19 @@ public class Intake extends SubsystemBase {
     }
 
     public void setupMotors() {
-        //Apply Configs
+        // Apply Configs
 
-        intake.setNeutralMode(NeutralModeValue.Brake);        
+        intake.setNeutralMode(NeutralModeValue.Brake);
         intakeConfig.Inverted = InvertedValue.Clockwise_Positive;
     }
 
     public void hpIntake(double value) {
         if (beamBreak.get()) {
-            //follower.set(value);
+            // follower.set(value);
             intake.set(value);
         } else {
             // leader.set(value);
-            //follower.set(0);
+            // follower.set(0);
             intake.set(0);
         }
 
@@ -72,7 +72,7 @@ public class Intake extends SubsystemBase {
 
     // Outtakes through the black wheels
     public void outTake(double value) {
-        //follower.set(value);
+        // follower.set(value);
 
         intake.set(value);
 

@@ -173,8 +173,8 @@ public final class Constants {
         public static final Rotation2d tolernace = Rotation2d.fromDegrees(1); // How much the arm's exact angle can be
                                                                               // off by
 
-        public static final Rotation2d maxVelocityPerSecond = Rotation2d.fromDegrees(400); // was 500
-        public static final Rotation2d maxAcceleration = Rotation2d.fromDegrees(400); // was 250
+        public static final Rotation2d maxVelocityPerSecond = Rotation2d.fromDegrees(100); // was 400
+        public static final Rotation2d maxAcceleration = Rotation2d.fromDegrees(100); // was 400
 
         public static double[] armSGV = new double[] { 0.0, 0.001, 0.0 }; // Static, Gravity, and Velocity gains
         public static double[] armPID = new double[] { 1.47, 0, 0f }; // Arm PID values
