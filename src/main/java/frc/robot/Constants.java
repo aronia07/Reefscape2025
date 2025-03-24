@@ -71,7 +71,7 @@ public final class Constants {
             "yellow", new Color(255, 255, 0),     // RGB (255, 255, 0) -> GRB (255, 255, 0) = Yellow
             "orange", new Color(128, 255, 0),     // RGB (128, 255, 0) -> GRB (255, 128, 0) = Orange (approx)
             "pink", new Color(128, 255, 192),     // RGB (128, 255, 192) -> GRB (255, 128, 192) = Pink (approx)
-            "magenta", new Color(255, 0, 255));  // RGB (255, 0, 255) -> GRB (0, 255, 255) = Magenta
+            "magenta", new Color(0, 255, 255));  // RGB (255, 0, 255) -> GRB (0, 255, 255) = Magenta
 
         //GBR Color Map
         public static Map<String, Color> GBRColors = Map.of(
@@ -84,7 +84,7 @@ public final class Constants {
             "yellow", new Color(255, 0, 255),     // RGB (255, 0, 255) -> GBR (0, 255, 255) = Yellow (approx)
             "orange", new Color(128, 0, 255),     // RGB (128, 0, 255) -> GBR (0, 255, 128) ≈ Orange
             "pink", new Color(128, 192, 255),     // RGB (128, 192, 255) -> GBR (192, 255, 128) ≈ Pink
-            "magenta", new Color(255, 255, 0));  // RGB (255, 255, 0) -> GBR (255, 0, 255) = Magenta (approx)
+            "magenta", new Color(0, 255, 255));  // RGB (255, 255, 0) -> GBR (255, 0, 255) = Magenta (approx)
     }
 
     public static final class VisionConstants {
