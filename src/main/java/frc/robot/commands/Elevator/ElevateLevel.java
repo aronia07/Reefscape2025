@@ -4,6 +4,7 @@ import java.lang.annotation.ElementType;
 import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
 
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.Timer;
@@ -16,6 +17,7 @@ public class ElevateLevel extends Command {
     protected final Elevator elevator_y;
     // private State initialState;
     private ElevateMode level;
+    private ProfiledPIDController elevatorPID;
     // private TrapezoidProfile profiler_y = new TrapezoidProfile(
     // new TrapezoidProfile.Constraints(ElevatorConstants.maxVelocity,
     // ElevatorConstants.maxAccel));
@@ -30,38 +32,46 @@ public class ElevateLevel extends Command {
 
     @Override
     public void initialize() {
-        // timer_y.reset();
-        // timer_y.start();
+        elevatorPID = elevator_y.pid;
 
         switch (level) {
             case UP:
                 break;
             case DOWN:
                 elevator_y.elevatorSetpoint = 1;
+                elevatorPID.setGoal(1);
                 break;
             case L1:
                 elevator_y.elevatorSetpoint = ElevatorConstants.LevelOneSetpoint;
+                elevatorPID.setGoal(ElevatorConstants.LevelOneSetpoint);
                 break;
             case L2:
                 elevator_y.elevatorSetpoint = ElevatorConstants.LevelTwoSetpoint;
+                elevatorPID.setGoal(ElevatorConstants.LevelTwoSetpoint);
                 break;
             case L2AR:
                 elevator_y.elevatorSetpoint = ElevatorConstants.LevelTwoAlgaeSetpoint;
+                elevatorPID.setGoal(ElevatorConstants.LevelTwoAlgaeSetpoint);
                 break;
             case L3:
                 elevator_y.elevatorSetpoint = ElevatorConstants.LevelThreeSetpoint;
+                elevatorPID.setGoal(ElevatorConstants.LevelThreeSetpoint);
                 break;
             case L4:
                 elevator_y.elevatorSetpoint = ElevatorConstants.LevelFourSetpoint;
+                elevatorPID.setGoal(ElevatorConstants.LevelFourSetpoint);
                 break;
             case HP:
                 elevator_y.elevatorSetpoint = ElevatorConstants.HPsetpoint;
+                elevatorPID.setGoal(ElevatorConstants.HPsetpoint);
                 break;
             case TEST:
                 elevator_y.elevatorSetpoint = ElevatorConstants.test;
+                elevatorPID.setGoal(ElevatorConstants.test);
                 break;
             case OFF:
                 elevator_y.elevatorSetpoint = 1;
+                elevatorPID.setGoal(1);
                 break;
             case RESET:
                 elevator_y.SET(0);
@@ -69,6 +79,7 @@ public class ElevateLevel extends Command {
                 break;
             case HOMING:
                 elevator_y.elevatorSetpoint = .5;
+                elevatorPID.setGoal(.5);
                 // if (elevator_y.leftElevatorMotor.getOutputCurrent() >= ElevatorConstants.homingCurrentThreshold) {
                 //     elevator_y.leftElevatorMotor.setVoltage(0);
                 //     elevator_y.rightElevatorMotor.setVoltage(0);
@@ -107,10 +118,14 @@ public class ElevateLevel extends Command {
 
     @Override
     public void execute() {
-        if(level == ElevateMode.HOMING){
-            elevator_y.leftElevatorMotor.set(.05);
-            elevator_y.rightElevatorMotor.set(-.05);
-        }
+        var ffoutput = elevator_y.ffElevate.calculate(elevatorPID.getSetpoint().velocity);
+        var pidOutput = elevatorPID.calculate(elevator_y.encoderPosition);
+        elevator_y.leftElevatorMotor.set(-pidOutput - ffoutput);
+        elevator_y.rightElevatorMotor.set(pidOutput + ffoutput);
+        // if(level == ElevateMode.HOMING){
+        //     elevator_y.leftElevatorMotor.set(.05);
+        //     elevator_y.rightElevatorMotor.set(-.05);
+        // }
         // var nextState = profiler_y.calculate(timer_y.get(),
         // initialState,
         // new TrapezoidProfile.State(elevator_y.getSetpoint(), 0));
@@ -126,9 +141,9 @@ public class ElevateLevel extends Command {
     @Override
     public void end(boolean interrupted) {
         // timer_y.stop();
-        elevator_y.elevatorSetpoint = 1;
-        elevator_y.leftElevatorMotor.set(0);
-        elevator_y.rightElevatorMotor.set(0);
+        // elevator_y.elevatorSetpoint = 1;
+        // elevator_y.leftElevatorMotor.set(0);
+        // elevator_y.rightElevatorMotor.set(0);
     }
 
 }

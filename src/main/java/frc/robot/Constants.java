@@ -58,7 +58,7 @@ public final class Constants {
                 new Translation3d(Units.inchesToMeters(19.41), 0, Units.inchesToMeters(6.6)),
                 new Rotation3d(0, Units.degreesToRadians(23), 0)); // TODO: edit yaw
         public static String cameraName = "orangepi";
-        public static String camera2Name = "USB_Camera(1)";
+        public static String camera2Name = "orangepi2";
         /* standard deviations for vision calculations */
         public static Vector<N3> kSingleTagStdDevs = VecBuilder.fill(2, 2, 2);
         public static Vector<N3> kMultiTagStdDevs = VecBuilder.fill(1, 1, 1);
@@ -93,7 +93,7 @@ public final class Constants {
     public static final class WristConstants {
         public static int wristMotorID = 51;
         public static int absoluteEncoderPort = 3;
-        public static double[] wristPID = { 1.5, 0, 0 };
+        public static double[] wristPID = { .625, 0, 0 };
         public static int maxVelocity = 9;
         public static int maxAccel = 0;
         public static double[] wristFF = { 0, 0, 0 };
@@ -152,7 +152,7 @@ public final class Constants {
         public static double LevelOneSetpoint = 1;
         public static double LevelTwoSetpoint = 1;
         public static double LevelTwoAlgaeSetpoint = 0.5;
-        public static double LevelThreeSetpoint = 5.3;
+        public static double LevelThreeSetpoint = 5;
         public static double LevelFourSetpoint = 18.7;
         public static double HPsetpoint = -01;
         public static double test = 16;

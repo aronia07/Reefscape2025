@@ -58,12 +58,12 @@ public class Wrist extends SubsystemBase {
     private Rotation2d goal = new Rotation2d();
   
     // Tunable values 
-    private LoggedTunableNumber wristP = new LoggedTunableNumber("wristP", Constants.WristConstants.wristPID[0]);
-    private LoggedTunableNumber wristI = new LoggedTunableNumber("wristI", Constants.WristConstants.wristPID[1]);
-    private LoggedTunableNumber wristD = new LoggedTunableNumber("wristD", Constants.WristConstants.wristPID[2]);
-    private LoggedTunableNumber wristS = new LoggedTunableNumber("wristS", Constants.WristConstants.wristFF[0]);
-    private LoggedTunableNumber wristG = new LoggedTunableNumber("wristG", Constants.WristConstants.wristFF[1]);
-    private LoggedTunableNumber wristV = new LoggedTunableNumber("wristV", Constants.WristConstants.wristFF[2]);
+    // private LoggedTunableNumber wristP = new LoggedTunableNumber("wristP", Constants.WristConstants.wristPID[0]);
+    // private LoggedTunableNumber wristI = new LoggedTunableNumber("wristI", Constants.WristConstants.wristPID[1]);
+    // private LoggedTunableNumber wristD = new LoggedTunableNumber("wristD", Constants.WristConstants.wristPID[2]);
+    // private LoggedTunableNumber wristS = new LoggedTunableNumber("wristS", Constants.WristConstants.wristFF[0]);
+    // private LoggedTunableNumber wristG = new LoggedTunableNumber("wristG", Constants.WristConstants.wristFF[1]);
+    // private LoggedTunableNumber wristV = new LoggedTunableNumber("wristV", Constants.WristConstants.wristFF[2]);
   
   
     public Wrist() {
@@ -99,18 +99,18 @@ public class Wrist extends SubsystemBase {
   
     //Checks to see if the PID and SGV values have changed. 
     //Updates the value if it's been changed
-    public void checkTunableValues() {
-      // if (!Constants.enableTunableValues)
-      //   return;
+  //   public void checkTunableValues() {
+  //     // if (!Constants.enableTunableValues)
+  //     //   return;
   
-      if (wristP.hasChanged() || wristI.hasChanged() || wristD.hasChanged()) {
-        pid.setPID(wristP.get(), wristI.get(), wristD.get());
-      }
+  //     if (wristP.hasChanged() || wristI.hasChanged() || wristD.hasChanged()) {
+  //       pid.setPID(wristP.get(), wristI.get(), wristD.get());
+  //     }
   
-      if (wristS.hasChanged() || wristG.hasChanged() || wristV.hasChanged()) {
-        ffModel = new ArmFeedforward(wristS.get(), wristG.get(), wristV.get());
-    }
-  }
+  //     if (wristS.hasChanged() || wristG.hasChanged() || wristV.hasChanged()) {
+  //       ffModel = new ArmFeedforward(wristS.get(), wristG.get(), wristV.get());
+  //   }
+  // }
 
   //Sets the goal
   public void setGoal(Rotation2d goal) {
@@ -178,7 +178,7 @@ public class Wrist extends SubsystemBase {
 
     encoderPosition = encoder.getAbsolutePosition();  //Finds the exact position of the encoder
     logValues();  //Logs values to SmartDashboard/Glass
-    checkTunableValues(); //Updates PID and FF values
+    // checkTunableValues(); //Updates PID and FF values
 
   //  var ffOutput = ffModel.calculate(setpoint.getRadians(), velocity.getRadians()); //Calculates Feedforward output
     var pidOutput = pid.calculate(getEncoderPosition().getRadians(), setpoint.getRadians());  //calculates PID output
@@ -186,7 +186,7 @@ public class Wrist extends SubsystemBase {
   //SmartDashboard.putNumber("ffoutput arm", ffOutput); //Displays the FF output calculated above on Smartdahsboard/Glass
 
     //PID+FF output on the leader and follower motors
-    // wristMotor.set(pidOutput+ffOutput);
+    wristMotor.set(pidOutput);
   }
 
 }

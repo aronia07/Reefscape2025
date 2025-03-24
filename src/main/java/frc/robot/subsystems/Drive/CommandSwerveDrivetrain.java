@@ -237,10 +237,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         // }
         SmartDashboard.putData(TheField);
         TheField.setRobotPose(getState().Pose);
-        if (vision.getEstimatedGlobalPose().isEmpty()) {
+        if (vision.getEstimatedGlobalPoseFront().isEmpty()) {
         } else {
             TheField.getObject("vision pls work")
-                    .setPose(vision.getEstimatedGlobalPose().get().estimatedPose.toPose2d());
+                    .setPose(vision.getEstimatedGlobalPoseFront().get().estimatedPose.toPose2d());
         }
         configureAutoBuilder();
     }
@@ -350,28 +350,80 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public Command sysIdDynamic(SysIdRoutine.Direction direction) {
         return m_sysIdRoutineToApply.dynamic(direction);
     }
+    /**
+     * Get both camera's pose estimates, check if present, then take avg of all three components
+     * @return {@link Pose2d} estimated pose based on both vision measurements
+     */
+    public Pose2d getPoseFromBoth() {
+        var visionEst = vision.getEstimatedGlobalPoseFront();
+        var visionEst2 = vision.getEstimatedGlobalPoseBack();
+        Pose2d combinedEstimate = new Pose2d();
+        if (visionEst.isPresent() && visionEst2.isPresent()){
+            Pose2d poseFromFront = visionEst.get().estimatedPose.toPose2d();
+            Pose2d poseFromBack = visionEst2.get().estimatedPose.toPose2d();
+            
+            double estXfromFront = poseFromFront.getX();
+            double estXfromBack = poseFromBack.getX();
+            
+            double estYfromFront = poseFromFront.getY();
+            double estYfromBack = poseFromBack.getY();
+            
+            double estCOSfromFront = poseFromFront.getRotation().getCos();
+            double estCOSfromBack = poseFromBack.getRotation().getCos();
+           
+            double estSINfromFront = poseFromFront.getRotation().getSin();
+            double estSINfromBack = poseFromBack.getRotation().getSin();
+            
+            double avgX = (estXfromBack + estXfromFront)/2;
+            double avgY = (estYfromBack + estYfromFront)/2;
+           
+            double avgCos = (estCOSfromBack + estCOSfromFront)/2;
+            double avgSin = (estSINfromBack + estSINfromFront)/2;
+            
+            combinedEstimate = new Pose2d(avgX, avgY, new Rotation2d(avgCos, avgSin));
+        } else if (visionEst.isPresent() && (visionEst2.isEmpty())) {
+            
+        } else if (visionEst2.isPresent() && (visionEst.isEmpty())) {
+            
+        } else {
+            combinedEstimate = new Pose2d();
+        }
+        return combinedEstimate;
+    }
 
     /**
      * Update the pose estimation and std devs with new vision data
      */
     public void updateVisionMeasurements() {
-        var visionEst = vision.getEstimatedGlobalPose();
-        visionEst.ifPresent(est -> {
-            // if (Math.sqrt(Math.pow(est.estimatedPose.toPose2d().getX(), 2) +
-            // Math.pow(est.estimatedPose.toPose2d().getY(), 2))
-            // > 4) {
-            // System.out.println("outofrange");
-            // return;
-            // }
-            // if (est.estimatedPose.toPose2d().getX() > 4) {
-            // System.out.println("outofrange");
-            // return;
-            // }
-            var estPose = est.estimatedPose.toPose2d();
+        var visionEst = vision.getEstimatedGlobalPoseFront();
+        var visionEst2 = vision.getEstimatedGlobalPoseBack();
+        if (visionEst.isPresent() && visionEst2.isPresent()){
+            var estPose = getPoseFromBoth();
             var estStdDevs = vision.getEstimationStdDevs(estPose);
-            super.addVisionMeasurement(est.estimatedPose.toPose2d(), Utils.fpgaToCurrentTime(est.timestampSeconds),
+            super.addVisionMeasurement(
+                estPose,
+                Utils.fpgaToCurrentTime(visionEst.get().timestampSeconds),
+                estStdDevs
+            );
+        } else if (visionEst.isPresent()) {
+            visionEst.ifPresent(est -> {
+                var estPose = est.estimatedPose.toPose2d();
+                var estStdDevs = vision.getEstimationStdDevs(estPose);
+                super.addVisionMeasurement(
+                    estPose,
+                    Utils.fpgaToCurrentTime(est.timestampSeconds),
                     estStdDevs);
-        });
+            });
+        } else if (visionEst2.isPresent()) {
+            visionEst2.ifPresent(est -> {
+                var estPose = est.estimatedPose.toPose2d();
+                var estStdDevs = vision.getEstimationStdDevs(estPose);
+                super.addVisionMeasurement(
+                    estPose,
+                    Utils.fpgaToCurrentTime(est.timestampSeconds),
+                    estStdDevs);
+            });  
+        } 
     }
 
     /**
@@ -382,7 +434,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      * @return result: The closest tag (if available)
      */
     public Optional<PhotonTrackedTarget> getClosestTag() {
-        var targets = vision.getLatestResult().getTargets();
+        var targets = vision.getLatestResultFront().getTargets();
         Optional<PhotonTrackedTarget> result = Optional.empty();
 
         for (var target : targets) {
