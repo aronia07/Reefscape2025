@@ -66,7 +66,6 @@ public class ToAngle extends Command {
   @Override
   public void end(boolean interrupted) {
     m_timer.stop(); //Stops timer
-    m_arm.setGoal(Rotation2d.fromRadians(Units.degreesToRadians(60)));
   }
 
 }

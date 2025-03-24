@@ -93,7 +93,7 @@ public final class Constants {
     public static final class WristConstants {
         public static int wristMotorID = 51;
         public static int absoluteEncoderPort = 3;
-        public static double[] wristPID = { 0.625, 0, 0 };
+        public static double[] wristPID = { 1.5, 0, 0 };
         public static int maxVelocity = 9;
         public static int maxAccel = 0;
         public static double[] wristFF = { 0, 0, 0 };
@@ -121,8 +121,8 @@ public final class Constants {
     public static final class ElevatorConstants {
         public static double min = .5;
         public static double max = 18;
-        public static double homingCurrentThreshold = 10;
-        public static double selfHomeSpeedVoltage = 10;
+        public static double homingCurrentThreshold = 20;
+        public static double selfHomeSpeedVoltage = 15;
         public static int desiredMin;
         public static int desiredMax;
         public static int leftElevatorMotorID = 41;
@@ -154,7 +154,7 @@ public final class Constants {
         public static double LevelTwoAlgaeSetpoint = 0.5;
         public static double LevelThreeSetpoint = 5.3;
         public static double LevelFourSetpoint = 18.7;
-        public static double HPsetpoint = -0.1;
+        public static double HPsetpoint = -01;
         public static double test = 16;
 
     }
@@ -173,8 +173,8 @@ public final class Constants {
         public static final Rotation2d tolernace = Rotation2d.fromDegrees(1); // How much the arm's exact angle can be
                                                                               // off by
 
-        public static final Rotation2d maxVelocityPerSecond = Rotation2d.fromDegrees(100); // was 400
-        public static final Rotation2d maxAcceleration = Rotation2d.fromDegrees(100); // was 400
+        public static final Rotation2d maxVelocityPerSecond = Rotation2d.fromDegrees(480); // was 400
+        public static final Rotation2d maxAcceleration = Rotation2d.fromDegrees(550); // was 400
 
         public static double[] armSGV = new double[] { 0.0, 0.001, 0.0 }; // Static, Gravity, and Velocity gains
         public static double[] armPID = new double[] { 1.47, 0, 0f }; // Arm PID values

@@ -96,18 +96,18 @@ public class Arm extends SubsystemBase {
 
   // Checks to see if the PID and SGV values have changed.
   // Updates the value if it's been changed
-  public void checkTunableValues() {
-    if (!Constants.enableTunableValues)
-      return;
+  // public void checkTunableValues() {
+  //   // if (!Constants.enableTunableValues)
+  //   //   return;
 
-    // if (armP.hasChanged() || armI.hasChanged() || armD.hasChanged()) {
-    // pid.setPID(armP.get(), armI.get(), armD.get());
-    // }
+  //   if (armP.hasChanged() || armI.hasChanged() || armD.hasChanged()) {
+  //   pid.setPID(armP.get(), armI.get(), armD.get());
+  //   }
 
-    // if (armS.hasChanged() || armG.hasChanged() || armV.hasChanged()) {
-    // ffModel = new ArmFeedforward(armS.get(), armG.get(), armV.get());
-    // }
-  }
+  //   if (armS.hasChanged() || armG.hasChanged() || armV.hasChanged()) {
+  //   ffModel = new ArmFeedforward(armS.get(), armG.get(), armV.get());
+  //   }
+  // }
 
   // Sets the arm's goal
   public void setGoal(Rotation2d goal) {
@@ -169,6 +169,8 @@ public class Arm extends SubsystemBase {
     SmartDashboard.putNumber("Arm Desired Angle", setpoint.getDegrees());
     SmartDashboard.putNumber("Arm Desired Speed", velocity.getDegrees());
     SmartDashboard.putNumber("Arm current", leader.getOutputCurrent());
+    SmartDashboard.putNumber("arm output", leader.getAppliedOutput());
+    
   }
 
   @Override

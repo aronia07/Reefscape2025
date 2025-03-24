@@ -138,11 +138,7 @@ public class RobotContainer {
                 driver.b().whileTrue(drivetrain
                                 .applyRequest(() -> point.withModuleDirection(
                                                 new Rotation2d(-driver.getLeftY(), -driver.getLeftX()))));
-                driver.x().whileTrue(new ParallelCommandGroup(
-                                new ToWristAngle(() -> Units.degreesToRadians(-77), wrist),
-                                new ToAngle(() -> Units.degreesToRadians(35), arm),
-                                new ElevateLevel(elevator, ElevateMode.L2),
-                                new IntakeIn(intake)).withTimeout(0.8));
+                
                 // driver.x().whileTrue(
                 // new ProxyCommand(
                 // DriveToLocation.driveTo(new Pose2d(
@@ -274,7 +270,23 @@ public class RobotContainer {
                 operator.povDown().whileTrue(new ClimbDown(climber, () -> 1));
                 operator.povUp().whileTrue(new Climb(climber, () -> 1));
 
-                operator.start().whileTrue(new ElevateLevel(elevator, ElevateMode.HP));
+                // operator.leftTrigger().whileTrue(new ParallelCommandGroup(
+                //         new ToAngle(() -> Units.degreesToRadians(0), arm),
+                //         new ToWristAngle(() -> Units.degreesToRadians(-70), wrist)));
+                        
+                // operator.rightTrigger().whileTrue(new ParallelCommandGroup(
+                //         new ToAngle(() -> Units.degreesToRadians(90), arm),
+                //         new ToWristAngle(() -> Units.degreesToRadians(-70), wrist)));
+                // operator.leftTrigger().whileTrue(
+                //         new ToWristAngle(() -> Units.degreesToRadians(80), wrist));
+                // operator.rightTrigger().whileTrue(
+                //         new ToWristAngle(() -> Units.degreesToRadians(-70), wrist));
+                operator.rightTrigger().whileTrue(new SequentialCommandGroup(
+                        // new ToAngle(() -> Units.degreesToRadians(0), arm),
+                        new ElevateLevel(elevator, ElevateMode.HOMING)
+                )
+                );
+
         }
 
         public void getDashboardCommand() {

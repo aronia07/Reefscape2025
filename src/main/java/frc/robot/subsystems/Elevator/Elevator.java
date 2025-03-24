@@ -167,20 +167,20 @@ public class Elevator extends SubsystemBase {
     this.nextVelocity = state.velocity;
   }
 
-  public void checkTunableValues() {
-    // if (Constants.enableTunableValues) {
+  // public void checkTunableValues() {
+  //   // if (Constants.enableTunableValues) {
 
-    // if (elevatorP.hasChanged() || elevatorI.hasChanged() ||
-    // elevatorD.hasChanged()) {
-    // pid.setPID(elevatorP.get(), elevatorI.get(), elevatorD.get());
-    // }
-    // if (elevatorS.hasChanged() || elevatorG.hasChanged() ||
-    // elevatorV.hasChanged() || elevatorA.hasChanged()) {
-    // ffElevate = new ElevatorFeedforward(elevatorS.get(), elevatorG.get(),
-    // elevatorV.get(), elevatorA.get());
-    // }
-    // }
-  }
+  //   if (elevatorP.hasChanged() || elevatorI.hasChanged() ||
+  //   elevatorD.hasChanged()) {
+  //   pid.setPID(elevatorP.get(), elevatorI.get(), elevatorD.get());
+  //   }
+  //   if (elevatorS.hasChanged() || elevatorG.hasChanged() ||
+  //   elevatorV.hasChanged()) {
+  //   ffElevate = new ElevatorFeedforward(elevatorS.get(), elevatorG.get(),
+  //   elevatorV.get());
+  //   }
+  //   // }
+  // }
 
   // public boolean isDone() {
   // return isLeftDone && isRightDone;
@@ -269,6 +269,7 @@ public class Elevator extends SubsystemBase {
   @Override
   public void periodic() {
     encoderPosition = encoderRight.getPosition();
+    // checkTunableValues();
     logValues();
     switch (isLeftOutOfBounds()) {
       case BADBADBAD:
@@ -292,10 +293,11 @@ public class Elevator extends SubsystemBase {
     leftElevatorMotor.set(-ffOutput - leftpidOutput);
     rightElevatorMotor.set(ffOutput + leftpidOutput);
 
-    SmartDashboard.putNumber("Elevator velocity", nextVelocity);
-    SmartDashboard.putNumber("Elevator PID output left", leftpidOutput);
+    SmartDashboard.putNumber("Elevator velocity", leftElevatorMotor.get());
+    // SmartDashboard.putNumber("Elevator PID output left", leftpidOutput);
     SmartDashboard.putNumber("Elevator's Setpoint", elevatorSetpoint);
-    SmartDashboard.putNumber("Elevator FF Output", ffOutput);
+    SmartDashboard.putNumber("Elevator Current", leftElevatorMotor.getOutputCurrent());
+    // SmartDashboard.putNumber("Elevator FF Output", ffOutput);
 
   }
 }

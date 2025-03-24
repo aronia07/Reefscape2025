@@ -470,8 +470,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         Pose2d target;
         int firstTag;
         int endtag;
-
-        List<Pose2d> reefTagPoseList = new ArrayList<>(6);
+        Pose2d currentPose = getState().Pose;
+        Pose2d currentPoseCopy = getStateCopy().Pose;
+        List<Pose2d> reefTagPoseList = new ArrayList<>(12);
 
         if (isRedAlliance()) {
             firstTag = 6;
@@ -482,15 +483,17 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
         for (int i = firstTag; i < endtag; i++) {
             reefTagPoseList.add(vision.kFieldLayout.getTagPose(i).get().toPose2d());
+            reefTagPoseList.add(vision.kFieldLayout.getTagPose(i).get().toPose2d().rotateBy(Rotation2d.k180deg));
         }
-        Pose2d nearestPose = getState().Pose.nearest(reefTagPoseList);
-        double angle = nearestPose.getRotation().rotateBy(Rotation2d.k180deg).getRadians();
-
+        Pose2d nearestPose = currentPose.nearest(reefTagPoseList);
+        Pose2d mostRecent = currentPoseCopy.nearest(reefTagPoseList);
+        double angle = nearestPose.getRotation().getRadians(); //used to be rotated by 180, now is accounted for
+        
         target = new Pose2d(
                 nearestPose.getX() + (-Units.inchesToMeters(VisionConstants.bumperToBumper / 2) * Math.cos(angle)),
                 nearestPose.getY() + (-Units.inchesToMeters(VisionConstants.bumperToBumper / 2) * Math.sin(angle)),
                 Rotation2d.fromRadians(angle));
-        TheField.getObject("nearestpose").setPose(nearestPose);
+        // TheField.getObject("nearestpose").setPose(nearestPose);
         TheField.getObject("target").setPose(target);
 
         return target;
@@ -513,6 +516,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     centerTarget.getY() + (leftOffset * Math.sin(angle)),
                     centerTarget.getRotation());
         }
+        TheField.getObject("offset target").setPose(offsetTarget);
         return offsetTarget;
     }
 

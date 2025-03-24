@@ -24,12 +24,6 @@
         "Module 2": {
           "open": true
         },
-        "TunableNumbers": {
-          "open": true
-        },
-        "open": true
-      },
-      "photonvision": {
         "open": true
       }
     },
@@ -54,11 +48,6 @@
       "/SmartDashboard/autos": "String Chooser"
     },
     "windows": {
-      "/SmartDashboard/Elevator test": {
-        "window": {
-          "visible": true
-        }
-      },
       "/SmartDashboard/Field": {
         "bottom": 1638,
         "builtin": "2025 Reefscape",
@@ -66,16 +55,21 @@
         "left": 534,
         "right": 3466,
         "top": 291,
-        "width": 17.54825210571289,
-        "window": {
-          "visible": true
-        }
+        "width": 17.54825210571289
       },
       "/SmartDashboard/Vision field": {
         "bottom": 1638,
         "builtin": "2025 Reefscape",
         "height": 8.051901817321777,
         "left": 534,
+        "pathplanner target pose": {
+          "color": [
+            143.66195678710938,
+            0.0,
+            255.0,
+            255.0
+          ]
+        },
         "right": 3466,
         "top": 291,
         "width": 17.54825210571289,
@@ -98,11 +92,7 @@
   },
   "NetworkTables Settings": {
     "mode": "Client (NT4)",
-    "serverTeam": "3161",
-    "visible": false
-  },
-  "NetworkTables View": {
-    "visible": false
+    "serverTeam": "3161"
   },
   "Plots": {
     "Plot <0>": {
@@ -114,7 +104,8 @@
             0.0,
             0.8500000238418579
           ],
-          "height": 664,
+          "height": 319,
+          "name": "Arm",
           "series": [
             {
               "color": [
@@ -150,7 +141,7 @@
             0.0,
             0.8500000238418579
           ],
-          "height": 462,
+          "height": 642,
           "series": [
             {
               "color": [
@@ -204,7 +195,7 @@
             0.0,
             0.8500000238418579
           ],
-          "height": 332,
+          "height": 358,
           "series": [
             {
               "color": [
@@ -240,7 +231,7 @@
             0.0,
             0.8500000238418579
           ],
-          "height": 901,
+          "height": 547,
           "series": [
             {
               "color": [
@@ -266,6 +257,111 @@
       "window": {
         "visible": false
       }
+    },
+    "Plot <4>": {
+      "plots": [
+        {
+          "backgroundColor": [
+            0.0,
+            0.0,
+            0.0,
+            0.8500000238418579
+          ],
+          "height": 332,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/Actual Elevator Position Left"
+            },
+            {
+              "color": [
+                0.8666667342185974,
+                0.5176470875740051,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/Desired Elevator Position"
+            }
+          ]
+        }
+      ],
+      "window": {
+        "visible": false
+      }
+    },
+    "Plot <5>": {
+      "plots": [
+        {
+          "backgroundColor": [
+            0.05999999865889549,
+            0.05999999865889549,
+            0.05999999865889549,
+            0.9399999976158142
+          ],
+          "height": 332,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/Arm Actual Angle"
+            },
+            {
+              "color": [
+                0.8666667342185974,
+                0.5176470875740051,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/Arm Desired Angle"
+            }
+          ]
+        }
+      ],
+      "window": {
+        "visible": false
+      }
+    },
+    "Plot <6>": {
+      "plots": [
+        {
+          "backgroundColor": [
+            0.05999999865889549,
+            0.05999999865889549,
+            0.05999999865889549,
+            0.9399999976158142
+          ],
+          "height": 332,
+          "series": [
+            {
+              "color": [
+                0.2980392277240753,
+                0.44705885648727417,
+                0.6901960968971252,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/Wrist Actual Angle"
+            },
+            {
+              "color": [
+                0.8666667342185974,
+                0.5176470875740051,
+                0.32156863808631897,
+                1.0
+              ],
+              "id": "NT:/SmartDashboard/Wrist Desired Angle"
+            }
+          ]
+        }
+      ]
     }
   }
 }

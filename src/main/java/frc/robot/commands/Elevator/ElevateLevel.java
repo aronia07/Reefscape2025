@@ -1,5 +1,6 @@
 package frc.robot.commands.Elevator;
 
+import java.lang.annotation.ElementType;
 import java.util.function.DoubleSupplier;
 import java.util.function.IntSupplier;
 
@@ -67,15 +68,16 @@ public class ElevateLevel extends Command {
                 elevator_y.reset();
                 break;
             case HOMING:
-                if (elevator_y.leftElevatorMotor.getOutputCurrent() >= ElevatorConstants.homingCurrentThreshold) {
-                    elevator_y.leftElevatorMotor.setVoltage(0);
-                    elevator_y.rightElevatorMotor.setVoltage(0);
-                    elevator_y.SET(0);
-                    ;
-                } else {
-                    elevator_y.leftElevatorMotor.setVoltage(ElevatorConstants.selfHomeSpeedVoltage);
-                    elevator_y.rightElevatorMotor.setVoltage(ElevatorConstants.selfHomeSpeedVoltage);
-                }
+                elevator_y.elevatorSetpoint = .5;
+                // if (elevator_y.leftElevatorMotor.getOutputCurrent() >= ElevatorConstants.homingCurrentThreshold) {
+                //     elevator_y.leftElevatorMotor.setVoltage(0);
+                //     elevator_y.rightElevatorMotor.setVoltage(0);
+                //     elevator_y.SET(0);
+                    
+                // } else {
+                //     elevator_y.leftElevatorMotor.setVoltage(ElevatorConstants.selfHomeSpeedVoltage);
+                //     elevator_y.rightElevatorMotor.setVoltage(ElevatorConstants.selfHomeSpeedVoltage);
+                // }
             default:
                 break;
         }
@@ -105,7 +107,10 @@ public class ElevateLevel extends Command {
 
     @Override
     public void execute() {
-
+        if(level == ElevateMode.HOMING){
+            elevator_y.leftElevatorMotor.set(.05);
+            elevator_y.rightElevatorMotor.set(-.05);
+        }
         // var nextState = profiler_y.calculate(timer_y.get(),
         // initialState,
         // new TrapezoidProfile.State(elevator_y.getSetpoint(), 0));
@@ -122,6 +127,8 @@ public class ElevateLevel extends Command {
     public void end(boolean interrupted) {
         // timer_y.stop();
         elevator_y.elevatorSetpoint = 1;
+        elevator_y.leftElevatorMotor.set(0);
+        elevator_y.rightElevatorMotor.set(0);
     }
 
 }
