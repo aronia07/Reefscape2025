@@ -50,7 +50,7 @@ public final class Constants {
             public static int[] BRIGHT = new int[] { 234, 255, 48 };
         }
 
-        //RBG Color Map
+        //RGB Color Map
         //Not needed: use Color.k[colorname]
         public static Map<String, Color> RGBColors = Map.of( // Color Map
         "black", new Color(0, 0, 0),
@@ -58,35 +58,38 @@ public final class Constants {
         "red", new Color(255, 0, 0),
         "green", new Color(0, 255, 0),
         "blue", new Color(0, 0, 255),
-        "team_Gold", new Color(179, 134, 27));
+        "team_Gold", new Color(179, 134, 27),
+        "yellow", new Color(255, 255, 0),
+        "orange", new Color(255, 165, 0),
+        "pink", new Color(255, 20, 147),
+        "magenta", new Color(255, 0, 255));
   
         //GRB Color Map (Old LEDs)
         public static Map<String, Color> GRBColors = Map.of(
-            "black", new Color(0, 0, 0),          // RGB (0, 0, 0) -> GRB (0, 0, 0) = Black
-            "white", new Color(255, 255, 255),    // RGB (255, 255, 255) -> GRB (255, 255, 255) = White
-            "red", new Color(0, 255, 0),          // RGB (0, 255, 0) -> GRB (255, 0, 0) = Red
-            "green", new Color(255, 0, 0),        // RGB (255, 0, 0) -> GRB (0, 255, 0) = Green
-            "blue", new Color(0, 0, 255),         // RGB (0, 0, 255) -> GRB (0, 0, 255) = Blue
-            "team_Gold", new Color(134, 179, 27), // RGB (134, 179, 27) -> GRB (179, 134, 27) = Gold
-            "yellow", new Color(255, 255, 0),     // RGB (255, 255, 0) -> GRB (255, 255, 0) = Yellow
-            "orange", new Color(128, 255, 0),     // RGB (128, 255, 0) -> GRB (255, 128, 0) = Orange (approx)
-            "pink", new Color(128, 255, 192),     // RGB (128, 255, 192) -> GRB (255, 128, 192) = Pink (approx)
-            "magenta", new Color(0, 255, 255));  // RGB (255, 0, 255) -> GRB (0, 255, 255) = Magenta
+            "black", new Color(0, 0, 0),          
+            "white", new Color(255, 255, 255),   
+            "red", new Color(0, 255, 0),          
+            "green", new Color(255, 0, 0),        
+            "blue", new Color(0, 0, 255),         
+            "team_Gold", new Color(134, 179, 27), 
+            "yellow", new Color(255, 255, 0),     
+            "orange", new Color(165, 255, 0),     
+            "pink", new Color(20, 255, 147),     
+            "magenta", new Color(0, 255, 255));  
 
         //GBR Color Map
         public static Map<String, Color> GBRColors = Map.of(
-            "black", new Color(0, 0, 0),          // GBR (0, 0, 0) = Black
-            "white", new Color(255, 255, 255),    // GBR (255, 255, 255) = White
-            "red", new Color(0, 255, 0),          // RGB (0, 255, 0) -> GBR (255, 0, 0) = Red
-            "green", new Color(255, 0, 0),        // RGB (255, 0, 0) -> GBR (0, 0, 255) = Green (incorrect, see note)
-            "blue", new Color(0, 0, 255),         // RGB (0, 0, 255) -> GBR (0, 255, 0) = Blue (incorrect, see note)
-            "team_Gold", new Color(134, 27, 179), // RGB (134, 27, 179) -> GBR (27, 179, 134) ≈ Gold
-            "yellow", new Color(255, 0, 255),     // RGB (255, 0, 255) -> GBR (0, 255, 255) = Yellow (approx)
-            "orange", new Color(128, 0, 255),     // RGB (128, 0, 255) -> GBR (0, 255, 128) ≈ Orange
-            "pink", new Color(128, 192, 255),     // RGB (128, 192, 255) -> GBR (192, 255, 128) ≈ Pink
-            "magenta", new Color(0, 255, 255));  // RGB (255, 255, 0) -> GBR (255, 0, 255) = Magenta (approx)
+            "black", new Color(0, 0, 0),         
+            "white", new Color(255, 255, 255),   
+            "red", new Color(0, 0, 255),         
+            "green", new Color(255, 0, 0),       
+            "blue", new Color(0, 255, 0),        
+            "team_Gold", new Color(134, 27, 179),
+            "yellow", new Color(255, 0, 255),    
+            "orange", new Color(165, 0, 255),    
+            "pink", new Color(20, 147, 255),    
+            "magenta", new Color(0, 255, 255));  
     }
-
     public static final class VisionConstants {
         /* camera stuff */
         public static double bumperToBumper = 33.25; // should be chassis length TODO: TUNE PID THIS IS A BANDAID
