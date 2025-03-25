@@ -11,10 +11,13 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.ElevatorConstants.ElevateMode;
+import frc.robot.subsystems.Arm.Arm;
 import frc.robot.subsystems.Elevator.Elevator;
 
 public class ElevateLevel extends Command {
     protected final Elevator elevator_y;
+    // private double lastSpeed;
+    // private double lastTime;
     // private State initialState;
     private ElevateMode level;
     private ProfiledPIDController elevatorPID;
@@ -23,8 +26,8 @@ public class ElevateLevel extends Command {
     // ElevatorConstants.maxAccel));
     // private Timer timer_y = new Timer();
 
-    public ElevateLevel(Elevator elevator, ElevateMode mode) {
-        elevator_y = elevator;
+    public ElevateLevel(Elevator elevator,ElevateMode mode) {
+        this.elevator_y = elevator;
         this.level = mode;
 
         addRequirements(elevator_y);
@@ -32,7 +35,10 @@ public class ElevateLevel extends Command {
 
     @Override
     public void initialize() {
+        // lastSpeed = 0;
+        // lastTime = Timer.getFPGATimestamp();
         elevatorPID = elevator_y.pid;
+        elevatorPID.setTolerance(.3);
 
         switch (level) {
             case UP:
@@ -80,48 +86,26 @@ public class ElevateLevel extends Command {
             case HOMING:
                 elevator_y.elevatorSetpoint = .5;
                 elevatorPID.setGoal(.5);
-                // if (elevator_y.leftElevatorMotor.getOutputCurrent() >= ElevatorConstants.homingCurrentThreshold) {
-                //     elevator_y.leftElevatorMotor.setVoltage(0);
-                //     elevator_y.rightElevatorMotor.setVoltage(0);
-                //     elevator_y.SET(0);
-                    
-                // } else {
-                //     elevator_y.leftElevatorMotor.setVoltage(ElevatorConstants.selfHomeSpeedVoltage);
-                //     elevator_y.rightElevatorMotor.setVoltage(ElevatorConstants.selfHomeSpeedVoltage);
-                // }
             default:
                 break;
         }
 
-        // if (level == 4) {
-        // elevator_y.setMode(ElevateMode.L4);
-        // } if (level == 3) {
-        // elevator_y.setMode(ElevateMode.L3);
-        // } if (level == 2) {
-        // elevator_y.setMode(ElevateMode.L2);
-        // } if (level == 1) {
-        // elevator_y.setMode(ElevateMode.L1);
-        // } if (level == 0) {
-        // elevator_y.setMode(ElevateMode.HP);
-        // } if (level == 5) {
-        // elevator_y.setMode(ElevateMode.DOWN);
-        // } if (level == 6) {
-        // elevator_y.setMode(ElevateMode.UP);
-        // } if (level == 7) {
-        // elevator_y.setMode(ElevateMode.TEST);
-        // } if (level == 8) {
-        // elevator_y.setMode(ElevateMode.MANUAL);
-        // }
-
-        // initialState = elevator_y.getCurrentState();
     }
 
     @Override
     public void execute() {
-        var ffoutput = elevator_y.ffElevate.calculate(elevatorPID.getSetpoint().velocity);
+        // double acceleration = (elevatorPID.getSetpoint().velocity - lastSpeed) / (Timer.getFPGATimestamp() - lastTime);
+        
+        var ffoutput = Math.sin(Arm.getEncoderPosition().getRadians())*ElevatorConstants.elevatorSGV[1] + 
+        elevator_y.ffElevate.calculate(elevatorPID.getSetpoint().velocity/*, acceleration*/);
+        
         var pidOutput = elevatorPID.calculate(elevator_y.encoderPosition);
+        
         elevator_y.leftElevatorMotor.set(-pidOutput - ffoutput);
         elevator_y.rightElevatorMotor.set(pidOutput + ffoutput);
+
+        // lastSpeed = elevatorPID.getSetpoint().velocity;
+        // lastTime = Timer.getFPGATimestamp();
         // if(level == ElevateMode.HOMING){
         //     elevator_y.leftElevatorMotor.set(.05);
         //     elevator_y.rightElevatorMotor.set(-.05);
@@ -137,9 +121,13 @@ public class ElevateLevel extends Command {
         // elevator_y.runState(nextState, nextNextState);
         // elevator_y.runState(nextState);
     }
+    @Override
+    public boolean isFinished() {
+        return elevatorPID.atSetpoint();
+    }
 
     @Override
-    public void end(boolean interrupted) {
+    public void end(boolean isFinished) {
         // timer_y.stop();
         // elevator_y.elevatorSetpoint = 1;
         // elevator_y.leftElevatorMotor.set(0);

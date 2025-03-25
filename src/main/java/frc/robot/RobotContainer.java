@@ -273,6 +273,8 @@ public class RobotContainer {
                 // d-pad
                 operator.povDown().whileTrue(new ClimbDown(climber, () -> 1));
                 operator.povUp().whileTrue(new Climb(climber, () -> 1));
+                operator.povLeft().whileTrue(new ElevateManual(() -> true, elevator));
+                operator.povRight().whileTrue(new ElevateManual(() -> false, elevator));
 
                 // operator.leftTrigger().whileTrue(new ParallelCommandGroup(
                 //         new ToAngle(() -> Units.degreesToRadians(0), arm),

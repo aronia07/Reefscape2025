@@ -31,67 +31,67 @@ public class Arm extends SubsystemBase {
 
   // Initialize encoders
   private final ArmEncoderThroughbore encoder = new ArmEncoderThroughbore(Constants.ArmConstants.encoderID);
-  public Rotation2d encoderPosition = new Rotation2d();
-
-  // PID controller + feedforward initialization
-  private final PIDController pid = new PIDController(Constants.ArmConstants.armPID[0],
-      Constants.ArmConstants.armPID[1],
-      Constants.ArmConstants.armPID[2]);
-  private ArmFeedforward ffModel = new ArmFeedforward(
-      Constants.ArmConstants.armSGV[0],
-      Constants.ArmConstants.armSGV[1],
-      Constants.ArmConstants.armSGV[2]);
-
-  // Motion profiling
-  private Rotation2d setpoint = new Rotation2d();
-  private Rotation2d velocity = new Rotation2d();
-  private Rotation2d goal = new Rotation2d();
-
-  // Tunable values
-  // private LoggedTunableNumber armP = new LoggedTunableNumber("armP",
-  // Constants.ArmConstants.armPID[0]);
-  // private LoggedTunableNumber armI = new LoggedTunableNumber("armI",
-  // Constants.ArmConstants.armPID[1]);
-  // private LoggedTunableNumber armD = new LoggedTunableNumber("armD",
-  // Constants.ArmConstants.armPID[2]);
-  // private LoggedTunableNumber armS = new LoggedTunableNumber("armS",
-  // Constants.ArmConstants.armSGV[0]);
-  // private LoggedTunableNumber armG = new LoggedTunableNumber("armG",
-  // Constants.ArmConstants.armSGV[1]);
-  // private LoggedTunableNumber armV = new LoggedTunableNumber("armV",
-  // Constants.ArmConstants.armSGV[2]);
-
-  public Arm() {
-    setupMotors();
-    // Set offset + get encoders position
-    encoder.setOffset(Constants.ArmConstants.offset);
-    encoderPosition = encoder.getAbsolutePosition();
-    runSetpoint(getEncoderPosition());
-  }
-
-  // Motor Set-Up
-  private void setupMotors() {
-
-    armLeaderConfig.voltageCompensation(12).smartCurrentLimit(60, 30).inverted(true).idleMode(IdleMode.kBrake);
-    leader.configure(armLeaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    // leader.restoreFactoryDefaults();
-    CANSparkMaxUtil.setSparkMaxBusUsage(leader, armLeaderConfig, Usage.kPositionOnly);
-
-    CANSparkMaxUtil.setSparkMaxBusUsage(follower, armFollowerConfig, Usage.kPositionOnly);
-    armFollowerConfig.voltageCompensation(12).smartCurrentLimit(60, 30).inverted(false).idleMode(IdleMode.kBrake);
-    follower.configure(armFollowerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
-    pid.setIntegratorRange(-0.05, 0.05);
-  }
-
-  // Resets the PID's i value
-  public void resetI() {
-    pid.reset();
-  }
-
-  // returns the encoder's position
-  public Rotation2d getEncoderPosition() {
-    return encoderPosition;
+  public static Rotation2d encoderPosition = new Rotation2d();
+  
+    // PID controller + feedforward initialization
+    private final PIDController pid = new PIDController(Constants.ArmConstants.armPID[0],
+        Constants.ArmConstants.armPID[1],
+        Constants.ArmConstants.armPID[2]);
+    private ArmFeedforward ffModel = new ArmFeedforward(
+        Constants.ArmConstants.armSGV[0],
+        Constants.ArmConstants.armSGV[1],
+        Constants.ArmConstants.armSGV[2]);
+  
+    // Motion profiling
+    private Rotation2d setpoint = new Rotation2d();
+    private Rotation2d velocity = new Rotation2d();
+    private Rotation2d goal = new Rotation2d();
+  
+    // Tunable values
+    // private LoggedTunableNumber armP = new LoggedTunableNumber("armP",
+    // Constants.ArmConstants.armPID[0]);
+    // private LoggedTunableNumber armI = new LoggedTunableNumber("armI",
+    // Constants.ArmConstants.armPID[1]);
+    // private LoggedTunableNumber armD = new LoggedTunableNumber("armD",
+    // Constants.ArmConstants.armPID[2]);
+    // private LoggedTunableNumber armS = new LoggedTunableNumber("armS",
+    // Constants.ArmConstants.armSGV[0]);
+    // private LoggedTunableNumber armG = new LoggedTunableNumber("armG",
+    // Constants.ArmConstants.armSGV[1]);
+    // private LoggedTunableNumber armV = new LoggedTunableNumber("armV",
+    // Constants.ArmConstants.armSGV[2]);
+  
+    public Arm() {
+      setupMotors();
+      // Set offset + get encoders position
+      encoder.setOffset(Constants.ArmConstants.offset);
+      encoderPosition = encoder.getAbsolutePosition();
+      runSetpoint(getEncoderPosition());
+    }
+  
+    // Motor Set-Up
+    private void setupMotors() {
+  
+      armLeaderConfig.voltageCompensation(12).smartCurrentLimit(60, 30).inverted(true).idleMode(IdleMode.kBrake);
+      leader.configure(armLeaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+      // leader.restoreFactoryDefaults();
+      CANSparkMaxUtil.setSparkMaxBusUsage(leader, armLeaderConfig, Usage.kPositionOnly);
+  
+      CANSparkMaxUtil.setSparkMaxBusUsage(follower, armFollowerConfig, Usage.kPositionOnly);
+      armFollowerConfig.voltageCompensation(12).smartCurrentLimit(60, 30).inverted(false).idleMode(IdleMode.kBrake);
+      follower.configure(armFollowerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+  
+      pid.setIntegratorRange(-0.05, 0.05);
+    }
+  
+    // Resets the PID's i value
+    public void resetI() {
+      pid.reset();
+    }
+  
+    // returns the encoder's position
+    public static Rotation2d getEncoderPosition() {
+      return encoderPosition;
   }
 
   // Checks to see if the PID and SGV values have changed.

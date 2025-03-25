@@ -35,23 +35,19 @@ public class Elevator extends SubsystemBase {
       ElevatorConstants.elevatorPID[2],
       new TrapezoidProfile.Constraints(ElevatorConstants.maxVelocity, ElevatorConstants.maxAccel));
   public ElevatorFeedforward ffElevate = new ElevatorFeedforward(ElevatorConstants.elevatorSGV[0],
-      ElevatorConstants.elevatorSGV[1], ElevatorConstants.elevatorSGV[2], ElevatorConstants.elevatorSGV[3]);
+      0, ElevatorConstants.elevatorSGV[2], ElevatorConstants.elevatorSGV[3]);
 
   private final RelativeEncoder encoderRight;
   // private final RelativeEncoder encoderLeft;
 
-  private Timer timer = new Timer();
   public double encoderPosition;
-  private double nextVelocity = 0.0;
-  private double nextNextVelocity = 0.0;
   public double elevatorSetpoint = 0.5;
   private double positionRateOfChange = 0;
-  private double changingSetpoint = 0;
 
   // private double leftPower = 0;
   // private double rightPower = 0;
   private ElevateMode elevateMode = ElevateMode.OFF;
-  private boolean isLeftDone = false;
+  // private boolean isLeftDone = false;
   // private boolean isRightDone = false;
 
   /* Tunable Values */
@@ -61,14 +57,14 @@ public class Elevator extends SubsystemBase {
   ElevatorConstants.elevatorPID[1]);
   private LoggedTunableNumber elevatorD = new LoggedTunableNumber("elevatorD",
   ElevatorConstants.elevatorPID[2]);
-  // private LoggedTunableNumber elevatorS = new LoggedTunableNumber("elevatorS",
-  // ElevatorConstants.elevatorSGV[0]);
-  // private LoggedTunableNumber elevatorG = new LoggedTunableNumber("elevatorG",
-  // ElevatorConstants.elevatorSGV[1]);
-  // private LoggedTunableNumber elevatorV = new LoggedTunableNumber("elevatorV",
-  // ElevatorConstants.elevatorSGV[2]);
-  // private LoggedTunableNumber elevatorA = new LoggedTunableNumber("elevatorA",
-  // ElevatorConstants.elevatorSGV[3]);
+  private LoggedTunableNumber elevatorS = new LoggedTunableNumber("elevatorS",
+  ElevatorConstants.elevatorSGV[0]);
+  private LoggedTunableNumber elevatorG = new LoggedTunableNumber("elevatorG",
+  ElevatorConstants.elevatorSGV[1]);
+  private LoggedTunableNumber elevatorV = new LoggedTunableNumber("elevatorV",
+  ElevatorConstants.elevatorSGV[2]);
+  private LoggedTunableNumber elevatorA = new LoggedTunableNumber("elevatorA",
+  ElevatorConstants.elevatorSGV[3]);
   // private LoggedTunableNumber elevatorLevel = new LoggedTunableNumber("changing
   // setpoint", elevatorSetpoint);
 
@@ -156,10 +152,10 @@ public class Elevator extends SubsystemBase {
     return new TrapezoidProfile.State(encoderRight.getPosition(), encoderRight.getVelocity());
   }
 
-  public void runState(TrapezoidProfile.State state) {
-    elevatorSetpoint = state.position;
-    this.nextVelocity = state.velocity;
-  }
+  // public void runState(TrapezoidProfile.State state) {
+  //   elevatorSetpoint = state.position;
+  //   this.nextVelocity = state.velocity;
+  // }
 
   public void checkTunableValues() {
     // if (Constants.enableTunableValues) {
@@ -168,11 +164,11 @@ public class Elevator extends SubsystemBase {
     elevatorD.hasChanged()) {
     pid.setPID(elevatorP.get(), elevatorI.get(), elevatorD.get());
     }
-    // if (elevatorS.hasChanged() || elevatorG.hasChanged() ||
-    // elevatorV.hasChanged()) {
-    // ffElevate = new ElevatorFeedforward(elevatorS.get(), elevatorG.get(),
-    // elevatorV.get());
-    // }
+    if (elevatorS.hasChanged() || elevatorG.hasChanged() ||
+    elevatorV.hasChanged() || elevatorA.hasChanged()) {
+    ffElevate = new ElevatorFeedforward(elevatorS.get(), elevatorG.get(),
+    elevatorV.get(), elevatorA.get());
+    }
     // }
   }
 

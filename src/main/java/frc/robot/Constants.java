@@ -57,6 +57,10 @@ public final class Constants {
         public static Transform3d kRobotToCam = new Transform3d(
                 new Translation3d(Units.inchesToMeters(19.41), 0, Units.inchesToMeters(6.6)),
                 new Rotation3d(0, Units.degreesToRadians(23), 0)); // TODO: edit yaw
+        public static Transform3d kRobotToCam2 = new Transform3d(
+            new Translation3d(-(Units.inchesToMeters(25.5) - Units.inchesToMeters(27 / 2)), 0.0,
+                Units.inchesToMeters(8.17)),
+            new Rotation3d(0, Units.degreesToRadians(-30), Math.PI));
         public static String cameraName = "orangepi";
         public static String camera2Name = "orangepi2";
         /* standard deviations for vision calculations */
@@ -128,7 +132,7 @@ public final class Constants {
         public static int leftElevatorMotorID = 41;
         public static int rightElevatorMotorID = 42;
         public static double[] elevatorPID = new double[] { 0.085, 0, 0 }; // p is a little aggressive
-        public static double[] elevatorSGV = new double[] { 0, 0.015, 0.0009, 0 }; // g needs testing
+        public static double[] elevatorSGV = new double[] { 0, 0, 0, 0 }; // g needs testing
         public static double maxVelocity = 150; // in mps
         public static double maxAccel = 150; // in mps/s
         public static double elevatorTolerance = .3;
