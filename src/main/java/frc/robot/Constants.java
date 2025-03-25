@@ -29,8 +29,8 @@ public final class Constants {
     public static boolean enableTunableValues = false;
 
     public static class LightsConstants {
-        public static int port = 2;
-        public static int length = 40;
+        public static int port = 0;
+        public static int length = 12;
 
         public static enum LightsType {
             ENDGAME,
@@ -49,8 +49,47 @@ public final class Constants {
             public static int[] MAGENTA = new int[] { 255, 0, 255 };
             public static int[] BRIGHT = new int[] { 234, 255, 48 };
         }
-    }
 
+        //RGB Color Map
+        //Not needed: use Color.k[colorname]
+        public static Map<String, Color> RGBColors = Map.of( // Color Map
+        "black", new Color(0, 0, 0),
+        "white", new Color(255, 255, 255),
+        "red", new Color(255, 0, 0),
+        "green", new Color(0, 255, 0),
+        "blue", new Color(0, 0, 255),
+        "team_Gold", new Color(179, 134, 27),
+        "yellow", new Color(255, 255, 0),
+        "orange", new Color(255, 165, 0),
+        "pink", new Color(255, 20, 147),
+        "magenta", new Color(255, 0, 255));
+  
+        //GRB Color Map (Old LEDs)
+        public static Map<String, Color> GRBColors = Map.of(
+            "black", new Color(0, 0, 0),          
+            "white", new Color(255, 255, 255),   
+            "red", new Color(0, 255, 0),          
+            "green", new Color(255, 0, 0),        
+            "blue", new Color(0, 0, 255),         
+            "team_Gold", new Color(134, 179, 27), 
+            "yellow", new Color(255, 255, 0),     
+            "orange", new Color(165, 255, 0),     
+            "pink", new Color(20, 255, 147),     
+            "magenta", new Color(0, 255, 255));  
+
+        //GBR Color Map
+        public static Map<String, Color> GBRColors = Map.of(
+            "black", new Color(0, 0, 0),         
+            "white", new Color(255, 255, 255),   
+            "red", new Color(0, 0, 255),         
+            "green", new Color(255, 0, 0),       
+            "blue", new Color(0, 255, 0),        
+            "team_Gold", new Color(134, 27, 179),
+            "yellow", new Color(255, 0, 255),    
+            "orange", new Color(165, 0, 255),    
+            "pink", new Color(20, 147, 255),    
+            "magenta", new Color(0, 255, 255));  
+    }
     public static final class VisionConstants {
         /* camera stuff */
         public static double bumperToBumper = 33.25; // should be chassis length TODO: TUNE PID THIS IS A BANDAID
