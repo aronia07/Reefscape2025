@@ -18,6 +18,7 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
   private Timer gcTimer = new Timer();
   private final RobotContainer m_robotContainer;
+  private boolean runningAuton = false;
 
   public Robot() {
     gcTimer.start();
@@ -50,6 +51,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
+    if (!runningAuton) {
+      m_robotContainer.disabledActions();
+    }
   }
 
   @Override
@@ -59,7 +63,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-
+    runningAuton = true;
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
@@ -78,6 +82,8 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+    runningAuton = false;
+
     m_robotContainer.getIdleCommands();
   }
 

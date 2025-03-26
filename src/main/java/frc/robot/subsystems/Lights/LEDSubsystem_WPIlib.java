@@ -58,9 +58,9 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
     animatedPattern = null;
     //setDefaultCommand(LED_Reset().withName("LED_Reset"));
     // setDefaultCommand(runPattern(LEDPattern.solid(Color.kBlack), false).withName("Off"));
-
-    LED_SolidColor(LightsConstants.GRBColors.get("magenta"));
-    //LED_Blinking(LEDPattern.solid(LightsConstants.GRBColors.get("magenta")), 1, 1);
+    
+    //LED_SolidColor(LightsConstants.GRBColors.get("magenta"));
+    // LED_Blinking(LEDPattern.solid(LightsConstants.GRBColors.get("magenta")), 1, 1);
     //LED_Breathing(LEDPattern.solid(LightsConstants.GRBColors.get("magenta")), 3);
 
     // System.out.println("Correctly set color!!!!!!!!!!!!!");

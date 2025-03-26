@@ -52,7 +52,10 @@
         "left": 534,
         "right": 3466,
         "top": 291,
-        "width": 17.54825210571289
+        "width": 17.54825210571289,
+        "window": {
+          "visible": true
+        }
       },
       "/SmartDashboard/Vision field": {
         "bottom": 1638,
@@ -84,7 +87,8 @@
   "NetworkTables Info": {
     "Clients": {
       "open": true
-    }
+    },
+    "visible": true
   },
   "NetworkTables Settings": {
     "mode": "Client (NT4)",
@@ -100,7 +104,7 @@
             0.05999999865889549,
             0.9399999976158142
           ],
-          "height": 319,
+          "height": 618,
           "series": [
             {
               "color": [
@@ -131,7 +135,10 @@
             }
           ]
         }
-      ]
+      ],
+      "window": {
+        "visible": false
+      }
     }
   }
 }

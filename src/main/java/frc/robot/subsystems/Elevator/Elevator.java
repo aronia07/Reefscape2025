@@ -37,7 +37,7 @@ public class Elevator extends SubsystemBase {
   public ElevatorFeedforward ffElevate = new ElevatorFeedforward(ElevatorConstants.elevatorSGV[0],
       0, ElevatorConstants.elevatorSGV[2], ElevatorConstants.elevatorSGV[3]);
 
-  private final RelativeEncoder encoderRight;
+  private final RelativeEncoder encoderLeft;
   // private final RelativeEncoder encoderLeft;
 
   public double encoderPosition;
@@ -70,7 +70,7 @@ public class Elevator extends SubsystemBase {
 
   public Elevator() {
     setupMotors();
-    encoderRight = rightElevatorMotor.getEncoder();
+    encoderLeft = rightElevatorMotor.getEncoder();
     // encoderLeft = leftElevatorMotor.getEncoder();
     resetEncoders();
 
@@ -108,9 +108,9 @@ public class Elevator extends SubsystemBase {
   }
 
   public void setSetpoint(double goal) {
-    if (encoderRight.getPosition() <= ElevatorConstants.min) {
+    if (encoderLeft.getPosition() <= ElevatorConstants.min) {
       this.elevatorSetpoint = ElevatorConstants.min;
-    } else if (encoderRight.getPosition() >= ElevatorConstants.max) {
+    } else if (encoderLeft.getPosition() >= ElevatorConstants.max) {
       this.elevatorSetpoint = ElevatorConstants.max;
     } else {
       this.elevatorSetpoint = goal;
@@ -123,15 +123,15 @@ public class Elevator extends SubsystemBase {
   }
 
   public void SET(double value) {
-    encoderRight.setPosition(value);
+    encoderLeft.setPosition(value);
   }
 
   public void reset() {
-    encoderRight.setPosition(0);
+    encoderLeft.setPosition(0);
   }
 
   public double ActualPositionLeader() {
-    return encoderRight.getPosition();
+    return encoderLeft.getPosition();
   }
 
   public double getDesiredPositionLeader() {
@@ -139,17 +139,17 @@ public class Elevator extends SubsystemBase {
   }
 
   private void resetEncoders() {
-    encoderRight.setPosition(0);
-    // encoderRight.setPosition(0);
+    encoderLeft.setPosition(0);
+    // encoderLeft.setPosition(0);
   }
 
   public void logValues() {
-    SmartDashboard.putNumber("Actual Elevator Position Left", encoderRight.getPosition());
+    SmartDashboard.putNumber("Actual Elevator Position Left", encoderLeft.getPosition());
     SmartDashboard.putNumber("Desired Elevator Position", pid.getSetpoint().position);
   }
 
   public TrapezoidProfile.State getCurrentState() {
-    return new TrapezoidProfile.State(encoderRight.getPosition(), encoderRight.getVelocity());
+    return new TrapezoidProfile.State(encoderLeft.getPosition(), encoderLeft.getVelocity());
   }
 
   // public void runState(TrapezoidProfile.State state) {
@@ -193,21 +193,21 @@ public class Elevator extends SubsystemBase {
   }
 
   // public States isRightOutOfBounds() {
-  // return outOfBounds(-encoderRight.getPosition());
+  // return outOfBounds(-encoderLeft.getPosition());
   // }
 
   public States isLeftOutOfBounds() {
-    return outOfBounds(encoderRight.getPosition());
+    return outOfBounds(encoderLeft.getPosition());
   }
 
   
   public boolean atGoal() {
-    return Math.abs(encoderRight.getPosition() - elevatorSetpoint) < ElevatorConstants.elevatorTolerance;
+    return Math.abs(encoderLeft.getPosition() - elevatorSetpoint) < ElevatorConstants.elevatorTolerance;
   }
 
   @Override
   public void periodic() {
-    encoderPosition = encoderRight.getPosition();
+    encoderPosition = encoderLeft.getPosition();
     checkTunableValues();
     logValues();
     
@@ -220,10 +220,10 @@ public class Elevator extends SubsystemBase {
                                                       // for
     // values around 0
     // }
-    // var leftpidOutput = pid.calculate(encoderPosition, this.elevatorSetpoint);
+    var leftpidOutput = pid.calculate(encoderPosition, this.elevatorSetpoint);
 
-    // leftElevatorMotor.set(-leftpidOutput);
-    // rightElevatorMotor.set(leftpidOutput);
+    leftElevatorMotor.set(-leftpidOutput);
+    rightElevatorMotor.set(leftpidOutput);
 
     SmartDashboard.putNumber("Elevator velocity", leftElevatorMotor.get());
     // SmartDashboard.putNumber("Elevator PID output left", leftpidOutput);

@@ -23,6 +23,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.util.Color;
 
 public final class Constants {
 
@@ -112,7 +113,10 @@ public final class Constants {
         public static Optional<Pose3d> redReefPose;
         public static double leftOffsetInches = 6;
         public static double rightOffsetInches = 5.5;
-
+        public static enum ScoringMode {
+            NORMAL,
+            MODIFIED
+        };
     }
 
     public static final class AutoConstants {
@@ -173,7 +177,7 @@ public final class Constants {
         public static double[] elevatorPID = new double[] { 0.085, 0, 0 }; // p is a little aggressive
         public static double[] elevatorSGV = new double[] { 0, 0, 0, 0 }; // g needs testing
         public static double maxVelocity = 150; // in mps
-        public static double maxAccel = 150; // in mps/s
+        public static double maxAccel = 150; // in mps/s was 150
         public static double elevatorTolerance = .3;
 
         public static enum ElevateMode {
@@ -196,7 +200,7 @@ public final class Constants {
         public static double LevelTwoSetpoint = 1;
         public static double LevelTwoAlgaeSetpoint = 0.5;
         public static double LevelThreeSetpoint = 5;
-        public static double LevelFourSetpoint = 18.7;
+        public static double LevelFourSetpoint = 19.3;
         public static double HPsetpoint = -01;
         public static double test = 16;
 

@@ -72,13 +72,13 @@ public class Arm extends SubsystemBase {
     // Motor Set-Up
     private void setupMotors() {
   
-      armLeaderConfig.voltageCompensation(12).smartCurrentLimit(60, 30).inverted(true).idleMode(IdleMode.kBrake);
+      armLeaderConfig.voltageCompensation(12).smartCurrentLimit(50, 30).inverted(true).idleMode(IdleMode.kBrake);
       leader.configure(armLeaderConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
       // leader.restoreFactoryDefaults();
       CANSparkMaxUtil.setSparkMaxBusUsage(leader, armLeaderConfig, Usage.kPositionOnly);
   
       CANSparkMaxUtil.setSparkMaxBusUsage(follower, armFollowerConfig, Usage.kPositionOnly);
-      armFollowerConfig.voltageCompensation(12).smartCurrentLimit(60, 30).inverted(false).idleMode(IdleMode.kBrake);
+      armFollowerConfig.voltageCompensation(12).smartCurrentLimit(50, 30).inverted(false).idleMode(IdleMode.kBrake);
       follower.configure(armFollowerConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   
       pid.setIntegratorRange(-0.05, 0.05);

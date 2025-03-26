@@ -3,6 +3,7 @@ package frc.robot.subsystems.Drive;
 import static edu.wpi.first.units.Units.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -52,6 +53,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.VisionConstants;
+import frc.robot.Constants.VisionConstants.ScoringMode;
 import frc.robot.subsystems.Drive.TunerConstants.TunerSwerveDrivetrain;
 
 /**
@@ -64,6 +66,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private double m_lastSimTime;
     public Vision vision = new Vision();
     private Pose2d lastActivePathPose = new Pose2d();
+    public ScoringMode scoringMode = ScoringMode.NORMAL;
     // for field centric path following:
     private final SwerveRequest.ApplyFieldSpeeds m_pathApplyFieldSpeeds = new SwerveRequest.ApplyFieldSpeeds();
     // for robot centric path following
@@ -315,7 +318,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             return;
 
         lastActivePathPose = poses.get(poses.size() - 1);
+    }
 
+    public void setScoringMode(ScoringMode mode) {
+        this.scoringMode = mode;
+    }
+    public ScoringMode getScoringMode() {
+        return this.scoringMode;
     }
 
     /**
@@ -452,72 +461,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return result;
     }
 
-    // public Command reefAlign(boolean leftAlign) {
-    // int closestTargetID = getClosestTag().get().getFiducialId();
-
-    // Transform2d leftApriltagOffset = new Transform2d(
-    // -(VisionConstants.bumperToBumper) / 2,
-    // AlignmentConstants.left_aprilTagOffsets.getOrDefault(closestTargetID, 0.0),
-    // new Rotation2d(0));
-    // Transform2d rightApriltagOffset = new Transform2d(
-    // -(VisionConstants.bumperToBumper) / 2,
-    // AlignmentConstants.right_aprilTagOffsets.getOrDefault(closestTargetID, 0.0),
-    // new Rotation2d(0));
-
-    // Pose2d estimatedLeftPOSE = (vision.kFieldLayout.getTagPose(closestTargetID))
-    // .map(Pose3d::toPose2d)
-    // .orElse(new Pose2d())
-    // .transformBy(
-    // new Transform2d(
-    // leftApriltagOffset.getTranslation().rotateBy(Rotation2d.fromDegrees(180)),
-    // Rotation2d.fromDegrees(180))
-    // .inverse());
-    // Pose2d estimatedRightPOSE = (vision.kFieldLayout.getTagPose(closestTargetID))
-    // .map(Pose3d::toPose2d)
-    // .orElse(new Pose2d())
-    // .transformBy(
-    // new Transform2d(
-    // rightApriltagOffset.getTranslation().rotateBy(Rotation2d.fromDegrees(180)),
-    // Rotation2d.fromDegrees(180))
-    // .inverse());
-    // Pose2d leftPose = estimatedLeftPOSE;
-    // Pose2d rightPose = estimatedRightPOSE;
-    // return new DeferredCommand(
-    // () -> {
-    // if (leftPose == null || rightPose == null) {
-    // return new InstantCommand();
-    // }
-    // // List<Pose2d> tagSide = leftAlign ? VisionConstants.leftReefList :
-    // // VisionConstants.rightReefList;
-    // Pose2d goalPose = leftAlign ? leftPose : rightPose;
-
-    // SmartDashboard.putNumber("Swerve/Attempted Pose X", goalPose.getX());
-    // SmartDashboard.putNumber("Swerve/Attempted Pose Y", goalPose.getY());
-
-    // return AutoBuilder.pathfindToPose(goalPose,
-    // new PathConstraints(AutoConstants.kMaxSpeedMetersPerSecond,
-    // AutoConstants.kMaxAccelerationMetersPerSecondSquared,
-    // AutoConstants.kMaxAngularSpeedRadiansPerSecond,
-    // AutoConstants.kMaxAngularSpeedRadiansPerSecondSquared),
-    // 0.0);
-    // },
-    // Set.of(this));
-    // }
-
-    // public Pose2d getTargetPose(boolean left) {
-    // Pose2d targetPose = new Pose2d();
-    // if (left) {
-    // targetPose = getState().Pose.nearest(
-    // isRedAlliance() ? AlignmentConstants.leftREDReefList :
-    // AlignmentConstants.leftBLUEReefList);
-    // } else {
-    // targetPose = getState().Pose.nearest(
-    // isRedAlliance() ? AlignmentConstants.rightREDReefList :
-    // AlignmentConstants.rightBLUEReefList);
-    // }
-    // return targetPose;
-    // }
-
     public Pose2d getCenterReefPose() {
         Pose2d target;
         int firstTag;
@@ -525,6 +468,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         Pose2d currentPose = getState().Pose;
         Pose2d currentPoseCopy = getStateCopy().Pose;
         List<Pose2d> reefTagPoseList = new ArrayList<>(12);
+        HashMap<Integer, Pose2d> flippedReefTagListwID = new HashMap<>(6);
+        HashMap<Integer, Pose2d> reefTagPoseListwID = new HashMap<>(6);
 
         if (isRedAlliance()) {
             firstTag = 6;
@@ -536,6 +481,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         for (int i = firstTag; i < endtag; i++) {
             reefTagPoseList.add(vision.kFieldLayout.getTagPose(i).get().toPose2d());
             reefTagPoseList.add(vision.kFieldLayout.getTagPose(i).get().toPose2d().rotateBy(Rotation2d.k180deg));
+            flippedReefTagListwID.put(i, vision.kFieldLayout.getTagPose(i).get().toPose2d().rotateBy(Rotation2d.k180deg));
+            reefTagPoseListwID.put(i, vision.kFieldLayout.getTagPose(i).get().toPose2d());
+
         }
         Pose2d nearestPose = currentPose.nearest(reefTagPoseList);
         Pose2d mostRecent = currentPoseCopy.nearest(reefTagPoseList);
@@ -545,10 +493,48 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 nearestPose.getX() + (-Units.inchesToMeters(VisionConstants.bumperToBumper / 2) * Math.cos(angle)),
                 nearestPose.getY() + (-Units.inchesToMeters(VisionConstants.bumperToBumper / 2) * Math.sin(angle)),
                 Rotation2d.fromRadians(angle));
+        
+        if(flippedReefTagListwID.containsValue(nearestPose)){
+            setScoringMode(ScoringMode.NORMAL);
+        } else {
+            setScoringMode(ScoringMode.MODIFIED);
+        }
         // TheField.getObject("nearestpose").setPose(nearestPose);
         TheField.getObject("target").setPose(target);
 
         return target;
+    }
+    public ScoringMode decideScoringMode() {
+        int firstTag;
+        int endtag;
+        Pose2d currentPose = getState().Pose;
+        Pose2d currentPoseCopy = getStateCopy().Pose;
+        List<Pose2d> reefTagPoseList = new ArrayList<>(12);
+        HashMap<Integer, Pose2d> flippedReefTagListwID = new HashMap<>(6);
+        HashMap<Integer, Pose2d> reefTagPoseListwID = new HashMap<>(6);
+
+        if (isRedAlliance()) {
+            firstTag = 6;
+            endtag = 12;
+        } else {
+            firstTag = 17;
+            endtag = 23;
+        }
+        for (int i = firstTag; i < endtag; i++) {
+            reefTagPoseList.add(vision.kFieldLayout.getTagPose(i).get().toPose2d());
+            reefTagPoseList.add(vision.kFieldLayout.getTagPose(i).get().toPose2d().rotateBy(Rotation2d.k180deg));
+            flippedReefTagListwID.put(i, vision.kFieldLayout.getTagPose(i).get().toPose2d().rotateBy(Rotation2d.k180deg));
+            reefTagPoseListwID.put(i, vision.kFieldLayout.getTagPose(i).get().toPose2d());
+
+        }
+        Pose2d nearestPose = currentPose.nearest(reefTagPoseList);
+        Pose2d mostRecent = currentPoseCopy.nearest(reefTagPoseList);
+        
+        if(flippedReefTagListwID.containsValue(nearestPose)){
+            return ScoringMode.NORMAL;
+        } else {
+            return ScoringMode.MODIFIED;
+        }
     }
 
     public Pose2d addOffset(boolean left) {

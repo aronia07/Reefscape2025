@@ -5,26 +5,27 @@ import frc.robot.subsystems.Lights.LEDSubsystem_WPIlib;
 import edu.wpi.first.wpilibj.util.Color;
 
 public class SetSolidColor extends Command {
-    private final LEDSubsystem_WPIlib ledSubsystem;
-    private final Color color;
+private final LEDSubsystem_WPIlib ledSubsystem;
 
-    public SetSolidColor(LEDSubsystem_WPIlib subsystem, Color color) {
-        this.ledSubsystem = subsystem;
-        this.color = color;
-        addRequirements(subsystem);
-    }
+private final Color color;
 
-    @Override
-    public void initialize() {
-        ledSubsystem.LED_SolidColor(color);
-    }
-    @Override
-    public void execute(){
-        ledSubsystem.LED_SolidColor(color);
-    }
+public SetSolidColor(LEDSubsystem_WPIlib subsystem, Color color) {
+    this.ledSubsystem = subsystem;
+    this.color = color;
+    addRequirements(subsystem);
+}
 
-    @Override
-    public boolean isFinished() {
-        return true;
-    }
+@Override
+public void initialize() {
+    ledSubsystem.LED_SolidColor(color);
+}
+@Override
+public void execute(){
+    ledSubsystem.LED_SolidColor(color);
+}
+
+@Override
+public boolean isFinished() {
+    return true;
+}
 }

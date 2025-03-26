@@ -19,8 +19,8 @@ public class ElevateLevel extends Command {
     // private double lastSpeed;
     // private double lastTime;
     // private State initialState;
-    private ElevateMode level;
     private ProfiledPIDController elevatorPID;
+    private ElevateMode level;
     // private TrapezoidProfile profiler_y = new TrapezoidProfile(
     // new TrapezoidProfile.Constraints(ElevatorConstants.maxVelocity,
     // ElevatorConstants.maxAccel));
@@ -37,7 +37,7 @@ public class ElevateLevel extends Command {
     public void initialize() {
         // lastSpeed = 0;
         // lastTime = Timer.getFPGATimestamp();
-        elevatorPID = elevator_y.pid;
+        elevatorPID = elevator_y.pid; 
         elevatorPID.setTolerance(.3);
 
         switch (level) {
@@ -96,13 +96,13 @@ public class ElevateLevel extends Command {
     public void execute() {
         // double acceleration = (elevatorPID.getSetpoint().velocity - lastSpeed) / (Timer.getFPGATimestamp() - lastTime);
         
-        var ffoutput = Math.sin(Arm.getEncoderPosition().getRadians())*ElevatorConstants.elevatorSGV[1] + 
-        elevator_y.ffElevate.calculate(elevatorPID.getSetpoint().velocity/*, acceleration*/);
+        // var ffoutput = Math.sin(Arm.getEncoderPosition().getRadians())*ElevatorConstants.elevatorSGV[1] + 
+        // elevator_y.ffElevate.calculate(elevatorPID.getSetpoint().velocity/*, acceleration*/);
         
-        var pidOutput = elevatorPID.calculate(elevator_y.encoderPosition);
+        // var pidOutput = elevatorPID.calculate(elevator_y.encoderPosition);
         
-        elevator_y.leftElevatorMotor.set(-pidOutput - ffoutput);
-        elevator_y.rightElevatorMotor.set(pidOutput + ffoutput);
+        // elevator_y.leftElevatorMotor.set(-pidOutput - ffoutput);
+        // elevator_y.rightElevatorMotor.set(pidOutput + ffoutput);
 
         // lastSpeed = elevatorPID.getSetpoint().velocity;
         // lastTime = Timer.getFPGATimestamp();
@@ -121,13 +121,13 @@ public class ElevateLevel extends Command {
         // elevator_y.runState(nextState, nextNextState);
         // elevator_y.runState(nextState);
     }
-    @Override
-    public boolean isFinished() {
-        return elevatorPID.atSetpoint();
-    }
+    // @Override
+    // public boolean isFinished() {
+    //     return elevatorPID.atSetpoint();
+    // }
 
     @Override
-    public void end(boolean isFinished) {
+    public void end(boolean interrupted) {
         // timer_y.stop();
         // elevator_y.elevatorSetpoint = 1;
         // elevator_y.leftElevatorMotor.set(0);
