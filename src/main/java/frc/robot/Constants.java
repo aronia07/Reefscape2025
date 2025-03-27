@@ -51,46 +51,47 @@ public final class Constants {
             public static int[] BRIGHT = new int[] { 234, 255, 48 };
         }
 
-        //RGB Color Map
-        //Not needed: use Color.k[colorname]
+        // RGB Color Map
+        // Not needed: use Color.k[colorname]
         public static Map<String, Color> RGBColors = Map.of( // Color Map
-        "black", new Color(0, 0, 0),
-        "white", new Color(255, 255, 255),
-        "red", new Color(255, 0, 0),
-        "green", new Color(0, 255, 0),
-        "blue", new Color(0, 0, 255),
-        "team_Gold", new Color(179, 134, 27),
-        "yellow", new Color(255, 255, 0),
-        "orange", new Color(255, 165, 0),
-        "pink", new Color(255, 20, 147),
-        "magenta", new Color(255, 0, 255));
-  
-        //GRB Color Map (Old LEDs)
-        public static Map<String, Color> GRBColors = Map.of(
-            "black", new Color(0, 0, 0),          
-            "white", new Color(255, 255, 255),   
-            "red", new Color(0, 255, 0),          
-            "green", new Color(255, 0, 0),        
-            "blue", new Color(0, 0, 255),         
-            "team_Gold", new Color(134, 179, 27), 
-            "yellow", new Color(255, 255, 0),     
-            "orange", new Color(165, 255, 0),     
-            "pink", new Color(20, 255, 147),     
-            "magenta", new Color(0, 255, 255));  
+                "black", new Color(0, 0, 0),
+                "white", new Color(255, 255, 255),
+                "red", new Color(255, 0, 0),
+                "green", new Color(0, 255, 0),
+                "blue", new Color(0, 0, 255),
+                "team_Gold", new Color(179, 134, 27),
+                "yellow", new Color(255, 255, 0),
+                "orange", new Color(255, 165, 0),
+                "pink", new Color(255, 20, 147),
+                "magenta", new Color(255, 0, 255));
 
-        //GBR Color Map
+        // GRB Color Map (Old LEDs)
+        public static Map<String, Color> GRBColors = Map.of(
+                "black", new Color(0, 0, 0),
+                "white", new Color(255, 255, 255),
+                "red", new Color(0, 255, 0),
+                "green", new Color(255, 0, 0),
+                "blue", new Color(0, 0, 255),
+                "team_Gold", new Color(134, 179, 27),
+                "yellow", new Color(255, 255, 0),
+                "orange", new Color(165, 255, 0),
+                "pink", new Color(20, 255, 147),
+                "magenta", new Color(0, 255, 255));
+
+        // GBR Color Map
         public static Map<String, Color> GBRColors = Map.of(
-            "black", new Color(0, 0, 0),         
-            "white", new Color(255, 255, 255),   
-            "red", new Color(0, 0, 255),         
-            "green", new Color(255, 0, 0),       
-            "blue", new Color(0, 255, 0),        
-            "team_Gold", new Color(134, 27, 179),
-            "yellow", new Color(255, 0, 255),    
-            "orange", new Color(165, 0, 255),    
-            "pink", new Color(20, 147, 255),    
-            "magenta", new Color(0, 255, 255));  
+                "black", new Color(0, 0, 0),
+                "white", new Color(255, 255, 255),
+                "red", new Color(0, 0, 255),
+                "green", new Color(255, 0, 0),
+                "blue", new Color(0, 255, 0),
+                "team_Gold", new Color(134, 27, 179),
+                "yellow", new Color(255, 0, 255),
+                "orange", new Color(165, 0, 255),
+                "pink", new Color(20, 147, 255),
+                "magenta", new Color(0, 255, 255));
     }
+
     public static final class VisionConstants {
         /* camera stuff */
         public static double bumperToBumper = 33.25; // should be chassis length TODO: TUNE PID THIS IS A BANDAID
@@ -98,9 +99,9 @@ public final class Constants {
                 new Translation3d(Units.inchesToMeters(19.41), 0, Units.inchesToMeters(6.6)),
                 new Rotation3d(0, Units.degreesToRadians(23), 0)); // TODO: edit yaw
         public static Transform3d kRobotToCam2 = new Transform3d(
-            new Translation3d(-(Units.inchesToMeters(25.5) - Units.inchesToMeters(27 / 2)), 0.0,
-                Units.inchesToMeters(8.17)),
-            new Rotation3d(0, Units.degreesToRadians(-30), Math.PI));
+                new Translation3d(-(Units.inchesToMeters(25.5) - Units.inchesToMeters(27 / 2)), 0.0,
+                        Units.inchesToMeters(8.17)),
+                new Rotation3d(0, Units.degreesToRadians(-30), Math.PI));
         public static String cameraName = "orangepi";
         public static String camera2Name = "orangepi2";
         /* standard deviations for vision calculations */
@@ -113,6 +114,7 @@ public final class Constants {
         public static Optional<Pose3d> redReefPose;
         public static double leftOffsetInches = 6;
         public static double rightOffsetInches = 5.5;
+
         public static enum ScoringMode {
             NORMAL,
             MODIFIED
@@ -150,7 +152,7 @@ public final class Constants {
         public static final Rotation2d maxAcceleration = Rotation2d.fromDegrees(460);
 
         public static final Rotation2d wristMax = Rotation2d.fromDegrees(86);
-        public static final Rotation2d wristMin = Rotation2d.fromDegrees(-76);
+        public static final Rotation2d wristMin = Rotation2d.fromDegrees(-83);
         public static final Rotation2d tolernace = Rotation2d.fromDegrees(0.5);
     }
 
@@ -161,7 +163,7 @@ public final class Constants {
 
     public static final class ClimberConstants {
         public static int climberMotorID = 25;
-        public static double climberMax = 315;
+        public static double climberMax = 400;
         public static double climberMin = -97.7; // was -90
     }
 
@@ -176,8 +178,8 @@ public final class Constants {
         public static int rightElevatorMotorID = 42;
         public static double[] elevatorPID = new double[] { 0.085, 0, 0 }; // p is a little aggressive
         public static double[] elevatorSGV = new double[] { 0, 0, 0, 0 }; // g needs testing
-        public static double maxVelocity = 150; // in mps
-        public static double maxAccel = 150; // in mps/s was 150
+        public static double maxVelocity = 75; // in mps was 150
+        public static double maxAccel = 75; // in mps/s was 150
         public static double elevatorTolerance = .3;
 
         public static enum ElevateMode {
@@ -187,6 +189,7 @@ public final class Constants {
             L2,
             L2AR,
             L3,
+            L3M,
             L4,
             HP,
             OFF,
@@ -196,11 +199,12 @@ public final class Constants {
             RESET
         }
 
-        public static double LevelOneSetpoint = 1;
+        public static double LevelOneSetpoint = 0.5;
         public static double LevelTwoSetpoint = 1;
         public static double LevelTwoAlgaeSetpoint = 0.5;
-        public static double LevelThreeSetpoint = 5;
-        public static double LevelFourSetpoint = 19.3;
+        public static double LevelThreeSetpoint = 4.2;
+        public static double LevelThreeSetpointM = 4.5;
+        public static double LevelFourSetpoint = 20.5;
         public static double HPsetpoint = -01;
         public static double test = 16;
 

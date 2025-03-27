@@ -26,7 +26,7 @@ public class ElevateLevel extends Command {
     // ElevatorConstants.maxAccel));
     // private Timer timer_y = new Timer();
 
-    public ElevateLevel(Elevator elevator,ElevateMode mode) {
+    public ElevateLevel(Elevator elevator, ElevateMode mode) {
         this.elevator_y = elevator;
         this.level = mode;
 
@@ -37,7 +37,7 @@ public class ElevateLevel extends Command {
     public void initialize() {
         // lastSpeed = 0;
         // lastTime = Timer.getFPGATimestamp();
-        elevatorPID = elevator_y.pid; 
+        elevatorPID = elevator_y.pid;
         elevatorPID.setTolerance(.3);
 
         switch (level) {
@@ -62,6 +62,10 @@ public class ElevateLevel extends Command {
             case L3:
                 elevator_y.elevatorSetpoint = ElevatorConstants.LevelThreeSetpoint;
                 elevatorPID.setGoal(ElevatorConstants.LevelThreeSetpoint);
+                break;
+            case L3M:
+                elevator_y.elevatorSetpoint = ElevatorConstants.LevelThreeSetpointM;
+                elevatorPID.setGoal(ElevatorConstants.LevelThreeSetpointM);
                 break;
             case L4:
                 elevator_y.elevatorSetpoint = ElevatorConstants.LevelFourSetpoint;
@@ -94,21 +98,25 @@ public class ElevateLevel extends Command {
 
     @Override
     public void execute() {
-        // double acceleration = (elevatorPID.getSetpoint().velocity - lastSpeed) / (Timer.getFPGATimestamp() - lastTime);
-        
-        // var ffoutput = Math.sin(Arm.getEncoderPosition().getRadians())*ElevatorConstants.elevatorSGV[1] + 
-        // elevator_y.ffElevate.calculate(elevatorPID.getSetpoint().velocity/*, acceleration*/);
-        
+        // double acceleration = (elevatorPID.getSetpoint().velocity - lastSpeed) /
+        // (Timer.getFPGATimestamp() - lastTime);
+
+        // var ffoutput =
+        // Math.sin(Arm.getEncoderPosition().getRadians())*ElevatorConstants.elevatorSGV[1]
+        // +
+        // elevator_y.ffElevate.calculate(elevatorPID.getSetpoint().velocity/*,
+        // acceleration*/);
+
         // var pidOutput = elevatorPID.calculate(elevator_y.encoderPosition);
-        
+
         // elevator_y.leftElevatorMotor.set(-pidOutput - ffoutput);
         // elevator_y.rightElevatorMotor.set(pidOutput + ffoutput);
 
         // lastSpeed = elevatorPID.getSetpoint().velocity;
         // lastTime = Timer.getFPGATimestamp();
         // if(level == ElevateMode.HOMING){
-        //     elevator_y.leftElevatorMotor.set(.05);
-        //     elevator_y.rightElevatorMotor.set(-.05);
+        // elevator_y.leftElevatorMotor.set(.05);
+        // elevator_y.rightElevatorMotor.set(-.05);
         // }
         // var nextState = profiler_y.calculate(timer_y.get(),
         // initialState,
@@ -123,7 +131,7 @@ public class ElevateLevel extends Command {
     }
     // @Override
     // public boolean isFinished() {
-    //     return elevatorPID.atSetpoint();
+    // return elevatorPID.atSetpoint();
     // }
 
     @Override

@@ -52,25 +52,25 @@ public class Elevator extends SubsystemBase {
 
   /* Tunable Values */
   private LoggedTunableNumber elevatorP = new LoggedTunableNumber("elevatorP",
-  ElevatorConstants.elevatorPID[0]);
+      ElevatorConstants.elevatorPID[0]);
   private LoggedTunableNumber elevatorI = new LoggedTunableNumber("elevatorI",
-  ElevatorConstants.elevatorPID[1]);
+      ElevatorConstants.elevatorPID[1]);
   private LoggedTunableNumber elevatorD = new LoggedTunableNumber("elevatorD",
-  ElevatorConstants.elevatorPID[2]);
+      ElevatorConstants.elevatorPID[2]);
   private LoggedTunableNumber elevatorS = new LoggedTunableNumber("elevatorS",
-  ElevatorConstants.elevatorSGV[0]);
+      ElevatorConstants.elevatorSGV[0]);
   private LoggedTunableNumber elevatorG = new LoggedTunableNumber("elevatorG",
-  ElevatorConstants.elevatorSGV[1]);
+      ElevatorConstants.elevatorSGV[1]);
   private LoggedTunableNumber elevatorV = new LoggedTunableNumber("elevatorV",
-  ElevatorConstants.elevatorSGV[2]);
+      ElevatorConstants.elevatorSGV[2]);
   private LoggedTunableNumber elevatorA = new LoggedTunableNumber("elevatorA",
-  ElevatorConstants.elevatorSGV[3]);
+      ElevatorConstants.elevatorSGV[3]);
   // private LoggedTunableNumber elevatorLevel = new LoggedTunableNumber("changing
   // setpoint", elevatorSetpoint);
 
   public Elevator() {
     setupMotors();
-    encoderLeft = rightElevatorMotor.getEncoder();
+    encoderLeft = leftElevatorMotor.getEncoder();
     // encoderLeft = leftElevatorMotor.getEncoder();
     resetEncoders();
 
@@ -144,7 +144,7 @@ public class Elevator extends SubsystemBase {
   }
 
   public void logValues() {
-    SmartDashboard.putNumber("Actual Elevator Position Left", encoderLeft.getPosition());
+    SmartDashboard.putNumber("Actual Elevator Position Left", -encoderLeft.getPosition());
     SmartDashboard.putNumber("Desired Elevator Position", pid.getSetpoint().position);
   }
 
@@ -153,21 +153,21 @@ public class Elevator extends SubsystemBase {
   }
 
   // public void runState(TrapezoidProfile.State state) {
-  //   elevatorSetpoint = state.position;
-  //   this.nextVelocity = state.velocity;
+  // elevatorSetpoint = state.position;
+  // this.nextVelocity = state.velocity;
   // }
 
   public void checkTunableValues() {
     // if (Constants.enableTunableValues) {
 
     if (elevatorP.hasChanged() || elevatorI.hasChanged() ||
-    elevatorD.hasChanged()) {
-    pid.setPID(elevatorP.get(), elevatorI.get(), elevatorD.get());
+        elevatorD.hasChanged()) {
+      pid.setPID(elevatorP.get(), elevatorI.get(), elevatorD.get());
     }
     if (elevatorS.hasChanged() || elevatorG.hasChanged() ||
-    elevatorV.hasChanged() || elevatorA.hasChanged()) {
-    ffElevate = new ElevatorFeedforward(elevatorS.get(), elevatorG.get(),
-    elevatorV.get(), elevatorA.get());
+        elevatorV.hasChanged() || elevatorA.hasChanged()) {
+      ffElevate = new ElevatorFeedforward(elevatorS.get(), elevatorG.get(),
+          elevatorV.get(), elevatorA.get());
     }
     // }
   }
@@ -200,24 +200,23 @@ public class Elevator extends SubsystemBase {
     return outOfBounds(encoderLeft.getPosition());
   }
 
-  
   public boolean atGoal() {
     return Math.abs(encoderLeft.getPosition() - elevatorSetpoint) < ElevatorConstants.elevatorTolerance;
   }
 
   @Override
   public void periodic() {
-    encoderPosition = encoderLeft.getPosition();
+    encoderPosition = -encoderLeft.getPosition();
     checkTunableValues();
     logValues();
-    
 
     // var ffOutput = ffElevate.calculateWithVelocities(nextVelocity,
     // nextNextVelocity);
 
     // if (ffOutput < ffElevate.calculate(nextVelocity)) {
-    // var ffOutput = ffElevate.calculate(); // the docmentation said "calculateWithVelocities" is inaccurate
-                                                      // for
+    // var ffOutput = ffElevate.calculate(); // the docmentation said
+    // "calculateWithVelocities" is inaccurate
+    // for
     // values around 0
     // }
     var leftpidOutput = pid.calculate(encoderPosition, this.elevatorSetpoint);

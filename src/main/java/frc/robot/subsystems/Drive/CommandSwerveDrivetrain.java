@@ -264,7 +264,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     new PPHolonomicDriveController(
                             // TODO: TUNE THESE VALUES
                             // PID constants for translation
-                            new PIDConstants(6, 0, 0),
+                            new PIDConstants(4, 0, 0),
                             // PID constants for rotation
                             new PIDConstants(2, 0, 0)),
                     config,
@@ -323,6 +323,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public void setScoringMode(ScoringMode mode) {
         this.scoringMode = mode;
     }
+
     public ScoringMode getScoringMode() {
         return this.scoringMode;
     }
@@ -359,41 +360,44 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public Command sysIdDynamic(SysIdRoutine.Direction direction) {
         return m_sysIdRoutineToApply.dynamic(direction);
     }
+
     /**
-     * Get both camera's pose estimates, check if present, then take avg of all three components
+     * Get both camera's pose estimates, check if present, then take avg of all
+     * three components
+     * 
      * @return {@link Pose2d} estimated pose based on both vision measurements
      */
     public Pose2d getPoseFromBoth() {
         var visionEst = vision.getEstimatedGlobalPoseFront();
         var visionEst2 = vision.getEstimatedGlobalPoseBack();
         Pose2d combinedEstimate = new Pose2d();
-        if (visionEst.isPresent() && visionEst2.isPresent()){
+        if (visionEst.isPresent() && visionEst2.isPresent()) {
             Pose2d poseFromFront = visionEst.get().estimatedPose.toPose2d();
             Pose2d poseFromBack = visionEst2.get().estimatedPose.toPose2d();
-            
+
             double estXfromFront = poseFromFront.getX();
             double estXfromBack = poseFromBack.getX();
-            
+
             double estYfromFront = poseFromFront.getY();
             double estYfromBack = poseFromBack.getY();
-            
+
             double estCOSfromFront = poseFromFront.getRotation().getCos();
             double estCOSfromBack = poseFromBack.getRotation().getCos();
-           
+
             double estSINfromFront = poseFromFront.getRotation().getSin();
             double estSINfromBack = poseFromBack.getRotation().getSin();
-            
-            double avgX = (estXfromBack + estXfromFront)/2;
-            double avgY = (estYfromBack + estYfromFront)/2;
-           
-            double avgCos = (estCOSfromBack + estCOSfromFront)/2;
-            double avgSin = (estSINfromBack + estSINfromFront)/2;
-            
+
+            double avgX = (estXfromBack + estXfromFront) / 2;
+            double avgY = (estYfromBack + estYfromFront) / 2;
+
+            double avgCos = (estCOSfromBack + estCOSfromFront) / 2;
+            double avgSin = (estSINfromBack + estSINfromFront) / 2;
+
             combinedEstimate = new Pose2d(avgX, avgY, new Rotation2d(avgCos, avgSin));
         } else if (visionEst.isPresent() && (visionEst2.isEmpty())) {
-            
+
         } else if (visionEst2.isPresent() && (visionEst.isEmpty())) {
-            
+
         } else {
             combinedEstimate = new Pose2d();
         }
@@ -406,33 +410,32 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public void updateVisionMeasurements() {
         var visionEst = vision.getEstimatedGlobalPoseFront();
         var visionEst2 = vision.getEstimatedGlobalPoseBack();
-        if (visionEst.isPresent() && visionEst2.isPresent()){
+        if (visionEst.isPresent() && visionEst2.isPresent()) {
             var estPose = getPoseFromBoth();
             var estStdDevs = vision.getEstimationStdDevs(estPose);
             super.addVisionMeasurement(
-                estPose,
-                Utils.fpgaToCurrentTime(visionEst.get().timestampSeconds),
-                estStdDevs
-            );
+                    estPose,
+                    Utils.fpgaToCurrentTime(visionEst.get().timestampSeconds),
+                    estStdDevs);
         } else if (visionEst.isPresent()) {
             visionEst.ifPresent(est -> {
                 var estPose = est.estimatedPose.toPose2d();
                 var estStdDevs = vision.getEstimationStdDevs(estPose);
                 super.addVisionMeasurement(
-                    estPose,
-                    Utils.fpgaToCurrentTime(est.timestampSeconds),
-                    estStdDevs);
+                        estPose,
+                        Utils.fpgaToCurrentTime(est.timestampSeconds),
+                        estStdDevs);
             });
         } else if (visionEst2.isPresent()) {
             visionEst2.ifPresent(est -> {
                 var estPose = est.estimatedPose.toPose2d();
                 var estStdDevs = vision.getEstimationStdDevs(estPose);
                 super.addVisionMeasurement(
-                    estPose,
-                    Utils.fpgaToCurrentTime(est.timestampSeconds),
-                    estStdDevs);
-            });  
-        } 
+                        estPose,
+                        Utils.fpgaToCurrentTime(est.timestampSeconds),
+                        estStdDevs);
+            });
+        }
     }
 
     /**
@@ -468,7 +471,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         Pose2d currentPose = getState().Pose;
         Pose2d currentPoseCopy = getStateCopy().Pose;
         List<Pose2d> reefTagPoseList = new ArrayList<>(12);
-        HashMap<Integer, Pose2d> flippedReefTagListwID = new HashMap<>(6);
+        List<Pose2d> flippedReefTagListwID = new ArrayList<>(6);
         HashMap<Integer, Pose2d> reefTagPoseListwID = new HashMap<>(6);
 
         if (isRedAlliance()) {
@@ -479,40 +482,54 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             endtag = 23;
         }
         for (int i = firstTag; i < endtag; i++) {
-            reefTagPoseList.add(vision.kFieldLayout.getTagPose(i).get().toPose2d());
-            reefTagPoseList.add(vision.kFieldLayout.getTagPose(i).get().toPose2d().rotateBy(Rotation2d.k180deg));
-            flippedReefTagListwID.put(i, vision.kFieldLayout.getTagPose(i).get().toPose2d().rotateBy(Rotation2d.k180deg));
-            reefTagPoseListwID.put(i, vision.kFieldLayout.getTagPose(i).get().toPose2d());
+            Pose2d aprilTag = vision.kFieldLayout.getTagPose(i).get().toPose2d();
+            reefTagPoseList.add(aprilTag);
+            reefTagPoseList.add(aprilTag.rotateAround(aprilTag.getTranslation(), Rotation2d.k180deg));
+            // flippedReefTagListwID.put(i,
+            // aprilTag.rotateAround(aprilTag.getTranslation(), Rotation2d.k180deg));
+            flippedReefTagListwID
+                    .add(new Pose2d(aprilTag.getTranslation(), aprilTag.getRotation().rotateBy(Rotation2d.k180deg)));
+
+            reefTagPoseListwID.put(i, aprilTag);
 
         }
         Pose2d nearestPose = currentPose.nearest(reefTagPoseList);
-        Pose2d mostRecent = currentPoseCopy.nearest(reefTagPoseList);
-        double angle = nearestPose.getRotation().getRadians(); //used to be rotated by 180, now is accounted for
-        
-        target = new Pose2d(
-                nearestPose.getX() + (-Units.inchesToMeters(VisionConstants.bumperToBumper / 2) * Math.cos(angle)),
-                nearestPose.getY() + (-Units.inchesToMeters(VisionConstants.bumperToBumper / 2) * Math.sin(angle)),
-                Rotation2d.fromRadians(angle));
-        
-        if(flippedReefTagListwID.containsValue(nearestPose)){
+        // Pose2d mostRecent = currentPoseCopy.nearest(reefTagPoseList);
+        // used to be rotated by
+        // 180, now is accounted for
+        if (flippedReefTagListwID.contains(nearestPose)) {
+            double angle = nearestPose.getRotation().rotateBy(Rotation2d.k180deg).getRadians();
+            target = new Pose2d(
+                    nearestPose.getX() + (-Units.inchesToMeters(VisionConstants.bumperToBumper / 2) * Math.cos(angle)),
+                    nearestPose.getY() + (-Units.inchesToMeters(VisionConstants.bumperToBumper / 2) * Math.sin(angle)),
+                    nearestPose.getRotation());
+        } else {
+            double angle = nearestPose.getRotation().rotateBy(Rotation2d.k180deg).getRadians();
+            target = new Pose2d(
+                    nearestPose.getX() + (-Units.inchesToMeters(VisionConstants.bumperToBumper / 2) * Math.cos(angle)),
+                    nearestPose.getY() + (-Units.inchesToMeters(VisionConstants.bumperToBumper / 2) * Math.sin(angle)),
+                    nearestPose.getRotation());
+        }
+
+        if (flippedReefTagListwID.contains(nearestPose)) {
             setScoringMode(ScoringMode.NORMAL);
         } else {
             setScoringMode(ScoringMode.MODIFIED);
         }
-        // TheField.getObject("nearestpose").setPose(nearestPose);
+        TheField.getObject("nearestpose").setPose(nearestPose);
         TheField.getObject("target").setPose(target);
 
         return target;
     }
+
     public ScoringMode decideScoringMode() {
         int firstTag;
         int endtag;
         Pose2d currentPose = getState().Pose;
         Pose2d currentPoseCopy = getStateCopy().Pose;
         List<Pose2d> reefTagPoseList = new ArrayList<>(12);
-        HashMap<Integer, Pose2d> flippedReefTagListwID = new HashMap<>(6);
-        HashMap<Integer, Pose2d> reefTagPoseListwID = new HashMap<>(6);
-
+        List<Pose2d> flippedReefTagListwID = new ArrayList<>(6);
+        List<Pose2d> reefTaflistID = new ArrayList<>(6);
         if (isRedAlliance()) {
             firstTag = 6;
             endtag = 12;
@@ -521,20 +538,26 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             endtag = 23;
         }
         for (int i = firstTag; i < endtag; i++) {
-            reefTagPoseList.add(vision.kFieldLayout.getTagPose(i).get().toPose2d());
-            reefTagPoseList.add(vision.kFieldLayout.getTagPose(i).get().toPose2d().rotateBy(Rotation2d.k180deg));
-            flippedReefTagListwID.put(i, vision.kFieldLayout.getTagPose(i).get().toPose2d().rotateBy(Rotation2d.k180deg));
-            reefTagPoseListwID.put(i, vision.kFieldLayout.getTagPose(i).get().toPose2d());
+            Pose2d aprilTag = vision.kFieldLayout.getTagPose(i).get().toPose2d();
+            reefTagPoseList.add(aprilTag);
+            reefTagPoseList
+                    .add(new Pose2d(aprilTag.getTranslation(), aprilTag.getRotation().rotateBy(Rotation2d.k180deg)));
+            // flippedReefTagListwID.put(i,
+            // aprilTag.rotateAround(aprilTag.getTranslation(), Rotation2d.k180deg));
+            flippedReefTagListwID
+                    .add(new Pose2d(aprilTag.getTranslation(), aprilTag.getRotation().rotateBy(Rotation2d.k180deg)));
+            reefTaflistID.add(aprilTag);
 
         }
         Pose2d nearestPose = currentPose.nearest(reefTagPoseList);
         Pose2d mostRecent = currentPoseCopy.nearest(reefTagPoseList);
-        
-        if(flippedReefTagListwID.containsValue(nearestPose)){
+
+        if (flippedReefTagListwID.contains(nearestPose)) {
             return ScoringMode.NORMAL;
-        } else {
+        } else if (reefTaflistID.contains(nearestPose)) {
             return ScoringMode.MODIFIED;
         }
+        return ScoringMode.MODIFIED;
     }
 
     public Pose2d addOffset(boolean left) {
@@ -560,6 +583,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     @Override
     public void periodic() {
+        SmartDashboard.putBoolean("corign mode", this.decideScoringMode() == ScoringMode.NORMAL);
+
         // updateVisionMeasurements();
         // var globalPose = vision.getEstimatedGlobalPose();
         // if (vision.getEstimatedGlobalPose().isEmpty()){

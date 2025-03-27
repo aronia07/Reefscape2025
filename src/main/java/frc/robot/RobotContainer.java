@@ -52,6 +52,7 @@ import frc.robot.commands.Wrist.ToWristAngle;
 import frc.robot.commands.Wrist.WristMove;
 import frc.robot.commands.Intake.IntakeOut;
 import frc.robot.commands.Intake.IntakeOut2;
+import frc.robot.commands.Intake.IntakeOutL1;
 import frc.robot.commands.Intake.Modify;
 import frc.robot.commands.Lights.WPIlib.RunPattern;
 import frc.robot.commands.Lights.WPIlib.ScrollPattern;
@@ -110,8 +111,8 @@ public class RobotContainer {
 
         private final Telemetry logger = new Telemetry(MaxSpeed);
 
-        private final CommandXboxController driver = new CommandXboxController(0);
-        private final CommandXboxController operator = new CommandXboxController(1);
+        public final CommandXboxController driver = new CommandXboxController(0);
+        public final CommandXboxController operator = new CommandXboxController(1);
 
         public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
@@ -150,7 +151,7 @@ public class RobotContainer {
                 driver.b().whileTrue(drivetrain
                                 .applyRequest(() -> point.withModuleDirection(
                                                 new Rotation2d(-driver.getLeftY(), -driver.getLeftX()))));
-                
+
                 // driver.x().whileTrue(
                 // new ProxyCommand(
                 // DriveToLocation.driveTo(new Pose2d(
@@ -208,7 +209,7 @@ public class RobotContainer {
                 operator.leftBumper().whileTrue(new IntakeOut2(intake));
                 // modified outtake
                 operator.rightBumper().and(operator.x()).whileTrue(
-                                new IntakeOut2(intake));
+                                new IntakeOutL1(intake));
 
                 operator.rightBumper().and(operator.b()).and(operator.rightTrigger()).whileTrue(
                                 new IntakeOut(intake));
@@ -218,69 +219,71 @@ public class RobotContainer {
 
                 // operator.x().onTrue(new SetSolidColor(wpiLights, Color.kMagenta));
 
-                
                 // if(drivetrain.getScoringMode() == ScoringMode.NORMAL) {
-                if(drivetrain.decideScoringMode() == ScoringMode.NORMAL) {
-                        //L4
-                        operator.y().whileTrue(new SequentialCommandGroup(
-                                new ToWristAngle(() -> Units.degreesToRadians(-76), wrist), //unknown
-                                new ParallelCommandGroup(
-                                        new ToAngle(() -> Units.degreesToRadians(82), arm),
-                                        new ElevateLevel(elevator, ElevateMode.L4)))
-                                .finallyDo(this::idle));
-                        // L3
-                        operator.b().whileTrue(new SequentialCommandGroup(
-                                new ToWristAngle(() -> Units.degreesToRadians(-76), wrist),
-                                new ParallelCommandGroup(
-                                        new ToAngle(() -> Units.degreesToRadians(77), arm),
-                                        new ElevateLevel(elevator, ElevateMode.L3)))
-                                .finallyDo(this::idle));
-                        // L2
-                        operator.a().whileTrue(new SequentialCommandGroup(
+                // if (drivetrain.decideScoringMode() == ScoringMode.NORMAL) {
+                // L4
+                operator.y().and(() -> drivetrain.decideScoringMode() == ScoringMode.NORMAL)
+                                .whileTrue(new SequentialCommandGroup(
+                                                new ToWristAngle(() -> Units.degreesToRadians(-76), wrist), // unknown
+                                                new ParallelCommandGroup(
+                                                                new ToAngle(() -> Units.degreesToRadians(85), arm),
+                                                                new ElevateLevel(elevator, ElevateMode.L4)))
+                                                .finallyDo(this::idle));
+                // L3
+                operator.b().and(() -> drivetrain.decideScoringMode() == ScoringMode.NORMAL)
+                                .whileTrue(new SequentialCommandGroup(
+                                                new ToWristAngle(() -> Units.degreesToRadians(-80), wrist),
+                                                new ParallelCommandGroup(
+                                                                new ToAngle(() -> Units.degreesToRadians(77), arm),
+                                                                new ElevateLevel(elevator, ElevateMode.L1)))
+                                                .finallyDo(this::idle));
+                // L2
+                operator.a().whileTrue(new SequentialCommandGroup(
                                 new ToWristAngle(() -> Units.degreesToRadians(-61), wrist),
                                 new ParallelCommandGroup(
-                                        new ToAngle(() -> Units.degreesToRadians(40), arm),
-                                        new ElevateLevel(elevator, ElevateMode.L2)))
+                                                new ToAngle(() -> Units.degreesToRadians(40), arm),
+                                                new ElevateLevel(elevator, ElevateMode.L2)))
                                 .finallyDo(this::idle));
-                        // L1
-                        operator.x().whileTrue(new SequentialCommandGroup(
-                                new ToWristAngle(() -> Units.degreesToRadians(-74), wrist),
+                // L1
+                operator.x().whileTrue(new SequentialCommandGroup(
+                                new ToWristAngle(() -> Units.degreesToRadians(-3), wrist),
                                 new ParallelCommandGroup(
-                                        new ToAngle(() -> Units.degreesToRadians(12.4), arm),
-                                        new ElevateLevel(elevator, ElevateMode.L1)))
+                                                new ToAngle(() -> Units.degreesToRadians(20), arm),
+                                                new ElevateLevel(elevator, ElevateMode.L1)))
                                 .finallyDo(this::idle));
 
-                } else {
-                        //L4
-                        operator.y().whileTrue(new SequentialCommandGroup(
-                                new ToWristAngle(() -> Units.degreesToRadians(15), wrist), //unknown
-                                new ParallelCommandGroup(
-                                        new ToAngle(() -> Units.degreesToRadians(70), arm),
-                                        new ElevateLevel(elevator, ElevateMode.L4)))
-                                .finallyDo(this::idle));
-                        // L3
-                        operator.b().whileTrue(new SequentialCommandGroup(
-                                new ToWristAngle(() -> Units.degreesToRadians(-15), wrist),
-                                new ParallelCommandGroup(
-                                        new ToAngle(() -> Units.degreesToRadians(50), arm),
-                                        new ElevateLevel(elevator, ElevateMode.L3)))
-                                .finallyDo(this::idle));
-                        // L2
-                        operator.a().whileTrue(new SequentialCommandGroup(
-                                new ToWristAngle(() -> Units.degreesToRadians(45), wrist),
-                                new ParallelCommandGroup(
-                                        new ToAngle(() -> Units.degreesToRadians(15), arm),
-                                        new ElevateLevel(elevator, ElevateMode.L2)))
-                                .finallyDo(this::idle));
-                        // L1
-                        operator.x().whileTrue(new SequentialCommandGroup(
-                                new ToWristAngle(() -> Units.degreesToRadians(61), wrist),
-                                new ParallelCommandGroup(
-                                        new ToAngle(() -> Units.degreesToRadians(35), arm),
-                                        new ElevateLevel(elevator, ElevateMode.L1)))
-                                .finallyDo(this::idle));
-                }
-                
+                // } else {
+                // L4
+                operator.y().and(() -> drivetrain.decideScoringMode() == ScoringMode.MODIFIED)
+                                .whileTrue(new SequentialCommandGroup(
+                                                new ToWristAngle(() -> Units.degreesToRadians(15), wrist), // unknown
+                                                new ParallelCommandGroup(
+                                                                new ToAngle(() -> Units.degreesToRadians(70), arm),
+                                                                new ElevateLevel(elevator, ElevateMode.L4)))
+                                                .finallyDo(this::idle));
+                // L3
+                operator.b().and(() -> drivetrain.decideScoringMode() == ScoringMode.MODIFIED)
+                                .whileTrue(new SequentialCommandGroup(
+                                                new ToWristAngle(() -> Units.degreesToRadians(-55), wrist),
+                                                new ParallelCommandGroup(
+                                                                new ToAngle(() -> Units.degreesToRadians(55), arm),
+                                                                new ElevateLevel(elevator, ElevateMode.L1)))
+                                                .finallyDo(this::idle));
+                // // L2
+                // operator.a().whileTrue(new SequentialCommandGroup(
+                // new ToWristAngle(() -> Units.degreesToRadians(-61), wrist),
+                // new ParallelCommandGroup(
+                // new ToAngle(() -> Units.degreesToRadians(40), arm),
+                // new ElevateLevel(elevator, ElevateMode.L2)))
+                // .finallyDo(this::idle));
+                // // L1
+                // operator.x().whileTrue(new SequentialCommandGroup(
+                // new ToWristAngle(() -> Units.degreesToRadians(61), wrist),
+                // new ParallelCommandGroup(
+                // new ToAngle(() -> Units.degreesToRadians(35), arm),
+                // new ElevateLevel(elevator, ElevateMode.L1)))
+                // .finallyDo(this::idle));
+                // }
 
                 // Modified L4
                 operator.y().and(operator.rightTrigger()).whileTrue(new SequentialCommandGroup(
@@ -289,6 +292,13 @@ public class RobotContainer {
                                                 new ToAngle(() -> 75, arm),
                                                 new ElevateLevel(elevator, ElevateMode.L4)))
                                 .finallyDo(this::idle));
+                // Modified L3
+                operator.b().and(operator.leftTrigger()).whileTrue(new SequentialCommandGroup(
+                                new ToWristAngle(() -> Units.degreesToRadians(-55), wrist),
+                                new ParallelCommandGroup(
+                                                new ToAngle(() -> Units.degreesToRadians(55), arm),
+                                                new ElevateLevel(elevator, ElevateMode.L3M)))
+                                .finallyDo(this::idle));
 
                 // L3 Algae Removal
                 operator.b().and(operator.rightTrigger()).whileTrue(new ParallelCommandGroup(
@@ -296,7 +306,6 @@ public class RobotContainer {
                                 new ElevateLevel(elevator, ElevateMode.L3),
                                 new ToWristAngle(() -> Units.degreesToRadians(-53), wrist)).finallyDo(this::idle));
 
-                
                 // L2 Algae Removal
                 operator.a().and(operator.rightTrigger()).whileTrue(new SequentialCommandGroup(
                                 new ToWristAngle(() -> Units.degreesToRadians(-76), wrist),
@@ -305,13 +314,13 @@ public class RobotContainer {
                                                 new ToAngle(() -> Units.degreesToRadians(88.67), arm),
                                                 new ElevateLevel(elevator, ElevateMode.L2AR)))
                                 .finallyDo(this::idle));
-
-                
-
+                // operator.leftTrigger().whileTrue(
+                // if(drivetrain.decideScoringMode() == ScoringMode.NORMAL){new
+                // IntakeOut(intake)});
                 // Reset
                 // operator.start().whileTrue(new SequentialCommandGroup(
-                //         new ToAngle(() -> Units.degreesToRadians(90), arm),
-                //         new ElevateLevel(elevator, ElevateMode.HP)
+                // new ToAngle(() -> Units.degreesToRadians(90), arm),
+                // new ElevateLevel(elevator, ElevateMode.HP)
                 // ));
                 operator.start().onTrue(new ElevatorReset(elevator));
                 beamBroken.onTrue(new SetSolidColor(wpiLights, LightsConstants.GRBColors.get("green")));
@@ -323,22 +332,83 @@ public class RobotContainer {
                 operator.povRight().whileTrue(new ElevateManual(() -> false, elevator));
 
                 // operator.leftTrigger().whileTrue(new ParallelCommandGroup(
-                //         new ToAngle(() -> Units.degreesToRadians(0), arm),
-                //         new ToWristAngle(() -> Units.degreesToRadians(-70), wrist)));
-                        
-                // operator.rightTrigger().whileTrue(new ParallelCommandGroup(
-                //         new ToAngle(() -> Units.degreesToRadians(90), arm),
-                //         new ToWristAngle(() -> Units.degreesToRadians(-70), wrist)));
-                // operator.leftTrigger().whileTrue(
-                //         new ToWristAngle(() -> Units.degreesToRadians(80), wrist));
-                // operator.rightTrigger().whileTrue(
-                //         new ToWristAngle(() -> Units.degreesToRadians(-70), wrist));
-                operator.leftTrigger().whileTrue(new SequentialCommandGroup(
-                        // new ToAngle(() -> Units.degreesToRadians(0), arm),
-                        new ElevateLevel(elevator, ElevateMode.L3)
-                )
-                );
+                // new ToAngle(() -> Units.degreesToRadians(0), arm),
+                // new ToWristAngle(() -> Units.degreesToRadians(-70), wrist)));
 
+                // operator.rightTrigger().whileTrue(new ParallelCommandGroup(
+                // new ToAngle(() -> Units.degreesToRadians(90), arm),
+                // new ToWristAngle(() -> Units.degreesToRadians(-70), wrist)));
+                // operator.leftTrigger().whileTrue(
+                // new ToWristAngle(() -> Units.degreesToRadians(80), wrist));
+                // operator.rightTrigger().whileTrue(
+                // new ToWristAngle(() -> Units.degreesToRadians(-70), wrist));
+                operator.leftTrigger().whileTrue(new SequentialCommandGroup(
+                                // new ToAngle(() -> Units.degreesToRadians(0), arm),
+                                new ElevateLevel(elevator, ElevateMode.L3)));
+
+        }
+
+        public void scoringBindings(ScoringMode plsowrk) {
+                if (plsowrk == ScoringMode.NORMAL) {
+                        // L4
+                        operator.y().whileTrue(new SequentialCommandGroup(
+                                        new ToWristAngle(() -> Units.degreesToRadians(-76), wrist), // unknown
+                                        new ParallelCommandGroup(
+                                                        new ToAngle(() -> Units.degreesToRadians(85), arm),
+                                                        new ElevateLevel(elevator, ElevateMode.L4)))
+                                        .finallyDo(this::idle));
+                        // L3
+                        operator.b().whileTrue(new SequentialCommandGroup(
+                                        new ToWristAngle(() -> Units.degreesToRadians(-80), wrist),
+                                        new ParallelCommandGroup(
+                                                        new ToAngle(() -> Units.degreesToRadians(77), arm),
+                                                        new ElevateLevel(elevator, ElevateMode.L3)))
+                                        .finallyDo(this::idle));
+                        // L2
+                        operator.a().whileTrue(new SequentialCommandGroup(
+                                        new ToWristAngle(() -> Units.degreesToRadians(-61), wrist),
+                                        new ParallelCommandGroup(
+                                                        new ToAngle(() -> Units.degreesToRadians(40), arm),
+                                                        new ElevateLevel(elevator, ElevateMode.L2)))
+                                        .finallyDo(this::idle));
+                        // L1
+                        operator.x().whileTrue(new SequentialCommandGroup(
+                                        new ToWristAngle(() -> Units.degreesToRadians(-74), wrist),
+                                        new ParallelCommandGroup(
+                                                        new ToAngle(() -> Units.degreesToRadians(12.4), arm),
+                                                        new ElevateLevel(elevator, ElevateMode.L1)))
+                                        .finallyDo(this::idle));
+
+                } else {
+                        // L4
+                        operator.y().whileTrue(new SequentialCommandGroup(
+                                        new ToWristAngle(() -> Units.degreesToRadians(15), wrist), // unknown
+                                        new ParallelCommandGroup(
+                                                        new ToAngle(() -> Units.degreesToRadians(70), arm),
+                                                        new ElevateLevel(elevator, ElevateMode.L4)))
+                                        .finallyDo(this::idle));
+                        // L3
+                        operator.b().whileTrue(new SequentialCommandGroup(
+                                        new ToWristAngle(() -> Units.degreesToRadians(-55), wrist),
+                                        new ParallelCommandGroup(
+                                                        new ToAngle(() -> Units.degreesToRadians(55), arm),
+                                                        new ElevateLevel(elevator, ElevateMode.L3M)))
+                                        .finallyDo(this::idle));
+                        // L2
+                        operator.a().whileTrue(new SequentialCommandGroup(
+                                        new ToWristAngle(() -> Units.degreesToRadians(-61), wrist),
+                                        new ParallelCommandGroup(
+                                                        new ToAngle(() -> Units.degreesToRadians(40), arm),
+                                                        new ElevateLevel(elevator, ElevateMode.L2)))
+                                        .finallyDo(this::idle));
+                        // L1
+                        operator.x().whileTrue(new SequentialCommandGroup(
+                                        new ToWristAngle(() -> Units.degreesToRadians(61), wrist),
+                                        new ParallelCommandGroup(
+                                                        new ToAngle(() -> Units.degreesToRadians(35), arm),
+                                                        new ElevateLevel(elevator, ElevateMode.L1)))
+                                        .finallyDo(this::idle));
+                }
         }
 
         public void getDashboardCommand() {
@@ -362,8 +432,10 @@ public class RobotContainer {
 
         public void configureTestCommands() {
                 // SmartDashboard.putBoolean("is it modified", Intake.modified);
-                // SmartDashboard.putData("Elevate", new ElevateLevel(elevator, ElevateMode.TEST));
-                // SmartDashboard.putData("Go down", new ElevateLevel(elevator, ElevateMode.DOWN));
+                // SmartDashboard.putData("Elevate", new ElevateLevel(elevator,
+                // ElevateMode.TEST));
+                // SmartDashboard.putData("Go down", new ElevateLevel(elevator,
+                // ElevateMode.DOWN));
 
                 // SmartDashboard.putData("Wrist Up", new ToWristAngle(() -> 70, wrist));
                 // SmartDashboard.putData("Wrist Down", new ToWristAngle(() -> -35, wrist));
@@ -377,9 +449,9 @@ public class RobotContainer {
         }
 
         public void disabledActions() {
-                new ScrollPattern(wpiLights, LEDPattern.gradient(GradientType.kContinuous, 
-                LightsConstants.GRBColors.get("blue"),
-                LightsConstants.GRBColors.get("magenta")), 5);
+                new ScrollPattern(wpiLights, LEDPattern.gradient(GradientType.kContinuous,
+                                LightsConstants.GRBColors.get("blue"),
+                                LightsConstants.GRBColors.get("magenta")), .5);
                 // new SetSolidColor(wpiLights, LightsConstants.GBRColors.get("team_Gold"));
                 arm.resetI();
                 arm.runState(new TrapezoidProfile.State(Arm.getEncoderPosition().getRadians(), 0));
@@ -390,15 +462,15 @@ public class RobotContainer {
                                 new ToWristAngle(() -> Units.degreesToRadians(-35), wrist),
                                 new ParallelCommandGroup(
                                                 new ToAngle(() -> Units.degreesToRadians(87), arm),
-                                                new ElevateLevel(elevator, ElevateMode.L4))));
+                                                new ElevateLevel(elevator, ElevateMode.L1))));
 
                 NamedCommands.registerCommand("outtake", new IntakeOut(intake).withTimeout(0.5));
 
-                NamedCommands.registerCommand("hpIntake", new ParallelCommandGroup(
-                                new ToWristAngle(() -> Units.degreesToRadians(-77), wrist),
-                                new ToAngle(() -> Units.degreesToRadians(35), arm),
-                                new ElevateLevel(elevator, ElevateMode.L2),
-                                new IntakeIn(intake)).withTimeout(0.7));
+                NamedCommands.registerCommand("intake", new ParallelCommandGroup(
+                                new ToWristAngle(() -> Units.degreesToRadians(33), wrist),
+                                new ToAngle(() -> Units.degreesToRadians(-7), arm),
+                                new IntakeIn(intake),
+                                new ElevateLevel(elevator, ElevateMode.HP)));
 
                 NamedCommands.registerCommand("reset", new SequentialCommandGroup(
                                 new ToWristAngle(() -> Units.degreesToRadians(-61.5), wrist),
