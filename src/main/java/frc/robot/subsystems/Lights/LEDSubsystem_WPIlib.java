@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.util.Color;
 
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Percent;
 import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.units.measure.Distance;
@@ -30,7 +31,8 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
   // Setup
   private static final int kPort = LightsConstants.port; // PWM Port
   private static final int kLength = LightsConstants.length; // LED strip length [# of LEDs]
-  private static final Distance kLedSpacing = Meters.of(1 / 20); // LED strip LEDs density - [... LEDs per meter]
+  private static final Distance kLedSpacing = LightsConstants.spacing; // LED strip LEDs density - [... LEDs per meter]
+  private static final int brightness = LightsConstants.brightness;
 
   private final AddressableLED m_led;
   private final AddressableLEDBuffer m_ledbuffer;
@@ -101,6 +103,7 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
   public void LED_ScrollPatternAbsolute(LEDPattern pattern, double speed) {
     LEDPattern m_scrollingPattern = pattern.scrollAtAbsoluteSpeed(MetersPerSecond.of(speed), kLedSpacing);
     runPattern(m_scrollingPattern, true);
+    System.out.println("Scroll function executed!!!!!!!!!!!!");
   }
 
   /**
@@ -149,12 +152,12 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
    */
   public void runPattern(LEDPattern pattern, boolean animated) {
     if (animated) {
-      animatedPattern = pattern;
+      animatedPattern = pattern.atBrightness(Percent.of(brightness));
       running_AnimatedPattern = true;
     } else {
       animatedPattern = null;
       running_AnimatedPattern = false;
-      pattern.applyTo(m_ledbuffer);
+      pattern.atBrightness(Percent.of(brightness)).applyTo(m_ledbuffer);
       m_led.setData(m_ledbuffer);
       // System.out.println("And executed proprely!!!!! Animated:" +
       // running_AnimatedPattern);

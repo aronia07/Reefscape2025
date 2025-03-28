@@ -41,7 +41,7 @@ public class Elevator extends SubsystemBase {
   // private final RelativeEncoder encoderLeft;
 
   public double encoderPosition;
-  public double elevatorSetpoint = 0.5;
+  public double elevatorSetpoint = 1;
   private double positionRateOfChange = 0;
 
   // private double leftPower = 0;

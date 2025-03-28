@@ -13,7 +13,7 @@ public class IntakeOutL1 extends Command {
 
   @Override
   public void execute() {
-    m_intake.outTake(0.2);
+    m_intake.outTake0.2);
   }
 
   @Override

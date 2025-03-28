@@ -266,7 +266,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                             // PID constants for translation
                             new PIDConstants(4, 0, 0),
                             // PID constants for rotation
-                            new PIDConstants(2, 0, 0)),
+                            new PIDConstants(3, 0, 0)),
                     config,
                     // Assume the path needs to be flipped for Red vs Blue, this is normally the
                     // case
@@ -498,7 +498,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         // used to be rotated by
         // 180, now is accounted for
         if (flippedReefTagListwID.contains(nearestPose)) {
-            double angle = nearestPose.getRotation().rotateBy(Rotation2d.k180deg).getRadians();
+            double angle = nearestPose.getRotation().getRadians();
             target = new Pose2d(
                     nearestPose.getX() + (-Units.inchesToMeters(VisionConstants.bumperToBumper / 2) * Math.cos(angle)),
                     nearestPose.getY() + (-Units.inchesToMeters(VisionConstants.bumperToBumper / 2) * Math.sin(angle)),
@@ -566,15 +566,25 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         Pose2d centerTarget = getCenterReefPose();
         double angle = (Math.PI / 2) - centerTarget.getRotation().getRadians();
         Pose2d offsetTarget;
-        if (!left) {
+        if (!left && (decideScoringMode() == ScoringMode.NORMAL)) {
             offsetTarget = new Pose2d(
                     centerTarget.getX() + (rightOffset * Math.cos(angle)),
                     centerTarget.getY() + (-rightOffset * Math.sin(angle)),
                     centerTarget.getRotation());
-        } else {
+        } else if (left && (decideScoringMode() == ScoringMode.NORMAL)) {
             offsetTarget = new Pose2d(
                     centerTarget.getX() + (-leftOffset * Math.cos(angle)),
                     centerTarget.getY() + (leftOffset * Math.sin(angle)),
+                    centerTarget.getRotation());
+        } else if (!left && (decideScoringMode() == ScoringMode.MODIFIED)) {
+            offsetTarget = new Pose2d(
+                    centerTarget.getX() + (-rightOffset * Math.cos(angle)),
+                    centerTarget.getY() + (rightOffset * Math.sin(angle)),
+                    centerTarget.getRotation());
+        } else {
+            offsetTarget = new Pose2d(
+                    centerTarget.getX() + (leftOffset * Math.cos(angle)),
+                    centerTarget.getY() + (-leftOffset * Math.sin(angle)),
                     centerTarget.getRotation());
         }
         TheField.getObject("offset target").setPose(offsetTarget);

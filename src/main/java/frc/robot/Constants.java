@@ -2,6 +2,8 @@ package frc.robot;
 
 import edu.wpi.first.math.Vector;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +25,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Distance;
+
 import edu.wpi.first.wpilibj.util.Color;
 
 public final class Constants {
@@ -32,6 +36,8 @@ public final class Constants {
     public static class LightsConstants {
         public static int port = 0;
         public static int length = 12;
+        public static Distance spacing = Meters.of(1 / 20);
+        public static int brightness = 50;
 
         public static enum LightsType {
             ENDGAME,
@@ -122,7 +128,7 @@ public final class Constants {
     }
 
     public static final class AutoConstants {
-        public static double kMaxSpeedMetersPerSecond = 3;
+        public static double kMaxSpeedMetersPerSecond = 1.5;
         public static double kMaxAccelerationMetersPerSecondSquared = 6.1;
         public static double kMaxAngularSpeedRadiansPerSecond = Units
                 .rotationsPerMinuteToRadiansPerSecond(0.75 * (1 / 60));
@@ -152,7 +158,8 @@ public final class Constants {
         public static final Rotation2d maxAcceleration = Rotation2d.fromDegrees(460);
 
         public static final Rotation2d wristMax = Rotation2d.fromDegrees(86);
-        public static final Rotation2d wristMin = Rotation2d.fromDegrees(-83);
+        public static final Rotation2d wristOldMin = Rotation2d.fromDegrees(-81);
+        public static final Rotation2d wristNewMin = Rotation2d.fromDegrees(268);
         public static final Rotation2d tolernace = Rotation2d.fromDegrees(0.5);
     }
 
@@ -178,8 +185,8 @@ public final class Constants {
         public static int rightElevatorMotorID = 42;
         public static double[] elevatorPID = new double[] { 0.085, 0, 0 }; // p is a little aggressive
         public static double[] elevatorSGV = new double[] { 0, 0, 0, 0 }; // g needs testing
-        public static double maxVelocity = 75; // in mps was 150
-        public static double maxAccel = 75; // in mps/s was 150
+        public static double maxVelocity = 150; // in mps was 150
+        public static double maxAccel = 175; // in mps/s was 150
         public static double elevatorTolerance = .3;
 
         public static enum ElevateMode {
@@ -203,7 +210,7 @@ public final class Constants {
         public static double LevelTwoSetpoint = 1;
         public static double LevelTwoAlgaeSetpoint = 0.5;
         public static double LevelThreeSetpoint = 4.2;
-        public static double LevelThreeSetpointM = 4.5;
+        public static double LevelThreeSetpointM = 5.5;
         public static double LevelFourSetpoint = 20.5;
         public static double HPsetpoint = -01;
         public static double test = 16;
