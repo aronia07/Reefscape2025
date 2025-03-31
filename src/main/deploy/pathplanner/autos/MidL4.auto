@@ -7,13 +7,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "JIB 1"
+            "pathName": "Mid L4"
           }
         },
         {
-          "type": "path",
+          "type": "named",
           "data": {
-            "pathName": "JIB 2"
+            "name": "L4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "outake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "reset"
           }
         }
       ]

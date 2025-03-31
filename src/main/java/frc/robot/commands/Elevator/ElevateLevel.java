@@ -63,6 +63,10 @@ public class ElevateLevel extends Command {
                 elevator_y.elevatorSetpoint = ElevatorConstants.LevelThreeSetpoint;
                 elevatorPID.setGoal(ElevatorConstants.LevelThreeSetpoint);
                 break;
+            case L3AR:
+                elevator_y.elevatorSetpoint = ElevatorConstants.LevelThreeAR;
+                elevatorPID.setGoal(ElevatorConstants.LevelThreeAR);
+                break;
             case L3M:
                 elevator_y.elevatorSetpoint = ElevatorConstants.LevelThreeSetpointM;
                 elevatorPID.setGoal(ElevatorConstants.LevelThreeSetpointM);

@@ -4,6 +4,7 @@ import edu.wpi.first.math.Vector;
 
 import static edu.wpi.first.units.Units.Meters;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -100,13 +101,13 @@ public final class Constants {
 
     public static final class VisionConstants {
         /* camera stuff */
-        public static double bumperToBumper = 33.25; // should be chassis length TODO: TUNE PID THIS IS A BANDAID
+        public static double bumperToBumper = 32.25; // should be chassis length TODO: TUNE PID THIS IS A BANDAID
         public static Transform3d kRobotToCam = new Transform3d(
                 new Translation3d(Units.inchesToMeters(19.41), 0, Units.inchesToMeters(6.6)),
                 new Rotation3d(0, Units.degreesToRadians(23), 0)); // TODO: edit yaw
         public static Transform3d kRobotToCam2 = new Transform3d(
                 new Translation3d(-(Units.inchesToMeters(25.5) - Units.inchesToMeters(27 / 2)), 0.0,
-                        Units.inchesToMeters(8.17)),
+                        Units.inchesToMeters(6.17)),
                 new Rotation3d(0, Units.degreesToRadians(-30), Math.PI));
         public static String cameraName = "orangepi";
         public static String camera2Name = "orangepi2";
@@ -118,8 +119,9 @@ public final class Constants {
         /* pose of reefs for alignment */
         public static Optional<Pose3d> blueReefPose;
         public static Optional<Pose3d> redReefPose;
-        public static double leftOffsetInches = 6;
+        public static double leftOffsetInches = 7;
         public static double rightOffsetInches = 5.5;
+        public static List<Integer> badTags = new ArrayList<>();
 
         public static enum ScoringMode {
             NORMAL,
@@ -153,12 +155,12 @@ public final class Constants {
         public static int maxAccel = 0;
         public static double[] wristFF = { 0, 0, 0 };
         public static double wristGearRatio = 0;
-        public static Rotation2d wristOffset = new Rotation2d(Units.degreesToRadians(94.464372)); // -59.7-18.8
-        public static final Rotation2d maxVelocityPerSecond = Rotation2d.fromDegrees(460); // was 500
-        public static final Rotation2d maxAcceleration = Rotation2d.fromDegrees(460);
+        public static Rotation2d wristOffset = new Rotation2d(Units.degreesToRadians(30.974372)); // -59.7-18.8
+        public static final Rotation2d maxVelocityPerSecond = Rotation2d.fromDegrees(600); // was 460
+        public static final Rotation2d maxAcceleration = Rotation2d.fromDegrees(900);
 
         public static final Rotation2d wristMax = Rotation2d.fromDegrees(86);
-        public static final Rotation2d wristOldMin = Rotation2d.fromDegrees(-81);
+        public static final Rotation2d wristOldMin = Rotation2d.fromDegrees(-95);
         public static final Rotation2d wristNewMin = Rotation2d.fromDegrees(268);
         public static final Rotation2d tolernace = Rotation2d.fromDegrees(0.5);
     }
@@ -171,7 +173,7 @@ public final class Constants {
     public static final class ClimberConstants {
         public static int climberMotorID = 25;
         public static double climberMax = 400;
-        public static double climberMin = -97.7; // was -90
+        public static double climberMin = -150; // was -90
     }
 
     public static final class ElevatorConstants {
@@ -196,6 +198,7 @@ public final class Constants {
             L2,
             L2AR,
             L3,
+            L3AR,
             L3M,
             L4,
             HP,
@@ -211,6 +214,7 @@ public final class Constants {
         public static double LevelTwoAlgaeSetpoint = 0.5;
         public static double LevelThreeSetpoint = 4.2;
         public static double LevelThreeSetpointM = 5.5;
+        public static double LevelThreeAR = 6;
         public static double LevelFourSetpoint = 20.5;
         public static double HPsetpoint = -01;
         public static double test = 16;
@@ -231,8 +235,8 @@ public final class Constants {
         public static final Rotation2d tolernace = Rotation2d.fromDegrees(1); // How much the arm's exact angle can be
                                                                               // off by
 
-        public static final Rotation2d maxVelocityPerSecond = Rotation2d.fromDegrees(480); // was 400
-        public static final Rotation2d maxAcceleration = Rotation2d.fromDegrees(550); // was 400
+        public static final Rotation2d maxVelocityPerSecond = Rotation2d.fromDegrees(250); // was 400
+        public static final Rotation2d maxAcceleration = Rotation2d.fromDegrees(250); // was 400
 
         public static double[] armSGV = new double[] { 0.0, 0.001, 0.0 }; // Static, Gravity, and Velocity gains
         public static double[] armPID = new double[] { 1.47, 0, 0f }; // Arm PID values

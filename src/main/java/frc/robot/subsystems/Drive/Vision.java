@@ -1,6 +1,7 @@
 package frc.robot.subsystems.Drive;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,7 +44,7 @@ public class Vision extends SubsystemBase {
     camera2 = new PhotonCamera(Constants.VisionConstants.camera2Name);
     photonPoseEstimatorFront = new PhotonPoseEstimator(kFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
         VisionConstants.kRobotToCam);
-    photonPoseEstimatorBack = new PhotonPoseEstimator(kFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, 
+    photonPoseEstimatorBack = new PhotonPoseEstimator(kFieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
         VisionConstants.kRobotToCam2);
     photonPoseEstimatorFront.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
     photonPoseEstimatorBack.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
@@ -72,7 +73,7 @@ public class Vision extends SubsystemBase {
     latestVision = estVision;
     return latestVision;
   }
-  
+
   public Optional<EstimatedRobotPose> getEstimatedGlobalPoseBack() {
     var estVision2 = photonPoseEstimatorBack.update(getLatestResultBack());
     double latestTimestamp = getLatestResultBack().getTimestampSeconds();
@@ -99,6 +100,51 @@ public class Vision extends SubsystemBase {
     return camera2.getLatestResult();
   }
 
+  public boolean checkBackTags() {
+    boolean isGood = true;
+    List<Integer> badTags = new ArrayList<>(10);
+    badTags.add(2);
+    badTags.add(3);
+    badTags.add(4);
+    badTags.add(5);
+    badTags.add(1);
+    badTags.add(12);
+    badTags.add(13);
+    badTags.add(14);
+    badTags.add(15);
+    badTags.add(16);
+    var tagsSeenBack = this.getLatestResultBack().getTargets();
+    for (var tgt : tagsSeenBack) {
+      if (badTags.contains(tgt.getFiducialId())) {
+        isGood = false;
+      }
+    }
+    return isGood;
+  }
+
+  public boolean checkFrontTags() {
+    boolean isGood = true;
+    List<Integer> badTags = new ArrayList<>(10);
+    badTags.add(2);
+    badTags.add(3);
+    badTags.add(4);
+    badTags.add(5);
+    badTags.add(1);
+    badTags.add(12);
+    badTags.add(13);
+    badTags.add(14);
+    badTags.add(15);
+    badTags.add(16);
+    var tagsSeenFront = this.getLatestResultFront().getTargets();
+    for (var tgt : tagsSeenFront) {
+      if (badTags.contains(tgt.getFiducialId())) {
+        isGood = false;
+      }
+    }
+    return isGood;
+
+  }
+
   public Matrix<N3, N1> getEstimationStdDevs(Pose2d estimatedPose) {
     var estStdDevs = Constants.VisionConstants.kSingleTagStdDevs;
     var targetsFront = getLatestResultFront().getTargets();
@@ -114,7 +160,7 @@ public class Vision extends SubsystemBase {
       numTagsFront++;
       avgDistFront += tagPose.get().toPose2d().getTranslation().getDistance(estimatedPose.getTranslation());
     }
-    for (var tgt2 : targetsFront) {
+    for (var tgt2 : targetsBack) {
       var tagPose = photonPoseEstimatorFront.getFieldTags().getTagPose(tgt2.getFiducialId());
       if (tagPose.isEmpty())
         continue;
@@ -126,14 +172,15 @@ public class Vision extends SubsystemBase {
     avgDistFront /= numTagsFront;
     avgDistBack /= numTagsBack;
     // Decrease std devs if multiple targets are visible
-    if (numTagsFront > 1 /*|| numTagsBack > 1*/)
+    if (numTagsFront > 1 /* || numTagsBack > 1 */)
       estStdDevs = Constants.VisionConstants.kMultiTagStdDevs;
     // Increase std devs based on (average) distance
-    if ((numTagsFront == 1 && avgDistFront > 4) /*|| (numTagsBack == 1 && avgDistBack > 4)*/)
+    if ((numTagsFront == 1 && avgDistFront > 4) || (numTagsBack == 1 && avgDistBack > 4))
       estStdDevs = VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
-    else
+    else if (avgDistFront < avgDistBack)
       estStdDevs = estStdDevs.times(1 + (avgDistFront * avgDistFront / 30));
-
+    else if (avgDistBack < avgDistFront)
+      estStdDevs = estStdDevs.times(1 + (avgDistBack * avgDistBack) / 30);
     return estStdDevs;
   }
 

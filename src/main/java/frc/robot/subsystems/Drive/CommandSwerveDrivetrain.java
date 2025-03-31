@@ -408,16 +408,22 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      * Update the pose estimation and std devs with new vision data
      */
     public void updateVisionMeasurements() {
+        boolean isBackGood = vision.checkBackTags();
+        boolean isFrontGood = vision.checkFrontTags();
         var visionEst = vision.getEstimatedGlobalPoseFront();
         var visionEst2 = vision.getEstimatedGlobalPoseBack();
-        if (visionEst.isPresent() && visionEst2.isPresent()) {
+
+        if (visionEst.isPresent() && visionEst2.isPresent() && vision.checkBackTags() && vision.checkFrontTags()) {
             var estPose = getPoseFromBoth();
             var estStdDevs = vision.getEstimationStdDevs(estPose);
             super.addVisionMeasurement(
                     estPose,
                     Utils.fpgaToCurrentTime(visionEst.get().timestampSeconds),
                     estStdDevs);
-        } else if (visionEst.isPresent()) {
+        } else if (visionEst.isPresent() /*
+                                          * && vision.checkFrontTags()
+                                          * && (visionEst2.isEmpty() || !vision.checkBackTags())
+                                          */) {
             visionEst.ifPresent(est -> {
                 var estPose = est.estimatedPose.toPose2d();
                 var estStdDevs = vision.getEstimationStdDevs(estPose);
@@ -426,7 +432,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                         Utils.fpgaToCurrentTime(est.timestampSeconds),
                         estStdDevs);
             });
-        } else if (visionEst2.isPresent()) {
+        } else if (visionEst2.isPresent() /*
+                                           * && vision.checkBackTags()
+                                           * && (visionEst.isEmpty() || !vision.checkFrontTags())
+                                           */) {
             visionEst2.ifPresent(est -> {
                 var estPose = est.estimatedPose.toPose2d();
                 var estStdDevs = vision.getEstimationStdDevs(estPose);

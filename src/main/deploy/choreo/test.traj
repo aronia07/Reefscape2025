@@ -1,12 +1,12 @@
 {
- "name":"JIB 2",
+ "name":"test",
  "version":1,
  "snapshot":{
   "waypoints":[
     {"x":3.27659875869751, "y":3.875935316085815, "heading":0.0, "intervals":34, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":2.61087408065796, "y":4.026000022888184, "heading":0.0, "intervals":34, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":1.924776554107666, "y":4.026000022888184, "heading":0.0, "intervals":34, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":1.240750789642334, "y":4.026000022888184, "heading":0.0, "intervals":39, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":1.240750789642334, "y":4.026000022888184, "heading":0.0, "intervals":39, "split":true, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":2.171152114868164, "y":4.191071510314941, "heading":0.0, "intervals":43, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":3.2765856742858888, "y":4.191071510314941, "heading":0.0, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
   "constraints":[
@@ -22,7 +22,7 @@
     {"x":{"exp":"3.27659875869751 m", "val":3.27659875869751}, "y":{"exp":"3.8759353160858154 m", "val":3.875935316085815}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":34, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":{"exp":"2.61087408065796 m", "val":2.61087408065796}, "y":{"exp":"4.026000022888184 m", "val":4.026000022888184}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":34, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":{"exp":"1.924776554107666 m", "val":1.924776554107666}, "y":{"exp":"4.026000022888184 m", "val":4.026000022888184}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":34, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
-    {"x":{"exp":"1.240750789642334 m", "val":1.240750789642334}, "y":{"exp":"4.026000022888184 m", "val":4.026000022888184}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":39, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
+    {"x":{"exp":"1.240750789642334 m", "val":1.240750789642334}, "y":{"exp":"4.026000022888184 m", "val":4.026000022888184}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":39, "split":true, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":{"exp":"2.171152114868164 m", "val":2.171152114868164}, "y":{"exp":"4.191071510314941 m", "val":4.191071510314941}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":43, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false},
     {"x":{"exp":"3.2765856742858888 m", "val":3.2765856742858888}, "y":{"exp":"4.191071510314941 m", "val":4.191071510314941}, "heading":{"exp":"0 deg", "val":0.0}, "intervals":40, "split":false, "fixTranslation":true, "fixHeading":true, "overrideIntervals":false}],
   "constraints":[
@@ -225,10 +225,7 @@
     {"t":6.02515, "x":3.2738, "y":4.19108, "heading":-0.00001, "vx":0.07468, "vy":-0.00016, "omega":0.00013, "ax":-0.99971, "ay":0.00212, "alpha":-0.00155, "fx":[-12.01474,-12.01474,-12.01876,-12.01876], "fy":[0.02083,0.04099,0.0193,0.02083]},
     {"t":6.0625, "x":3.27589, "y":4.19107, "heading":0.0, "vx":0.03734, "vy":-0.00008, "omega":0.00007, "ax":-0.99972, "ay":0.00212, "alpha":-0.00188, "fx":[-12.02398,-11.9981,-12.02272,-12.02272], "fy":[0.02323,0.02774,0.02774,0.02323]},
     {"t":6.09985, "x":3.27659, "y":4.19107, "heading":0.0, "vx":0.0, "vy":0.0, "omega":0.0, "ax":0.0, "ay":0.0, "alpha":0.0, "fx":[0.0,0.0,0.0,0.0], "fy":[0.0,0.0,0.0,0.0]}],
-  "splits":[0]
+  "splits":[0,102]
  },
- "events":[
-   {"name":"Marker", "from":{"target":0, "targetTimestamp":0.0, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"intake"}}},
-   {"name":"Marker", "from":{"target":3, "targetTimestamp":3.05152, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"armToL4"}}},
-   {"name":"Marker", "from":{"target":4, "targetTimestamp":4.49383, "offset":{"exp":"0 s", "val":0.0}}, "event":{"type":"named", "data":{"name":"L4"}}}]
+ "events":[]
 }

@@ -28,6 +28,7 @@ import frc.lib.util.CANSparkMaxUtil;
 import frc.lib.util.LoggedTunableNumber;
 import frc.lib.util.CANSparkMaxUtil.Usage;
 import frc.robot.Constants;
+import frc.robot.Constants.WristConstants;
 import frc.robot.subsystems.Arm.Arm;
 import frc.robot.subsystems.Wrist.Encoders.WristEncoder;
 import frc.robot.subsystems.Wrist.Encoders.WristEncoderThroughbore;
@@ -83,7 +84,7 @@ public class Wrist extends SubsystemBase {
   // Motor Set-Up
   private void setupMotors() {
 
-    wristConfig.voltageCompensation(12).smartCurrentLimit(60, 30).inverted(true).idleMode(IdleMode.kBrake);
+    wristConfig.voltageCompensation(12).smartCurrentLimit(60, 40).inverted(true).idleMode(IdleMode.kBrake);
     wristMotor.configure(wristConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     // leader.restoreFactoryDefaults();
     CANSparkMaxUtil.setSparkMaxBusUsage(wristMotor, wristConfig, Usage.kPositionOnly);
