@@ -17,9 +17,6 @@
           "open": true
         }
       },
-      "PathPlanner": {
-        "open": true
-      },
       "Pose": {
         "open": true
       },
@@ -96,9 +93,16 @@
     },
     "visible": true
   },
+  "NetworkTables Log": {
+    "visible": true
+  },
   "NetworkTables Settings": {
     "mode": "Client (NT4)",
-    "serverTeam": "3161"
+    "serverTeam": "3161",
+    "visible": false
+  },
+  "NetworkTables View": {
+    "visible": false
   },
   "Plots": {
     "Plot <0>": {

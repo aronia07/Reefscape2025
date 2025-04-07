@@ -7,7 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "JIB 1 Wide"
+            "pathName": "RSP1.0"
           }
         },
         {
@@ -20,18 +20,18 @@
           "type": "named",
           "data": {
             "name": "outtake"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "reset"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "JIB 2.0"
+            "pathName": "RSP2.0"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RSP3.0"
           }
         },
         {
@@ -47,9 +47,27 @@
           }
         },
         {
+          "type": "path",
+          "data": {
+            "pathName": "RSP4.0"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "RSP5.0"
+          }
+        },
+        {
           "type": "named",
           "data": {
-            "name": "reset"
+            "name": "L4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "outtake"
           }
         }
       ]

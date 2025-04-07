@@ -7,31 +7,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "JIB 1 Wide"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "L4"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "outtake"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "reset"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "JIB 2.0"
+            "pathName": "JIB 2"
           }
         },
         {

@@ -155,7 +155,7 @@ public final class Constants {
         public static int maxAccel = 0;
         public static double[] wristFF = { 0, 0, 0 };
         public static double wristGearRatio = 0;
-        public static Rotation2d wristOffset = new Rotation2d(Units.degreesToRadians(30.974372)); // -59.7-18.8
+        public static Rotation2d wristOffset = new Rotation2d(Units.degreesToRadians(-27.982976)); // -59.7-18.8
         public static final Rotation2d maxVelocityPerSecond = Rotation2d.fromDegrees(600); // was 460
         public static final Rotation2d maxAcceleration = Rotation2d.fromDegrees(900);
 
@@ -198,6 +198,7 @@ public final class Constants {
             L2,
             L2AR,
             L3,
+            L3R,
             L3AR,
             L3M,
             L4,
@@ -214,7 +215,8 @@ public final class Constants {
         public static double LevelTwoAlgaeSetpoint = 0.5;
         public static double LevelThreeSetpoint = 4.2;
         public static double LevelThreeSetpointM = 5.5;
-        public static double LevelThreeAR = 6;
+        public static double LevelThreeSetpointR = 7.5;
+        public static double LevelThreeAR = 6.5;
         public static double LevelFourSetpoint = 20.5;
         public static double HPsetpoint = -01;
         public static double test = 16;
