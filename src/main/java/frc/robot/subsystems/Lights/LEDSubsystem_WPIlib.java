@@ -188,7 +188,9 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
     }
   }
 
-
+  /**
+   * Random assignment of LEDs
+  */
   private void randomizeList() {
     twinkleIndexes.clear();
     int maxTwinkleLEDs = Math.min(3, kLength);
