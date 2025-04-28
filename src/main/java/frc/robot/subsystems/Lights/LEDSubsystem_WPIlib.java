@@ -6,11 +6,16 @@ import frc.robot.Constants.LightsConstants;
 //LED Imports
 //import edu.wpi.first.units.Units.*;
 import edu.wpi.first.wpilibj.LEDPattern;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Percent;
 import static edu.wpi.first.units.Units.Seconds;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.AddressableLED;
@@ -36,9 +41,13 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
   private final AddressableLEDBuffer m_ledbuffer;
   // private final AddressableLEDBufferView m_left; //Left side of the LED strip
   // private final AddressableLEDBufferView m_right; //Right side of the LED strip
+  private final Timer timer = new Timer(); // WPILib Timer
+  private final Random random = new Random();
   private boolean running_AnimatedPattern = false;
   private boolean running_TwinklePattern = false;
+  private double twinklePeriod = 0;
   private Color twinkleBaseColor = null;
+  private List<Integer> twinkleIndexes = new ArrayList<>();
   private LEDPattern animatedPattern;
 
   public LEDSubsystem_WPIlib() {
@@ -59,12 +68,14 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
     running_AnimatedPattern = false;
     running_TwinklePattern = false;
     twinkleBaseColor = null;
+    randomizeList();
+    twinklePeriod = 0;
     animatedPattern = null;
     // setDefaultCommand(LED_Reset().withName("LED_Reset"));
     // setDefaultCommand(runPattern(LEDPattern.solid(Color.kBlack),
     // false).withName("Off"));
 
-    LED_Twinkle(LightsConstants.GRBColors.get("yellow"), LightsConstants.GRBColors.get("team_Gold"), 1);
+    LED_Twinkle(LightsConstants.GRBColors.get("black"), LightsConstants.GRBColors.get("yellow"), 2);
   }
 
   /**
@@ -136,8 +147,23 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
   public void LED_Twinkle(Color baseColor, Color twinkleColor, double period) {
     LEDPattern m_breathingPattern = LEDPattern.solid(twinkleColor).breathe(Seconds.of(period));
     runPattern(m_breathingPattern, true);
+    timer.reset(); // Ensure clean timer state
+    timer.start();
+    twinklePeriod = period;
     twinkleBaseColor = baseColor;
     running_TwinklePattern = true;
+  }
+
+  /**
+   * Stops the twinkle effect by resetting all twinkle-related state.
+  */
+  public void stopTwinkle() {
+    running_TwinklePattern = false;
+    twinkleBaseColor = null;
+    twinklePeriod = 0;
+    twinkleIndexes.clear();
+    timer.stop();
+    timer.reset();
   }
 
   @Override
@@ -148,15 +174,31 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
       animatedPattern.applyTo(m_ledbuffer);
       if (running_TwinklePattern){
         for (int index=0;index<kLength;index++){
-          if (index%4!=0){
+          if (!twinkleIndexes.contains(index)){
             m_ledbuffer.setLED(index, twinkleBaseColor);
           }
+        }
+        if (timer.hasElapsed(twinklePeriod/2)) {
+          randomizeList();
+          // Reset the timer to start counting again
+          timer.reset();
         }
       }
       m_led.setData(m_ledbuffer);
     }
   }
 
+
+  private void randomizeList() {
+    twinkleIndexes.clear();
+    int maxTwinkleLEDs = Math.min(3, kLength);
+    while (twinkleIndexes.size() < maxTwinkleLEDs) {
+        int newNumber = random.nextInt(kLength);
+        if (!twinkleIndexes.contains(newNumber)) {
+            twinkleIndexes.add(newNumber);
+        }
+    }
+  }
   /**
    * A function that runs a pattern on the entire LED strip.
    * It also controls whether the pattern is animated or not
@@ -169,6 +211,7 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
    *           m_rainbow = LEDPattern.rainbow(255, 128);
    */
   public void runPattern(LEDPattern pattern, boolean animated) {
+    stopTwinkle();
     if (animated) {
       animatedPattern = pattern.atBrightness(Percent.of(brightness));
       running_AnimatedPattern = true;
