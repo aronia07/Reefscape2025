@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.util.Color;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Percent;
+import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
 
 import java.util.ArrayList;
@@ -75,7 +76,8 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
     // setDefaultCommand(runPattern(LEDPattern.solid(Color.kBlack),
     // false).withName("Off"));
 
-    LED_Twinkle(LightsConstants.GRBColors.get("black"), LightsConstants.GRBColors.get("yellow"), 2);
+    //LED_Twinkle(LightsConstants.GRBColors.get("black"), LightsConstants.GRBColors.get("yellow"), 2);
+    //LED_ScrollPatternRelative(LEDPattern.rainbow(255, 64), 100);
   }
 
   /**
@@ -103,13 +105,14 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
   }
 
   /**
-   * Scrolling pattern at absolute speed.
+   * Scrolling pattern at relative speed.
    * 
    * @param pattern the LED pattern to run
-   * @param speed   the speed of the pattern scrolling in [m/s]
+   * @param magnitude for frequency calculation [/s]
    */
-  public void LED_ScrollPatternAbsolute(LEDPattern pattern, double speed) {
-    LEDPattern m_scrollingPattern = pattern.scrollAtAbsoluteSpeed(MetersPerSecond.of(speed), kLedSpacing);
+  public void LED_ScrollPatternRelative(LEDPattern pattern, double magnitude) {
+    //LEDPattern m_scrollingPattern = pattern.scrollAtAbsoluteSpeed(MetersPerSecond.of(speed), kLedSpacing);
+    LEDPattern m_scrollingPattern = pattern.scrollAtRelativeSpeed(Percent.per(Second).of(magnitude));
     runPattern(m_scrollingPattern, true);
     //System.out.println("Scroll function executed!!!!!!!!!!!!");
   }
