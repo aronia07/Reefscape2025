@@ -410,12 +410,9 @@ public class RobotContainer {
                 SmartDashboard.putData("autos", m_chooser);
         }
 
-        public void disabledActions() {
-                // new ScrollPattern(wpiLights,
-                // LEDPattern.gradient(LEDPattern.GradientType.kContinuous,
-                // LightsConstants.GRBColors.get("blue"),
-                // LightsConstants.GRBColors.get("magenta")), 0.05);
-                new SetBreathingPattern(wpiLights, LEDPattern.solid(LightsConstants.GBRColors.get("magenta")), 1);
+       public void disabledActions() {
+                // new SetBreathingPattern(wpiLights, LEDPattern.solid(LightsConstants.GBRColors.get("magenta")), 1);
+                new ScrollPattern(wpiLights, LEDPattern.rainbow(255, 64), 100);
                 arm.resetI();
                 arm.runState(new TrapezoidProfile.State(Arm.getEncoderPosition().getRadians(), 0));
                 wrist.runState(new TrapezoidProfile.State(wrist.getEncoderPosition().getRadians(), 0));

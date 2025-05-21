@@ -7,18 +7,18 @@ import edu.wpi.first.wpilibj.LEDPattern;
 public class ScrollPattern extends Command {
     private final LEDSubsystem_WPIlib ledSubsystem;
     private final LEDPattern pattern;
-    private final double speed;
+    private final double magnitude;
 
-    public ScrollPattern(LEDSubsystem_WPIlib subsystem, LEDPattern pattern, double speed) {
+    public ScrollPattern(LEDSubsystem_WPIlib subsystem, LEDPattern pattern, double magnitude) {
         this.ledSubsystem = subsystem;
         this.pattern = pattern;
-        this.speed = speed;
+        this.magnitude = magnitude;
         addRequirements(subsystem);
     }
 
     @Override
     public void initialize() {
-        ledSubsystem.LED_ScrollPatternAbsolute(pattern, speed);
+        ledSubsystem.LED_ScrollPatternRelative(pattern, magnitude);
     }
 
     @Override

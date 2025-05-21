@@ -1,18 +1,22 @@
 package frc.robot.subsystems.Lights;
 
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.LightsConstants;
 
 //LED Imports
 //import edu.wpi.first.units.Units.*;
 import edu.wpi.first.wpilibj.LEDPattern;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 
-import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Percent;
+import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Seconds;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.AddressableLED;
@@ -38,7 +42,13 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
   private final AddressableLEDBuffer m_ledbuffer;
   // private final AddressableLEDBufferView m_left; //Left side of the LED strip
   // private final AddressableLEDBufferView m_right; //Right side of the LED strip
+  private final Timer timer = new Timer(); // WPILib Timer
+  private final Random random = new Random();
   private boolean running_AnimatedPattern = false;
+  private boolean running_TwinklePattern = false;
+  private double twinklePeriod = 0;
+  private Color twinkleBaseColor = null;
+  private List<Integer> twinkleIndexes = new ArrayList<>();
   private LEDPattern animatedPattern;
 
   public LEDSubsystem_WPIlib() {
@@ -57,17 +67,17 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
     // the last command to run will continue to be displayed.
     // Note: Other default patterns could be used instead!
     running_AnimatedPattern = false;
+    running_TwinklePattern = false;
+    twinkleBaseColor = null;
+    randomizeList();
+    twinklePeriod = 0;
     animatedPattern = null;
     // setDefaultCommand(LED_Reset().withName("LED_Reset"));
     // setDefaultCommand(runPattern(LEDPattern.solid(Color.kBlack),
     // false).withName("Off"));
 
-    // LED_SolidColor(LightsConstants.GRBColors.get("magenta"));
-    // LED_Blinking(LEDPattern.solid(LightsConstants.GRBColors.get("magenta")), 1,
-    // 1);
-    // LED_Breathing(LEDPattern.solid(LightsConstants.GRBColors.get("magenta")), 3);
-
-    // System.out.println("Correctly set color!!!!!!!!!!!!!");
+    //LED_Twinkle(LightsConstants.GRBColors.get("black"), LightsConstants.GRBColors.get("yellow"), 2);
+    //LED_ScrollPatternRelative(LEDPattern.rainbow(255, 64), 100);
   }
 
   /**
@@ -95,15 +105,16 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
   }
 
   /**
-   * Scrolling pattern at absolute speed.
+   * Scrolling pattern at relative speed.
    * 
    * @param pattern the LED pattern to run
-   * @param speed   the speed of the pattern scrolling in [m/s]
+   * @param magnitude for frequency calculation [/s]
    */
-  public void LED_ScrollPatternAbsolute(LEDPattern pattern, double speed) {
-    LEDPattern m_scrollingPattern = pattern.scrollAtAbsoluteSpeed(MetersPerSecond.of(speed), kLedSpacing);
+  public void LED_ScrollPatternRelative(LEDPattern pattern, double magnitude) {
+    //LEDPattern m_scrollingPattern = pattern.scrollAtAbsoluteSpeed(MetersPerSecond.of(speed), kLedSpacing);
+    LEDPattern m_scrollingPattern = pattern.scrollAtRelativeSpeed(Percent.per(Second).of(magnitude));
     runPattern(m_scrollingPattern, true);
-    System.out.println("Scroll function executed!!!!!!!!!!!!");
+    //System.out.println("Scroll function executed!!!!!!!!!!!!");
   }
 
   /**
@@ -125,8 +136,37 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
    * @param period  the time of one full cycle in [s]
    */
   public void LED_Breathing(LEDPattern pattern, double period) {
-    LEDPattern m_chasingPattern = pattern.breathe(Seconds.of(period));
-    runPattern(m_chasingPattern, true);
+    LEDPattern m_breathingPattern = pattern.breathe(Seconds.of(period));
+    runPattern(m_breathingPattern, true);
+  }
+
+  /**
+   * Twinkle pattern.
+   * 
+   * @param baseColor the color of static LED's
+   * @param twinkleColor the color of twinkling LED's
+   * @param period the time of one full cycle in [s]
+   */
+  public void LED_Twinkle(Color baseColor, Color twinkleColor, double period) {
+    LEDPattern m_breathingPattern = LEDPattern.solid(twinkleColor).breathe(Seconds.of(period));
+    runPattern(m_breathingPattern, true);
+    timer.reset(); // Ensure clean timer state
+    timer.start();
+    twinklePeriod = period;
+    twinkleBaseColor = baseColor;
+    running_TwinklePattern = true;
+  }
+
+  /**
+   * Stops the twinkle effect by resetting all twinkle-related state.
+  */
+  public void stopTwinkle() {
+    running_TwinklePattern = false;
+    twinkleBaseColor = null;
+    twinklePeriod = 0;
+    twinkleIndexes.clear();
+    timer.stop();
+    timer.reset();
   }
 
   @Override
@@ -135,10 +175,35 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
     // display
     if (running_AnimatedPattern) {
       animatedPattern.applyTo(m_ledbuffer);
+      if (running_TwinklePattern){
+        for (int index=0;index<kLength;index++){
+          if (!twinkleIndexes.contains(index)){
+            m_ledbuffer.setLED(index, twinkleBaseColor);
+          }
+        }
+        if (timer.hasElapsed(twinklePeriod/2)) {
+          randomizeList();
+          // Reset the timer to start counting again
+          timer.reset();
+        }
+      }
       m_led.setData(m_ledbuffer);
     }
   }
 
+  /**
+   * Random assignment of LEDs
+  */
+  private void randomizeList() {
+    twinkleIndexes.clear();
+    int maxTwinkleLEDs = Math.min(3, kLength);
+    while (twinkleIndexes.size() < maxTwinkleLEDs) {
+        int newNumber = random.nextInt(kLength);
+        if (!twinkleIndexes.contains(newNumber)) {
+            twinkleIndexes.add(newNumber);
+        }
+    }
+  }
   /**
    * A function that runs a pattern on the entire LED strip.
    * It also controls whether the pattern is animated or not
@@ -151,6 +216,7 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
    *           m_rainbow = LEDPattern.rainbow(255, 128);
    */
   public void runPattern(LEDPattern pattern, boolean animated) {
+    stopTwinkle();
     if (animated) {
       animatedPattern = pattern.atBrightness(Percent.of(brightness));
       running_AnimatedPattern = true;
