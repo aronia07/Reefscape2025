@@ -38,7 +38,7 @@ public class ElevateLevel extends Command {
         // lastSpeed = 0;
         // lastTime = Timer.getFPGATimestamp();
         elevatorPID = elevator_y.pid;
-        elevatorPID.setTolerance(.3);
+        elevatorPID.setTolerance(.1);
 
         switch (level) {
             case UP:
@@ -117,8 +117,8 @@ public class ElevateLevel extends Command {
 
         // var pidOutput = elevatorPID.calculate(elevator_y.encoderPosition);
 
-        // elevator_y.leftElevatorMotor.set(-pidOutput - ffoutput);
-        // elevator_y.rightElevatorMotor.set(pidOutput + ffoutput);
+        // elevator_y.leftElevatorMotor.set(-pidOutput );
+        // elevator_y.rightElevatorMotor.set(pidOutput );
 
         // lastSpeed = elevatorPID.getSetpoint().velocity;
         // lastTime = Timer.getFPGATimestamp();

@@ -91,17 +91,14 @@
     "Clients": {
       "open": true
     },
-    "visible": true
-  },
-  "NetworkTables Log": {
+    "glass@1": {
+      "open": true
+    },
     "visible": true
   },
   "NetworkTables Settings": {
     "mode": "Client (NT4)",
     "serverTeam": "3161",
-    "visible": false
-  },
-  "NetworkTables View": {
     "visible": false
   },
   "Plots": {

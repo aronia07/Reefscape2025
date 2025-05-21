@@ -89,11 +89,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    // if (m_robotContainer.operator.y().getAsBoolean() ||
-    // m_robotContainer.operator.b().getAsBoolean()) {
-    // m_robotContainer.scoringBindings(m_robotContainer.drivetrain.decideScoringMode());
-
-    // }
+  
   }
 
   @Override

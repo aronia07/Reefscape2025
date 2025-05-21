@@ -26,10 +26,6 @@ public class Elevator extends SubsystemBase {
   private SparkMaxConfig leftConfig = new SparkMaxConfig();
   private SparkMaxConfig rightConfig = new SparkMaxConfig();
 
-  // private PIDController pid = new
-  // PIDController(ElevatorConstants.elevatorPID[0],
-  // ElevatorConstants.elevatorPID[1],
-  // ElevatorConstants.elevatorPID[2]);
   public ProfiledPIDController pid = new ProfiledPIDController(ElevatorConstants.elevatorPID[0],
       ElevatorConstants.elevatorPID[1],
       ElevatorConstants.elevatorPID[2],
@@ -172,10 +168,6 @@ public class Elevator extends SubsystemBase {
     // }
   }
 
-  // public boolean isDone() {
-  // return isLeftDone && isRightDone;
-  // }
-
   public States outOfBounds(double encoderValue) {
     if (encoderValue <= ElevatorConstants.min) {
       return States.BADBADBAD;
@@ -190,14 +182,6 @@ public class Elevator extends SubsystemBase {
     } else {
       return States.BADBADBAD;
     }
-  }
-
-  // public States isRightOutOfBounds() {
-  // return outOfBounds(-encoderLeft.getPosition());
-  // }
-
-  public States isLeftOutOfBounds() {
-    return outOfBounds(encoderLeft.getPosition());
   }
 
   public boolean atGoal() {

@@ -77,13 +77,13 @@ public final class Constants {
                 "black", new Color(0, 0, 0),
                 "white", new Color(255, 255, 255),
                 "red", new Color(0, 255, 0),
-                "green", new Color(255, 0, 0),
-                "blue", new Color(0, 0, 255),
-                "team_Gold", new Color(134, 179, 27),
+                "green", new Color(100, 0, 0),
+                "blue", new Color(0, 0, 100),
+                "team_Gold", new Color(126, 235, 44),
                 "yellow", new Color(255, 255, 0),
                 "orange", new Color(165, 255, 0),
                 "pink", new Color(20, 255, 147),
-                "magenta", new Color(0, 255, 255));
+                "magenta", new Color(0, 100, 100));
 
         // GBR Color Map
         public static Map<String, Color> GBRColors = Map.of(
