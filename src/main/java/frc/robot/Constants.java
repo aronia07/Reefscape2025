@@ -155,9 +155,9 @@ public final class Constants {
         public static int maxAccel = 0;
         public static double[] wristFF = { 0, 0, 0 };
         public static double wristGearRatio = 0;
-        public static Rotation2d wristOffset = new Rotation2d(Units.degreesToRadians(-27.982976)); // -59.7-18.8
-        public static final Rotation2d maxVelocityPerSecond = Rotation2d.fromDegrees(600); // was 460
-        public static final Rotation2d maxAcceleration = Rotation2d.fromDegrees(900);
+        public static Rotation2d wristOffset = new Rotation2d(Units.degreesToRadians(-59.526573)); // -59.7-18.8
+        public static final Rotation2d maxVelocityPerSecond = Rotation2d.fromDegrees(600); // was 600
+        public static final Rotation2d maxAcceleration = Rotation2d.fromDegrees(900); // was 900
 
         public static final Rotation2d wristMax = Rotation2d.fromDegrees(86);
         public static final Rotation2d wristOldMin = Rotation2d.fromDegrees(-95);
@@ -188,7 +188,7 @@ public final class Constants {
         public static double[] elevatorPID = new double[] { 0.085, 0, 0 }; // p is a little aggressive
         public static double[] elevatorSGV = new double[] { 0, 0, 0, 0 }; // g needs testing
         public static double maxVelocity = 150; // in mps was 150
-        public static double maxAccel = 175; // in mps/s was 150
+        public static double maxAccel = 175; // in mps/s was 175
         public static double elevatorTolerance = .3;
 
         public static enum ElevateMode {
@@ -237,8 +237,8 @@ public final class Constants {
         public static final Rotation2d tolernace = Rotation2d.fromDegrees(1); // How much the arm's exact angle can be
                                                                               // off by
 
-        public static final Rotation2d maxVelocityPerSecond = Rotation2d.fromDegrees(250); // was 400
-        public static final Rotation2d maxAcceleration = Rotation2d.fromDegrees(250); // was 400
+        public static final Rotation2d maxVelocityPerSecond = Rotation2d.fromDegrees(250); // was 250
+        public static final Rotation2d maxAcceleration = Rotation2d.fromDegrees(250); // was 250
 
         public static double[] armSGV = new double[] { 0.0, 0.001, 0.0 }; // Static, Gravity, and Velocity gains
         public static double[] armPID = new double[] { 1.47, 0, 0f }; // Arm PID values

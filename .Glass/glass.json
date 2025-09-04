@@ -18,6 +18,9 @@
         }
       },
       "Pose": {
+        "double[]##v_/Pose/robotPose": {
+          "open": true
+        },
         "open": true
       },
       "SmartDashboard": {
@@ -28,10 +31,14 @@
       }
     },
     "types": {
+      "/AdvantageKit/RealOutputs/Alerts": "Alerts",
+      "/AdvantageKit/RealOutputs/PathPlanner": "Alerts",
       "/FMSInfo": "FMSInfo",
       "/Pose": "Field2d",
+      "/SmartDashboard/Alerts": "Alerts",
       "/SmartDashboard/Arm down": "Command",
       "/SmartDashboard/Arm up": "Command",
+      "/SmartDashboard/Auto Choices": "String Chooser",
       "/SmartDashboard/Elevate": "Command",
       "/SmartDashboard/Elevator test": "Command",
       "/SmartDashboard/Field": "Field2d",
@@ -41,6 +48,7 @@
       "/SmartDashboard/Module 2": "Mechanism2d",
       "/SmartDashboard/Module 3": "Mechanism2d",
       "/SmartDashboard/PathPlanner": "Alerts",
+      "/SmartDashboard/PhotonAlerts": "Alerts",
       "/SmartDashboard/Vision field": "Field2d",
       "/SmartDashboard/Wrist Down": "Command",
       "/SmartDashboard/Wrist Neuteral": "Command",
@@ -48,6 +56,11 @@
       "/SmartDashboard/autos": "String Chooser"
     },
     "windows": {
+      "/SmartDashboard/Auto Choices": {
+        "window": {
+          "visible": true
+        }
+      },
       "/SmartDashboard/Field": {
         "bottom": 1638,
         "builtin": "2025 Reefscape",
@@ -76,11 +89,6 @@
         "right": 3466,
         "top": 291,
         "width": 17.54825210571289,
-        "window": {
-          "visible": true
-        }
-      },
-      "/SmartDashboard/autos": {
         "window": {
           "visible": true
         }

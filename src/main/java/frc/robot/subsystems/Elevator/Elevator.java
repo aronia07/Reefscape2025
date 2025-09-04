@@ -204,7 +204,7 @@ public class Elevator extends SubsystemBase {
     // values around 0
     // }
     var leftpidOutput = pid.calculate(encoderPosition, this.elevatorSetpoint);
-
+    
     leftElevatorMotor.set(-leftpidOutput);
     rightElevatorMotor.set(leftpidOutput);
 

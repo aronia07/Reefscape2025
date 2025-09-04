@@ -133,15 +133,15 @@ public class RobotContainer {
                 // drive with joysticks
                 drivetrain.setDefaultCommand(
                                 // Drivetrain will execute this command periodically
-                                drivetrain.applyRequest(() -> drive.withVelocityX(-driver.getLeftY() * MaxSpeed) // Drive
+                                drivetrain.applyRequest(() -> drive.withVelocityX(-driver.getLeftY() * MaxSpeed *.5) // Drive
                                                                                                                  // forward
                                                                                                                  // with
                                                                                                                  // negative
                                                                                                                  // Y
                                                                                                                  // (forward)
-                                                .withVelocityY(-driver.getLeftX() * MaxSpeed) // Drive left with
+                                                .withVelocityY(-driver.getLeftX() * MaxSpeed*.5) // Drive left with
                                                                                               // negative X (left)
-                                                .withRotationalRate(-driver.getRightX() * MaxAngularRate) // Drive
+                                                .withRotationalRate(-driver.getRightX() * MaxAngularRate*.5) // Drive
                                                                                                           // counterclockwise
                                                                                                           // with
                                                                                                           // negative X
@@ -170,8 +170,8 @@ public class RobotContainer {
                 driver.leftBumper().whileTrue(new SequentialCommandGroup(
                                 new ToAngle(() -> Arm.getEncoderPosition().getRadians(), arm),
                                 new ParallelCommandGroup(
-                                                new ToWristAngle(() -> Units.degreesToRadians(60), wrist),
-                                                new ToAngle(() -> Units.degreesToRadians(1.8), arm),
+                                                new ToWristAngle(() -> Units.degreesToRadians(60), wrist), //used to be 60
+                                                new ToAngle(() -> Units.degreesToRadians(1.8), arm), //used to be 1.8
                                                 // new IntakeIn(intake),
                                                 new ElevateLevel(elevator, ElevateMode.L2))
                                                 .finallyDo(this::intakeIdle)));
@@ -180,7 +180,7 @@ public class RobotContainer {
                                 new ToAngle(() -> Arm.getEncoderPosition().getRadians(), arm),
                                 new ParallelCommandGroup(
                                                 new ToWristAngle(() -> Units.degreesToRadians(34), wrist),
-                                                new ToAngle(() -> Units.degreesToRadians(-7), arm),
+                                                new ToAngle(() -> Units.degreesToRadians(-6), arm),
                                                 new IntakeIn(intake),
                                                 new ElevateLevel(elevator, ElevateMode.HP))
                                                 .finallyDo(this::intakeIdle)));
@@ -348,7 +348,7 @@ public class RobotContainer {
                 // d-pad
                 operator.povDown().whileTrue(new ClimbDown(climber, () -> 1));
                 operator.povUp().whileTrue(new Climb(climber, () -> 1));
-                operator.povLeft().whileTrue(new IntakeOut(intake));
+                operator.povLeft().whileTrue(new IntakeIn(intake)); //should be intake out
                 operator.leftTrigger().whileTrue(new SequentialCommandGroup(
                                 new ParallelCommandGroup(
                                                 new ToAngle(() -> Units.degreesToRadians(78), arm), // 75
@@ -412,6 +412,8 @@ public class RobotContainer {
 
        public void disabledActions() {
                 // new SetBreathingPattern(wpiLights, LEDPattern.solid(LightsConstants.GBRColors.get("magenta")), 1);
+                // beamBroken.onTrue(new SetSolidColor(wpiLights, LightsConstants.GRBColors.get("green")));
+                // beamBroken.onFalse(new SetSolidColor(wpiLights, LightsConstants.GRBColors.get("blue")));
                 new ScrollPattern(wpiLights, LEDPattern.rainbow(255, 64), 100);
                 arm.resetI();
                 arm.runState(new TrapezoidProfile.State(Arm.getEncoderPosition().getRadians(), 0));

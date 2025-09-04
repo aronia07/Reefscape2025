@@ -173,6 +173,7 @@ public class LEDSubsystem_WPIlib extends SubsystemBase {
   public void periodic() {
     // Periodically send the latest LED color data to the LED strip for it to
     // display
+
     if (running_AnimatedPattern) {
       animatedPattern.applyTo(m_ledbuffer);
       if (running_TwinklePattern){
