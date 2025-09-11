@@ -155,7 +155,7 @@ public final class Constants {
         public static int maxAccel = 0;
         public static double[] wristFF = { 0, 0, 0 };
         public static double wristGearRatio = 0;
-        public static Rotation2d wristOffset = new Rotation2d(Units.degreesToRadians(-59.526573)); // -59.7-18.8
+        public static Rotation2d wristOffset = new Rotation2d(Units.degreesToRadians(-59.526573 + 2.440350)); // -59.7-18.8
         public static final Rotation2d maxVelocityPerSecond = Rotation2d.fromDegrees(600); // was 600
         public static final Rotation2d maxAcceleration = Rotation2d.fromDegrees(900); // was 900
 
