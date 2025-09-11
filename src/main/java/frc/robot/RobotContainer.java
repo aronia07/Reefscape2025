@@ -175,15 +175,25 @@ public class RobotContainer {
                                                 // new IntakeIn(intake),
                                                 new ElevateLevel(elevator, ElevateMode.L2))
                                                 .finallyDo(this::intakeIdle)));
+                
+                
+                driver.rightBumper().onTrue(new SequentialCommandGroup(
+                        new ToAngle(() -> Arm.getEncoderPosition().getRadians(), arm),
+                        new ParallelCommandGroup(
+                                        new ToWristAngle(() -> Units.degreesToRadians(60), wrist), //used to be 60
+                                        new ToAngle(() -> Units.degreesToRadians(1.8), arm), //used to be 1.8
+                                        // new IntakeIn(intake),
+                                        new ElevateLevel(elevator, ElevateMode.L2))));
+                driver.rightBumper().onFalse(getIntakeIdleSeq());
 
-                driver.rightBumper().whileTrue(new SequentialCommandGroup(
-                                new ToAngle(() -> Arm.getEncoderPosition().getRadians(), arm),
-                                new ParallelCommandGroup(
-                                                new ToWristAngle(() -> Units.degreesToRadians(34), wrist),
-                                                new ToAngle(() -> Units.degreesToRadians(-6), arm),
-                                                new IntakeIn(intake),
-                                                new ElevateLevel(elevator, ElevateMode.HP))
-                                                .finallyDo(this::intakeIdle)));
+                // driver.rightBumper().whileTrue(new SequentialCommandGroup(
+                //                 new ToAngle(() -> Arm.getEncoderPosition().getRadians(), arm),
+                //                 new ParallelCommandGroup(
+                //                                 new ToWristAngle(() -> Units.degreesToRadians(34), wrist),
+                //                                 new ToAngle(() -> Units.degreesToRadians(-6), arm),
+                //                                 new IntakeIn(intake),
+                //                                 new ElevateLevel(elevator, ElevateMode.HP))
+                //                                 .finallyDo(this::intakeIdle)));
 
                 // 9659 inspired align
                 driver.leftTrigger().whileTrue(
