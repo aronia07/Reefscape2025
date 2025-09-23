@@ -166,23 +166,22 @@ public class RobotContainer {
                 // reset the field-centric heading on left bumper press
                 driver.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-                // HP Pickup
-                driver.leftBumper().whileTrue(new SequentialCommandGroup(
-                                new ToAngle(() -> Arm.getEncoderPosition().getRadians(), arm),
-                                new ParallelCommandGroup(
-                                                new ToWristAngle(() -> Units.degreesToRadians(60), wrist), //used to be 60
-                                                new ToAngle(() -> Units.degreesToRadians(1.8), arm), //used to be 1.8
-                                                // new IntakeIn(intake),
-                                                new ElevateLevel(elevator, ElevateMode.L2))
-                                                .finallyDo(this::intakeIdle)));
-                
+                // // HP Pickup
+                // driver.leftBumper().whileTrue(new SequentialCommandGroup(
+                //                 new ToAngle(() -> Arm.getEncoderPosition().getRadians(), arm),
+                //                 new ParallelCommandGroup(
+                //                                 new ToWristAngle(() -> Units.degreesToRadians(60), wrist),
+                //                                 new ToAngle(() -> Units.degreesToRadians(1.8), arm), 
+                //                                 // new IntakeIn(intake),
+                //                                 new ElevateLevel(elevator, ElevateMode.L2))));
+                // driver.leftBumper().onFalse(getIntakeIdleSeq());                
                 
                 driver.rightBumper().onTrue(new SequentialCommandGroup(
                         new ToAngle(() -> Arm.getEncoderPosition().getRadians(), arm),
                         new ParallelCommandGroup(
-                                        new ToWristAngle(() -> Units.degreesToRadians(60), wrist), //used to be 60
-                                        new ToAngle(() -> Units.degreesToRadians(1.8), arm), //used to be 1.8
-                                        // new IntakeIn(intake),
+                                        new ToWristAngle(() -> Units.degreesToRadians(34), wrist),
+                                        new ToAngle(() -> Units.degreesToRadians(-7), arm), 
+                                        new IntakeIn(intake),
                                         new ElevateLevel(elevator, ElevateMode.L2))));
                 driver.rightBumper().onFalse(getIntakeIdleSeq());
 
@@ -249,8 +248,8 @@ public class RobotContainer {
                                                                 new ToAngle(() -> Units.degreesToRadians(82), arm),
                                                                 new ToWristAngle(() -> Units.degreesToRadians(-88),
                                                                                 wrist)),
-                                                new ElevateLevel(elevator, ElevateMode.L4))
-                                                .finallyDo(this::idle));
+                                                new ElevateLevel(elevator, ElevateMode.L4)));
+                operator.y().onFalse(getIdleCommands());
                 // L3
                 operator.b().and(() -> drivetrain.decideScoringMode() == ScoringMode.NORMAL)
                                 .whileTrue(new SequentialCommandGroup(
@@ -259,24 +258,24 @@ public class RobotContainer {
                                                                 new ToWristAngle(() -> Units.degreesToRadians(-80),
                                                                                 wrist),
                                                                 new ToAngle(() -> Units.degreesToRadians(77), arm)),
-                                                new ElevateLevel(elevator, ElevateMode.L3))
-                                                .finallyDo(this::idle));
+                                                new ElevateLevel(elevator, ElevateMode.L3)));
+                operator.b().onFalse(getIdleCommands());
                 // L2
                 operator.a().whileTrue(new SequentialCommandGroup(
                                 new ToAngle(() -> Arm.getEncoderPosition().getRadians(), arm),
                                 new ParallelCommandGroup(
                                                 new ToAngle(() -> Units.degreesToRadians(45), arm),
                                                 new ToWristAngle(() -> Units.degreesToRadians(-40), wrist)),
-                                new ElevateLevel(elevator, ElevateMode.L2))
-                                .finallyDo(this::idle));
+                                new ElevateLevel(elevator, ElevateMode.L2)));
+                operator.a().onFalse(getIdleCommands());
                 // L1
                 operator.x().whileTrue(new SequentialCommandGroup(
                                 new ToAngle(() -> Arm.getEncoderPosition().getRadians(), arm),
                                 new ParallelCommandGroup(
                                                 new ToAngle(() -> Units.degreesToRadians(20), arm),
                                                 new ToWristAngle(() -> Units.degreesToRadians(-3), wrist)),
-                                new ElevateLevel(elevator, ElevateMode.L1))
-                                .finallyDo(this::idle));
+                                new ElevateLevel(elevator, ElevateMode.L1)));
+                operator.x().onFalse(getIdleCommands());
 
                 // } else {
                 // L4
@@ -286,8 +285,7 @@ public class RobotContainer {
                                                                 new ToAngle(() -> Units.degreesToRadians(77), arm),
                                                                 new ToWristAngle(() -> Units.degreesToRadians(3),
                                                                                 wrist)),
-                                                new ElevateLevel(elevator, ElevateMode.L4))
-                                                .finallyDo(this::idle));
+                                                new ElevateLevel(elevator, ElevateMode.L4)));
                 // L3
                 operator.b().and(() -> drivetrain.decideScoringMode() == ScoringMode.MODIFIED)
                                 .whileTrue(new SequentialCommandGroup(
@@ -296,8 +294,7 @@ public class RobotContainer {
                                                                 new ToWristAngle(() -> Units.degreesToRadians(-58),
                                                                                 wrist),
                                                                 new ToAngle(() -> Units.degreesToRadians(55), arm)),
-                                                new ElevateLevel(elevator, ElevateMode.L3M))
-                                                .finallyDo(this::idle));
+                                                new ElevateLevel(elevator, ElevateMode.L3M)));
 
                 // L3 Algae Removal dunk
                 driver.b().and(() -> drivetrain.decideScoringMode() == ScoringMode.NORMAL)
@@ -307,7 +304,7 @@ public class RobotContainer {
                                                                 new ToWristAngle(() -> Units.degreesToRadians(-53),
                                                                                 wrist),
                                                                 new ToAngle(() -> Units.degreesToRadians(87), arm)),
-                                                new ElevateLevel(elevator, ElevateMode.L3AR)).finallyDo(this::idle));
+                                                new ElevateLevel(elevator, ElevateMode.L3AR)));
 
                 // L2 Algae Removal dunk
                 driver.a().and(() -> drivetrain.decideScoringMode() == ScoringMode.NORMAL)
@@ -317,8 +314,7 @@ public class RobotContainer {
                                                                 new ToWristAngle(() -> Units.degreesToRadians(-76),
                                                                                 wrist),
                                                                 new ToAngle(() -> Units.degreesToRadians(88.67), arm)),
-                                                new ElevateLevel(elevator, ElevateMode.L2AR))
-                                                .finallyDo(this::idle));
+                                                new ElevateLevel(elevator, ElevateMode.L2AR)));
 
                 // L3 Algae Removal reach
                 driver.b().and(() -> drivetrain.decideScoringMode() == ScoringMode.MODIFIED)
@@ -328,7 +324,7 @@ public class RobotContainer {
                                                                 new ToWristAngle(() -> Units.degreesToRadians(44.5),
                                                                                 wrist),
                                                                 new ToAngle(() -> Units.degreesToRadians(65), arm)),
-                                                new ElevateLevel(elevator, ElevateMode.L3R)).finallyDo(this::idle));
+                                                new ElevateLevel(elevator, ElevateMode.L3R)));
                 // l3 algae align
                 driver.b().and(() -> drivetrain.decideScoringMode() == ScoringMode.MODIFIED)
                                 .whileTrue(drivetrain.defer(
@@ -336,6 +332,7 @@ public class RobotContainer {
                                                                 .getCenterReefPose(), drivetrain))
                                                 .until(() -> drivetrain.getState().Pose == drivetrain
                                                                 .getCenterReefPose()));
+                driver.b().onFalse(getIdleCommands());
                 // L3 algae align forward
                 driver.b().and(() -> drivetrain.decideScoringMode() == ScoringMode.NORMAL).whileTrue(
                                 drivetrain.defer(() -> DriveToLocation.driveTo(drivetrain.getCenterReefPose(),
@@ -349,8 +346,8 @@ public class RobotContainer {
                                                                 new ToWristAngle(() -> Units.degreesToRadians(-3),
                                                                                 wrist),
                                                                 new ToAngle(() -> Units.degreesToRadians(25), arm)),
-                                                new ElevateLevel(elevator, ElevateMode.L2AR))
-                                                .finallyDo(this::idle));
+                                                new ElevateLevel(elevator, ElevateMode.L2AR)));
+                driver.a().onFalse(getIdleCommands());
 
                 operator.start().onTrue(new ElevatorReset(elevator));
                 beamBroken.onTrue(new SetSolidColor(wpiLights, LightsConstants.GRBColors.get("green")));
@@ -359,24 +356,14 @@ public class RobotContainer {
                 operator.povDown().whileTrue(new ClimbDown(climber, () -> 1));
                 operator.povUp().whileTrue(new Climb(climber, () -> 1));
                 operator.povLeft().whileTrue(new IntakeIn(intake)); //should be intake out
+                //barge
                 operator.leftTrigger().whileTrue(new SequentialCommandGroup(
                                 new ParallelCommandGroup(
                                                 new ToAngle(() -> Units.degreesToRadians(78), arm), // 75
                                                 new ToWristAngle(() -> Units.degreesToRadians(32), wrist)), // 36.5
                                 new ElevateLevel(elevator, ElevateMode.L4).withTimeout(0.7),
-                                new IntakeOut(intake).withTimeout(0.5)).finallyDo(this::idle));
-                // operator.leftTrigger().whileTrue(
-                // new SequentialCommandGroup(
-                // new ParallelCommandGroup(
-                // new ToWristAngle(() -> Units.degreesToRadians(-53),
-                // wrist),
-                // new ToAngle(() -> Units.degreesToRadians(87), arm)),
-                // new ElevateLevel(elevator, ElevateMode.L3AR)).finallyDo(this::idle));
-
-                // operator.leftTrigger().whileTrue(new ParallelCommandGroup(
-                // new ToWristAngle(() -> 21.5, wrist),
-                // new ToAngle(() -> 2.5, arm),
-                // new ElevateLevel(elevator, ElevateMode.HP)));
+                                new IntakeOut(intake).withTimeout(0.5)));
+                operator.leftTrigger().onFalse(getIdleCommands());
 
         }
 
