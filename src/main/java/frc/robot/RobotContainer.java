@@ -46,6 +46,7 @@ import frc.robot.commands.Drive.DriveToLocation;
 import frc.robot.commands.Elevator.ElevateLevel;
 import frc.robot.commands.Elevator.ElevateManual;
 import frc.robot.commands.Elevator.ElevatorReset;
+import frc.robot.commands.Intake.IntakeCommand;
 import frc.robot.commands.Intake.IntakeIn;
 //import frc.robot.commands.Intake.IntakeNotifier;
 import frc.robot.commands.Wrist.ToWristAngle;
@@ -64,6 +65,7 @@ import frc.robot.subsystems.Drive.TunerConstants;
 import frc.robot.subsystems.Drive.Vision;
 import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.Intake.Intake;
+import frc.robot.subsystems.Intake.Intake.WantedMode;
 import frc.robot.subsystems.Lights.LEDSubsystem_WPIlib;
 import frc.robot.subsystems.Wrist.Wrist;
 import frc.robot.subsystems.Arm.Arm;
@@ -108,15 +110,22 @@ public class RobotContainer {
 
         public final CommandXboxController driver = new CommandXboxController(0);
         public final CommandXboxController operator = new CommandXboxController(1);
+        public final CommandXboxController controller = new CommandXboxController(2);
+
 
         public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
         public final Trigger beamBroken = new Trigger(() -> intake.hasCoral());
+        public final Trigger beamNotBroken = new Trigger(() -> !intake.hasCoral());
         public final Trigger modified = new Trigger(() -> drivetrain.decideScoringMode() == ScoringMode.MODIFIED);
         public final Trigger normal = new Trigger(() -> drivetrain.decideScoringMode() == ScoringMode.NORMAL);
 
         public void idle() {
                 getIdleCommands().schedule();
+        }
+
+        public void TESTidle() {
+                getTestIdleCommands().schedule();
         }
 
         public void intakeIdle() {
@@ -131,22 +140,22 @@ public class RobotContainer {
 
                 /* DRIVER CONTROLS */
                 // drive with joysticks
-                drivetrain.setDefaultCommand(
-                                // Drivetrain will execute this command periodically
-                                drivetrain.applyRequest(() -> drive.withVelocityX(-driver.getLeftY() * MaxSpeed *.5) // Drive
-                                                                                                                 // forward
-                                                                                                                 // with
-                                                                                                                 // negative
-                                                                                                                 // Y
-                                                                                                                 // (forward)
-                                                .withVelocityY(-driver.getLeftX() * MaxSpeed*.5) // Drive left with
-                                                                                              // negative X (left)
-                                                .withRotationalRate(-driver.getRightX() * MaxAngularRate*.5) // Drive
-                                                                                                          // counterclockwise
-                                                                                                          // with
-                                                                                                          // negative X
-                                                                                                          // (left)
-                                ));
+                // drivetrain.setDefaultCommand(
+                // //                 // Drivetrain will execute this command periodically
+                //                 drivetrain.applyRequest(() -> drive.withVelocityX(-driver.getLeftY() * MaxSpeed) // Drive
+                //                                                                                                  // forward
+                //                                                                                                  // with
+                //                                                                                                  // negative
+                //                                                                                                  // Y
+                //                                                                                                  // (forward)
+                //                                 .withVelocityY(-driver.getLeftX() * MaxSpeed) // Drive left with
+                //                                                                               // negative X (left)
+                //                                 .withRotationalRate(-driver.getRightX() * MaxAngularRate) // Drive
+                //                                                                                           // counterclockwise
+                //                                                                                           // with
+                //                                                                                           // negative X
+                //                                                                                           // (left)
+                //                 ));
                 // buttons
                 // driver.a().whileTrue(drivetrain.applyRequest(() -> brake));
                 // driver.b().whileTrue(drivetrain
@@ -181,7 +190,7 @@ public class RobotContainer {
                         new ParallelCommandGroup(
                                         new ToWristAngle(() -> Units.degreesToRadians(34), wrist),
                                         new ToAngle(() -> Units.degreesToRadians(-7), arm), 
-                                        new IntakeIn(intake),
+                                        new IntakeCommand(intake, WantedMode.INTAKE_CORAL),
                                         new ElevateLevel(elevator, ElevateMode.L2))));
                 driver.rightBumper().onFalse(getIntakeIdleSeq());
 
@@ -211,30 +220,40 @@ public class RobotContainer {
                 // operator.rightBumper().whileTrue(new IntakeOut(intake));
                 operator.leftBumper().whileTrue(new IntakeOut2(intake));
                 // modified outtake
-                operator.rightBumper().and(operator.x()).whileTrue(
-                                new IntakeOutL1(intake));
+                operator.rightBumper().and(()-> drivetrain.decideScoringMode() == ScoringMode.MODIFIED).and(() -> (operator.x().getAsBoolean() == false)).whileTrue(
+                        new IntakeCommand(intake, WantedMode.SCORE_CORAL_BATTERYSIDE));
 
-                operator.rightBumper().and(operator.b())
-                                .and(() -> drivetrain.decideScoringMode() == ScoringMode.MODIFIED).whileTrue(
-                                                new IntakeOut(intake));
+                operator.rightBumper().and(() -> drivetrain.decideScoringMode() == ScoringMode.MODIFIED).and(operator.x()).whileTrue(
+                        new IntakeCommand(intake, WantedMode.SCORE_CORAL_L1));
 
-                operator.rightBumper().and(operator.y())
-                                .and(() -> drivetrain.decideScoringMode() == ScoringMode.MODIFIED)
-                                .whileTrue(new IntakeOut(intake));
+                operator.rightBumper().and(() -> drivetrain.decideScoringMode() == ScoringMode.NORMAL).and(() -> (operator.x().getAsBoolean() == false)).whileTrue(
+                        new IntakeCommand(intake, WantedMode.SCORE_CORAL_PIVOTSIDE));
 
-                operator.rightBumper().and(operator.a()).whileTrue(new IntakeOutVar(intake, () -> -0.2));
+                operator.rightBumper().onFalse(new IntakeCommand(intake, WantedMode.IDLE));
+                // operator.rightBumper().and(operator.x()).whileTrue(
+                //                 new IntakeOutL1(intake));
 
-                operator.rightBumper().and(() -> drivetrain.decideScoringMode() == ScoringMode.NORMAL).and(operator.b())
-                                .whileTrue(new IntakeOut2(intake));
+                // operator.rightBumper().and(operator.b())
+                //                 .and(() -> drivetrain.decideScoringMode() == ScoringMode.MODIFIED).whileTrue(
+                //                                 new IntakeOut(intake));
 
-                operator.rightBumper().and(() -> drivetrain.decideScoringMode() == ScoringMode.NORMAL).and(operator.y())
-                                .whileTrue(new IntakeOutVar(intake, () -> 0.7));
+                // operator.rightBumper().and(operator.y())
+                //                 .and(() -> drivetrain.decideScoringMode() == ScoringMode.MODIFIED)
+                //                 .whileTrue(new IntakeOut(intake));
 
-                operator.rightBumper().and(operator.b()).and(operator.rightTrigger()).whileTrue(
-                                new IntakeOut2(intake));
+                // operator.rightBumper().and(operator.a()).whileTrue(new IntakeOutVar(intake, () -> -0.2));
 
-                operator.rightBumper().and(operator.a()).and(operator.rightTrigger()).whileTrue(
-                                new IntakeOut2(intake));
+                // operator.rightBumper().and(() -> drivetrain.decideScoringMode() == ScoringMode.NORMAL).and(operator.b())
+                //                 .whileTrue(new IntakeOut2(intake));
+
+                // operator.rightBumper().and(() -> drivetrain.decideScoringMode() == ScoringMode.NORMAL).and(operator.y())
+                //                 .whileTrue(new IntakeOutVar(intake, () -> 0.7));
+
+                // operator.rightBumper().and(operator.b()).and(operator.rightTrigger()).whileTrue(
+                //                 new IntakeOut2(intake));
+
+                // operator.rightBumper().and(operator.a()).and(operator.rightTrigger()).whileTrue(
+                //                 new IntakeOut2(intake));
 
                 // operator.x().onTrue(new SetSolidColor(wpiLights, Color.kMagenta));
 
@@ -365,6 +384,124 @@ public class RobotContainer {
                                 new IntakeOut(intake).withTimeout(0.5)));
                 operator.leftTrigger().onFalse(getIdleCommands());
 
+/* OFFSEASON CODE TESTING GROUND */ ////////////////////////////////////////////////////////////////////
+        // //Combined controllers test
+        drivetrain.setDefaultCommand(
+                // Drivetrain will execute this command periodically
+                drivetrain.applyRequest(() -> drive.withVelocityX(-controller.getLeftY() * MaxSpeed) 
+                                .withVelocityY(-controller.getLeftX() * MaxSpeed)
+                                .withRotationalRate(-controller.getRightX() * MaxAngularRate)));
+        // /*intaking coral*/
+        controller.rightBumper().whileTrue(new SequentialCommandGroup(
+                        new ToAngle(() -> Arm.getEncoderPosition().getRadians(), arm),
+                        new ParallelCommandGroup(
+                                        new ToWristAngle(() -> Units.degreesToRadians(34), wrist),
+                                        new ToAngle(() -> Units.degreesToRadians(-7), arm), 
+                                        new IntakeCommand(intake, WantedMode.INTAKE_CORAL),
+                                        new ElevateLevel(elevator, ElevateMode.L2))));
+        
+        // /*handling algae*/
+        // operator.povDown().whileTrue(new IntakeCommand(intake, WantedMode.INTAKE_ALGAE));
+        // operator.povDown().onFalse(getTestIdleCommands());
+        // operator.povUp().whileTrue(new IntakeCommand(intake, WantedMode.SCORE_ALGAE));
+        // operator.povUp().whileTrue(getTestIdleCommands());
+
+        // /* SCORING */
+        //scoring coral
+        controller.leftBumper().and(()-> drivetrain.decideScoringMode() == ScoringMode.MODIFIED).and(() -> (controller.x().getAsBoolean() == false)).whileTrue(
+                new IntakeCommand(intake, WantedMode.SCORE_CORAL_BATTERYSIDE));
+
+        controller.leftBumper().and(() -> drivetrain.decideScoringMode() == ScoringMode.MODIFIED).and(controller.x()).whileTrue(
+                new IntakeCommand(intake, WantedMode.SCORE_CORAL_L1));
+
+        controller.leftBumper().and(() -> drivetrain.decideScoringMode() == ScoringMode.NORMAL).and(() -> (controller.x().getAsBoolean() == false)).whileTrue(
+                new IntakeCommand(intake, WantedMode.SCORE_CORAL_PIVOTSIDE));
+        //L4 Coral pivot side
+        controller.y().and(() -> drivetrain.decideScoringMode() == ScoringMode.NORMAL).and(beamBroken)
+                .whileTrue(new SequentialCommandGroup(
+                        new ToAngle(() -> Arm.getEncoderPosition().getRadians(), arm),
+                        new ParallelCommandGroup(
+                                new ToAngle(() -> Units.degreesToRadians(82), arm),
+                                new ToWristAngle(() -> Units.degreesToRadians(-88), wrist)),
+                        new ElevateLevel(elevator, ElevateMode.L4)));
+        //L4 Coral battery side
+        controller.y().and(() -> drivetrain.decideScoringMode() == ScoringMode.MODIFIED).and(beamBroken)
+                .whileTrue(new SequentialCommandGroup(
+                                new ParallelCommandGroup(
+                                        new ToAngle(() -> Units.degreesToRadians(77), arm),
+                                        new ToWristAngle(() -> Units.degreesToRadians(3), wrist)),
+                                new ElevateLevel(elevator, ElevateMode.L4)));
+        //L3 Coral pivot side
+        controller.b().and(() -> drivetrain.decideScoringMode() == ScoringMode.MODIFIED).and(beamBroken)
+                .whileTrue(new SequentialCommandGroup(
+                                new ToAngle(() -> Arm.getEncoderPosition().getRadians(), arm),
+                                new ParallelCommandGroup(
+                                        new ToWristAngle(() -> Units.degreesToRadians(-58), wrist),
+                                        new ToAngle(() -> Units.degreesToRadians(55), arm)),
+                                new ElevateLevel(elevator, ElevateMode.L3M)));
+        //L3 Algae removal pivot side
+        controller.b().and(() -> drivetrain.decideScoringMode() == ScoringMode.NORMAL).and(beamNotBroken)
+                .whileTrue(new SequentialCommandGroup(
+                                new ToAngle(() -> Arm.getEncoderPosition().getRadians(), arm),
+                                new ParallelCommandGroup(
+                                        new ToWristAngle(() -> Units.degreesToRadians(-53), wrist),
+                                        new ToAngle(() -> Units.degreesToRadians(87), arm)),
+                                new ElevateLevel(elevator, ElevateMode.L3AR)));
+        //L3 Coral battery side
+        controller.b().and(() -> drivetrain.decideScoringMode() == ScoringMode.NORMAL).and(beamBroken)
+                .whileTrue(new SequentialCommandGroup(
+                        new ToAngle(() -> Arm.getEncoderPosition().getRadians(), arm),
+                        new ParallelCommandGroup(
+                                new ToWristAngle(() -> Units.degreesToRadians(-80), wrist),
+                                new ToAngle(() -> Units.degreesToRadians(77), arm)),
+                        new ElevateLevel(elevator, ElevateMode.L3)));
+        //L3 Algae removal battery side
+        controller.b().and(() -> drivetrain.decideScoringMode() == ScoringMode.MODIFIED).and(beamNotBroken)
+                .whileTrue(new SequentialCommandGroup(
+                                new ToAngle(() -> Arm.getEncoderPosition().getRadians(), arm),
+                                new ParallelCommandGroup(
+                                                new ToWristAngle(() -> Units.degreesToRadians(44.5), wrist),
+                                                new ToAngle(() -> Units.degreesToRadians(65), arm)),
+                                new ElevateLevel(elevator, ElevateMode.L3R)));
+        //L2 Coral 
+        controller.a().and(beamBroken).whileTrue(new SequentialCommandGroup(
+                new ToAngle(() -> Arm.getEncoderPosition().getRadians(), arm),
+                new ParallelCommandGroup(
+                        new ToAngle(() -> Units.degreesToRadians(45), arm),
+                        new ToWristAngle(() -> Units.degreesToRadians(-40), wrist)),
+                new ElevateLevel(elevator, ElevateMode.L2)));
+        //L2 Algae Removal battery side
+        controller.a().and(() -> drivetrain.decideScoringMode() == ScoringMode.MODIFIED).and(beamNotBroken)
+                .whileTrue(new SequentialCommandGroup(
+                        new ToAngle(() -> Arm.getEncoderPosition().getRadians(), arm),
+                        new ParallelCommandGroup(
+                                new ToWristAngle(() -> Units.degreesToRadians(-3), wrist),
+                                new ToAngle(() -> Units.degreesToRadians(25), arm)),
+                        new ElevateLevel(elevator, ElevateMode.L2AR)));
+        //L2 Algae Removal pivot side
+        controller.a().and(() -> drivetrain.decideScoringMode() == ScoringMode.NORMAL).and(beamNotBroken)
+                .whileTrue(new SequentialCommandGroup(
+                        new ToAngle(() -> Arm.getEncoderPosition().getRadians(), arm),
+                        new ParallelCommandGroup(
+                                new ToWristAngle(() -> Units.degreesToRadians(-76), wrist),
+                                new ToAngle(() -> Units.degreesToRadians(88.67), arm)),
+                        new ElevateLevel(elevator, ElevateMode.L2AR)));
+        //L1 Coral
+        controller.x().whileTrue(new SequentialCommandGroup(
+                new ToAngle(() -> Arm.getEncoderPosition().getRadians(), arm),
+                new ParallelCommandGroup(
+                        new ToAngle(() -> Units.degreesToRadians(20), arm),
+                        new ToWristAngle(() -> Units.degreesToRadians(-3), wrist)),
+                new ElevateLevel(elevator, ElevateMode.L1)));
+
+        /* IDLE */
+        controller.rightBumper().onFalse(getIntakeIdleSeq());
+        controller.leftBumper().onFalse(new IntakeCommand(intake, WantedMode.IDLE));
+        controller.a().onFalse(getTestIdleCommands());
+        controller.b().onFalse(getTestIdleCommands());
+        controller.x().onFalse(getTestIdleCommands());
+        controller.y().onFalse(getTestIdleCommands());
+        
         }
 
         public void getDashboardCommand() {
@@ -378,8 +515,17 @@ public class RobotContainer {
                                                 new ToAngle(() -> Units.degreesToRadians(60), arm)));
         }
 
+        public Command getTestIdleCommands() {
+                return new SequentialCommandGroup(
+                        new ToWristAngle(() -> Units.degreesToRadians(-77), wrist),
+                        new ParallelCommandGroup(
+                                new ElevateLevel(elevator, ElevateMode.L1),
+                                new ToAngle(() -> Units.degreesToRadians(60), arm)));
+        }
+
         public Command getIntakeIdleSeq() {
                 return new ParallelCommandGroup(
+                        new IntakeCommand(intake, WantedMode.IDLE),
                                 new ToWristAngle(() -> Units.degreesToRadians(-76), wrist),
                                 new ToAngle(() -> Units.degreesToRadians(20), arm));
         }
