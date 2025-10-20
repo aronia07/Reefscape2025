@@ -66,7 +66,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private double m_lastSimTime;
     public Vision vision = new Vision();
     private Pose2d lastActivePathPose = new Pose2d();
-    public ScoringMode scoringMode = ScoringMode.NORMAL;
+    public ScoringMode scoringMode = ScoringMode.PIVOT_SIDE;
     // for field centric path following:
     private final SwerveRequest.ApplyFieldSpeeds m_pathApplyFieldSpeeds = new SwerveRequest.ApplyFieldSpeeds();
     // for robot centric path following
@@ -521,9 +521,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
 
         if (flippedReefTagListwID.contains(nearestPose)) {
-            setScoringMode(ScoringMode.NORMAL);
+            setScoringMode(ScoringMode.PIVOT_SIDE);
         } else {
-            setScoringMode(ScoringMode.MODIFIED);
+            setScoringMode(ScoringMode.BATTERY_SIDE);
         }
         TheField.getObject("nearestpose").setPose(nearestPose);
         TheField.getObject("target").setPose(target);
@@ -562,11 +562,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         Pose2d mostRecent = currentPoseCopy.nearest(reefTagPoseList);
 
         if (flippedReefTagListwID.contains(nearestPose)) {
-            return ScoringMode.NORMAL;
+            return ScoringMode.PIVOT_SIDE;
         } else if (reefTaflistID.contains(nearestPose)) {
-            return ScoringMode.MODIFIED;
+            return ScoringMode.BATTERY_SIDE;
         }
-        return ScoringMode.MODIFIED;
+        return ScoringMode.BATTERY_SIDE;
     }
 
     public Pose2d addOffset(boolean left) {
@@ -575,17 +575,17 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         Pose2d centerTarget = getCenterReefPose();
         double angle = (Math.PI / 2) - centerTarget.getRotation().getRadians();
         Pose2d offsetTarget;
-        if (!left && (decideScoringMode() == ScoringMode.NORMAL)) {
+        if (!left && (decideScoringMode() == ScoringMode.PIVOT_SIDE)) {
             offsetTarget = new Pose2d(
                     centerTarget.getX() + (rightOffset * Math.cos(angle)),
                     centerTarget.getY() + (-rightOffset * Math.sin(angle)),
                     centerTarget.getRotation());
-        } else if (left && (decideScoringMode() == ScoringMode.NORMAL)) {
+        } else if (left && (decideScoringMode() == ScoringMode.PIVOT_SIDE)) {
             offsetTarget = new Pose2d(
                     centerTarget.getX() + (-leftOffset * Math.cos(angle)),
                     centerTarget.getY() + (leftOffset * Math.sin(angle)),
                     centerTarget.getRotation());
-        } else if (!left && (decideScoringMode() == ScoringMode.MODIFIED)) {
+        } else if (!left && (decideScoringMode() == ScoringMode.BATTERY_SIDE)) {
             offsetTarget = new Pose2d(
                     centerTarget.getX() + (-rightOffset * Math.cos(angle)),
                     centerTarget.getY() + (rightOffset * Math.sin(angle)),
@@ -602,7 +602,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     @Override
     public void periodic() {
-        SmartDashboard.putBoolean("corign mode", this.decideScoringMode() == ScoringMode.NORMAL);
+        SmartDashboard.putBoolean("corign mode", this.decideScoringMode() == ScoringMode.PIVOT_SIDE);
 
         // updateVisionMeasurements();
         // var globalPose = vision.getEstimatedGlobalPose();

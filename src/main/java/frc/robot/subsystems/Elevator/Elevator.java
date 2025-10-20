@@ -10,13 +10,18 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib.util.LoggedTunableNumber;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.ElevatorConstants.ElevateMode;
+import frc.robot.Constants.ElevatorConstants.ElevatorWantedMode;
+import frc.robot.Constants.ElevatorConstants.SystemMode;
+import frc.robot.subsystems.Intake.Intake;
 
 public class Elevator extends SubsystemBase {
 
@@ -43,6 +48,9 @@ public class Elevator extends SubsystemBase {
   // private double leftPower = 0;
   // private double rightPower = 0;
   private ElevateMode elevateMode = ElevateMode.OFF;
+  private ElevatorWantedMode wantedMode = ElevatorWantedMode.IDLE;
+  private SystemMode systemMode = SystemMode.IDLE;
+  private DigitalInput beamy = Constants.beamy;
   // private boolean isLeftDone = false;
   // private boolean isRightDone = false;
 
@@ -70,13 +78,6 @@ public class Elevator extends SubsystemBase {
     // encoderLeft = leftElevatorMotor.getEncoder();
     resetEncoders();
 
-  }
-
-  private static enum States {
-    BADBADBAD,
-    OKAYUP,
-    OKAYDOWN,
-    GOOD
   }
 
   private void setupMotors() {
@@ -111,7 +112,6 @@ public class Elevator extends SubsystemBase {
     } else {
       this.elevatorSetpoint = goal;
     }
-
   }
 
   public double getSetpoint() {
@@ -167,31 +167,154 @@ public class Elevator extends SubsystemBase {
     }
     // }
   }
-
-  public States outOfBounds(double encoderValue) {
-    if (encoderValue <= ElevatorConstants.min) {
-      return States.BADBADBAD;
-    } else if (encoderValue <= ElevatorConstants.desiredMin) {
-      return States.OKAYUP;
-    } else if (encoderValue < ElevatorConstants.desiredMax) {
-      return States.GOOD;
-    } else if (encoderValue < ElevatorConstants.max) {
-      return States.OKAYDOWN;
-    } else if (encoderValue >= ElevatorConstants.max) {
-      return States.BADBADBAD;
-    } else {
-      return States.BADBADBAD;
-    }
-  }
+  
 
   public boolean atGoal() {
     return Math.abs(encoderLeft.getPosition() - elevatorSetpoint) < ElevatorConstants.elevatorTolerance;
   }
 
+  public void setWantedElevatorMode(ElevatorWantedMode desiredMode) {
+    this.wantedMode = desiredMode;
+  }
+
+  public boolean hasCoral() {
+    return !beamy.get();
+  }
+
+  private SystemMode changeCurrentSystemMode() {
+    return switch (wantedMode) {
+      case IDLE:
+        yield SystemMode.IDLE;
+      case L1:
+        if (hasCoral()) {
+          yield SystemMode.GOING_L1;
+        } else {
+          yield SystemMode.IDLE;
+        }
+      case INTAKE_CORAL:
+        if (hasCoral()) {
+          yield SystemMode.IDLE;
+        } else {
+          yield SystemMode.INTAKING_CORAL;
+        }
+      case INTAKE_ALGAE:
+        if (hasCoral()) {
+          yield SystemMode.IDLE;
+        } else {
+          yield SystemMode.INTAKING_ALGAE;
+        }
+      case L2_CORAL:
+        if (hasCoral()) {
+          yield SystemMode.GOING_L2_CORAL;
+        } else {
+          yield SystemMode.IDLE;
+        }
+      case L2_ALGAE_BATTERY:
+        if (hasCoral()) {
+          yield SystemMode.IDLE;
+        } else {
+          yield SystemMode.GOING_L2_ALGAE_BATTERY;
+        }
+      case L2_ALGAE_PIVOT:
+        if (hasCoral()) {
+          yield SystemMode.IDLE;
+        } else {
+          yield SystemMode.GOING_L2_ALGAE_PIVOT;
+        }
+      case L3_CORAL_BATTERY:
+        if (hasCoral()) {
+          yield SystemMode.GOING_L3_CORAL_BATTERY;
+        } else {
+          yield SystemMode.IDLE;
+        }
+      case L3_CORAL_PIVOT:
+        if (hasCoral()) {
+          yield SystemMode.GOING_L3_CORAL_PIVOT;
+        } else {
+          yield SystemMode.IDLE;
+        }
+      case L3_ALGAE_BATTERY:
+        if (hasCoral()) {
+          yield SystemMode.IDLE;
+        } else {
+          yield SystemMode.GOING_L3_ALGAE_BATTERY;
+        }
+      case L3_ALGAE_PIVOT:
+        if (hasCoral()) {
+          yield SystemMode.IDLE;
+        } else {
+          yield SystemMode.GOING_L3_ALGAE_PIVOT;
+        }
+      case L4_CORAL_BATTERY:
+        if (hasCoral()) {
+          yield SystemMode.GOING_L4_CORAL_BATTERY;
+        } else {
+          yield SystemMode.IDLE;
+        }
+      case L4_CORAL_PIVOT:
+        if (hasCoral()) {
+          yield SystemMode.GOING_L4_CORAL_PIVOT;
+        } else {
+          yield SystemMode.IDLE;
+        }
+      case ALGAE_BARGE:
+        yield SystemMode.GOING_ALGAE_BARGE;
+    };
+  }
+
+  private void applyState() {
+    switch (systemMode) {
+      case INTAKING_CORAL:
+        elevatorSetpoint = ElevatorConstants.LevelOneSetpoint;
+      case INTAKING_ALGAE:
+        elevatorSetpoint = ElevatorConstants.LevelOneSetpoint;
+      case GOING_L1:
+        elevatorSetpoint = ElevatorConstants.LevelOneSetpoint;
+        break;
+      case GOING_L2_CORAL:
+        elevatorSetpoint = ElevatorConstants.LevelTwoSetpoint;
+        break;
+      case GOING_L2_ALGAE_BATTERY:
+        elevatorSetpoint = ElevatorConstants.LevelTwoAlgaeSetpoint;
+        break;
+      case GOING_L2_ALGAE_PIVOT:
+        elevatorSetpoint = ElevatorConstants.LevelTwoAlgaeSetpoint;
+        break;
+      case GOING_L3_ALGAE_BATTERY:
+        elevatorSetpoint = ElevatorConstants.LevelThreeSetpointR;
+        break;
+      case GOING_L3_ALGAE_PIVOT:
+        elevatorSetpoint = ElevatorConstants.LevelThreeAR;
+        break;
+      case GOING_L3_CORAL_BATTERY:
+        elevatorSetpoint = ElevatorConstants.LevelThreeSetpointM;
+        break;
+      case GOING_L3_CORAL_PIVOT:
+        elevatorSetpoint = ElevatorConstants.LevelThreeSetpointR;
+        break;
+      case GOING_L4_CORAL_BATTERY:
+        elevatorSetpoint = ElevatorConstants.LevelFourSetpoint;
+        break;
+      case GOING_L4_CORAL_PIVOT:
+        elevatorSetpoint = ElevatorConstants.LevelFourSetpoint;
+        break;
+      case GOING_ALGAE_BARGE:
+        elevatorSetpoint = ElevatorConstants.LevelFourSetpoint;
+        break;
+      case IDLE:
+        elevatorSetpoint = 1;
+        break;
+      default:
+        break;
+    }
+  }
+
   @Override
   public void periodic() {
+    systemMode = changeCurrentSystemMode();
+    applyState();
     encoderPosition = -encoderLeft.getPosition();
-    checkTunableValues();
+    // checkTunableValues();
     logValues();
 
     // var ffOutput = ffElevate.calculateWithVelocities(nextVelocity,
@@ -204,14 +327,14 @@ public class Elevator extends SubsystemBase {
     // values around 0
     // }
     var leftpidOutput = pid.calculate(encoderPosition, this.elevatorSetpoint);
-    
+
     leftElevatorMotor.set(-leftpidOutput);
     rightElevatorMotor.set(leftpidOutput);
 
     SmartDashboard.putNumber("Elevator velocity", leftElevatorMotor.get());
     // SmartDashboard.putNumber("Elevator PID output left", leftpidOutput);
     SmartDashboard.putNumber("Elevator's Setpoint", elevatorSetpoint);
-    SmartDashboard.putNumber("Elevator Current", leftElevatorMotor.getOutputCurrent());
+    // SmartDashboard.putNumber("Elevator Current", leftElevatorMotor.getOutputCurrent());
     // SmartDashboard.putNumber("Elevator FF Output", ffOutput);
 
   }

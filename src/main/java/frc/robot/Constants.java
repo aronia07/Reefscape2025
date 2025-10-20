@@ -27,10 +27,12 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
-
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.util.Color;
 
 public final class Constants {
+
+    public static DigitalInput beamy = new DigitalInput(1);
 
     public static boolean enableTunableValues = false;
 
@@ -124,8 +126,8 @@ public final class Constants {
         public static List<Integer> badTags = new ArrayList<>();
 
         public static enum ScoringMode {
-            NORMAL,
-            MODIFIED
+            PIVOT_SIDE,
+            BATTERY_SIDE
         };
     }
 
@@ -168,6 +170,25 @@ public final class Constants {
     public static final class IntakeConstants {
         public static int leaderID = 61; // was the intake
         public static int followerID = 62; // was the deflector
+
+        public static enum IntakeWantedMode {
+            INTAKE_ALGAE,
+            SCORE_ALGAE,
+            INTAKE_CORAL,
+            SCORE_CORAL_BATTERYSIDE,
+            SCORE_CORAL_PIVOTSIDE,
+            SCORE_CORAL_L1,
+            IDLE
+        }
+        public static enum SystemMode {
+            INTAKING_ALGAE,
+            SCORING_ALGAE,
+            INTAKING_CORAL,
+            SCORING_CORAL_BATTERYSIDE,
+            SCORING_CORAL_PIVOTSIDE,
+            SCORING_CORAL_L1,
+            IDLING
+        }
     }
 
     public static final class ClimberConstants {
@@ -210,6 +231,40 @@ public final class Constants {
             RESET
         }
 
+        public static enum ElevatorWantedMode {
+            IDLE,
+            INTAKE_CORAL,
+            INTAKE_ALGAE,
+            L1,
+            L2_CORAL,
+            L2_ALGAE_BATTERY,
+            L2_ALGAE_PIVOT,
+            L3_CORAL_BATTERY,
+            L3_CORAL_PIVOT,
+            L3_ALGAE_BATTERY,
+            L3_ALGAE_PIVOT,
+            L4_CORAL_BATTERY,
+            L4_CORAL_PIVOT,
+            ALGAE_BARGE
+        }
+        
+        public static enum SystemMode {
+            IDLE,
+            INTAKING_CORAL,
+            INTAKING_ALGAE,
+            GOING_L1,
+            GOING_L2_CORAL,
+            GOING_L2_ALGAE_PIVOT,
+            GOING_L2_ALGAE_BATTERY,
+            GOING_L3_CORAL_BATTERY,
+            GOING_L3_CORAL_PIVOT,
+            GOING_L3_ALGAE_BATTERY,
+            GOING_L3_ALGAE_PIVOT,
+            GOING_L4_CORAL_BATTERY,
+            GOING_L4_CORAL_PIVOT,
+            GOING_ALGAE_BARGE
+        }
+
         public static double LevelOneSetpoint = 0.5;
         public static double LevelTwoSetpoint = 1;
         public static double LevelTwoAlgaeSetpoint = 0.5;
@@ -242,6 +297,43 @@ public final class Constants {
 
         public static double[] armSGV = new double[] { 0.0, 0.001, 0.0 }; // Static, Gravity, and Velocity gains
         public static double[] armPID = new double[] { 1.47, 0, 0f }; // Arm PID values
+
+        public static enum ArmWantedMode {
+            IDLE,
+            INTAKE_CORAL,
+            INTAKE_ALGAE,
+            L1,
+            L2_CORAL,
+            L2_ALGAE_BATTERY,
+            L2_ALGAE_PIVOT,
+            L3_CORAL_BATTERY,
+            L3_CORAL_PIVOT,
+            L3_ALGAE_BATTERY,
+            L3_ALGAE_PIVOT,
+            L4_CORAL_BATTERY,
+            L4_CORAL_PIVOT,
+            ALGAE_BARGE,
+            // HIGH_IDLE,
+            // LOW_IDLE
+        }
+
+        public static enum SystemMode {
+            HIGH_IDLE,
+            LOW_IDLE,
+            INTAKING_CORAL,
+            INTAKING_ALGAE,
+            GOING_L1,
+            GOING_L2_CORAL,
+            GOING_L2_ALGAE_PIVOT,
+            GOING_L2_ALGAE_BATTERY,
+            GOING_L3_CORAL_BATTERY,
+            GOING_L3_CORAL_PIVOT,
+            GOING_L3_ALGAE_BATTERY,
+            GOING_L3_ALGAE_PIVOT,
+            GOING_L4_CORAL_BATTERY,
+            GOING_L4_CORAL_PIVOT,
+            GOING_ALGAE_BARGE
+        }
 
         // Arm's polynomial regression (useed to predict distances from speaker)
         // public static final PolynomialRegression

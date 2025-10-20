@@ -4,8 +4,11 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.IntakeConstants;
+import frc.robot.Constants.IntakeConstants.IntakeWantedMode;
+import frc.robot.Constants.IntakeConstants.SystemMode;
 import frc.robot.Constants.VisionConstants.ScoringMode;
 
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -30,36 +33,17 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 public class Intake extends SubsystemBase {
-    public enum WantedMode {
-        INTAKE_ALGAE,
-        SCORE_ALGAE,
-        INTAKE_CORAL,
-        SCORE_CORAL_BATTERYSIDE,
-        SCORE_CORAL_PIVOTSIDE,
-        SCORE_CORAL_L1,
-        IDLE
-    }
-    private enum SystemMode {
-        INTAKING_ALGAE,
-        SCORING_ALGAE,
-        INTAKING_CORAL,
-        SCORING_CORAL_BATTERYSIDE,
-        SCORING_CORAL_PIVOTSIDE,
-        SCORING_CORAL_L1,
-        IDLING
-    }
-
-
+    
     private static TalonFX intake = new TalonFX(61);
 
     private static TalonFXConfiguration intakeConfig = new TalonFXConfiguration();
 
-    private static DigitalInput beamBreak = new DigitalInput(1);
+    private static DigitalInput beamBreak = Constants.beamy;
 
     private static Timer pulseTimer = new Timer();
     public static boolean modified = false;
 
-    private WantedMode wantedMode = WantedMode.IDLE;
+    private IntakeWantedMode wantedMode = IntakeWantedMode.IDLE;
     private SystemMode systemMode = SystemMode.IDLING;
 
     public Intake() {
@@ -109,11 +93,11 @@ public class Intake extends SubsystemBase {
 
         intake.set(0);
     }
-    public void setWantedIntakeMode(WantedMode desiredMode) {
+    public void setWantedIntakeMode(IntakeWantedMode desiredMode) {
         this.wantedMode = desiredMode;
     }
 
-    private SystemMode changeCurrentMode() {
+    private SystemMode changeCurrentSystemMode() {
         return switch (wantedMode) {
             case INTAKE_ALGAE:
                 if (!hasCoral()){
@@ -166,7 +150,7 @@ public class Intake extends SubsystemBase {
         };
     }
 
-    private void applyState() {
+    private void applyMode() {
         double motorSpeed = 0.0;
         switch (systemMode) {
             case SCORING_CORAL_L1:
@@ -205,9 +189,8 @@ public class Intake extends SubsystemBase {
 
     @Override
     public void periodic() {
-        systemMode = changeCurrentMode();
-        applyState();
-        SmartDashboard.putBoolean("Beamy", beamBreak.get());
+        systemMode = changeCurrentSystemMode();
+        applyMode();
         SmartDashboard.putString("INTAKE WANTED STATE", wantedMode.toString());
         SmartDashboard.putString("INTAKE SYSTEM STATE", systemMode.toString());
     }
