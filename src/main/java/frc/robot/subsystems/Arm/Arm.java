@@ -197,50 +197,50 @@ public class Arm extends SubsystemBase {
   private SystemMode changeCurrentSystemMode() {
     return switch (wantedMode) {
       case IDLE:
-      if (hasCoral()) {
-        yield SystemMode.HIGH_IDLE;
-      } else {
-        yield SystemMode.LOW_IDLE;
-      }
+        if (!hasCoral() || (systemMode == SystemMode.INTAKING_CORAL)) {
+          yield SystemMode.LOW_IDLE;
+        } else {
+          yield SystemMode.HIGH_IDLE;
+        }
       case INTAKE_CORAL:
         if (hasCoral()) {
           yield SystemMode.HIGH_IDLE;
         } else {
-          // if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
+          if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
             yield SystemMode.INTAKING_CORAL;
-          // }
+          }
         }
       case INTAKE_ALGAE:
         if (hasCoral()) {
           yield SystemMode.HIGH_IDLE;
         } else {
-          // if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
+          if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
             yield SystemMode.INTAKING_ALGAE;
-          // }
+          }
         }
       case L1:
         if (hasCoral()) {
-          // if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
+          if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
             yield SystemMode.GOING_L1;
-          // }
+          }
         } else {
-          yield SystemMode.LOW_IDLE;
+          yield SystemMode.HIGH_IDLE;
         }
       case L2_CORAL:
         if (hasCoral()) {
-          // if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
+          if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
             yield SystemMode.GOING_L2_CORAL;
-          // }
+          }
         } else {
-          yield SystemMode.LOW_IDLE;
+          yield SystemMode.HIGH_IDLE;
         }
       case L2_ALGAE_BATTERY:
         if (hasCoral()) {
           yield SystemMode.HIGH_IDLE;
         } else {
-          // if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
+          if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
             yield SystemMode.GOING_L2_ALGAE_BATTERY;
-          // }
+          }
         }
       case L2_ALGAE_PIVOT:
         if (hasCoral()) {
@@ -256,46 +256,48 @@ public class Arm extends SubsystemBase {
             yield SystemMode.GOING_L3_CORAL_BATTERY;
           // }
         } else {
-          yield SystemMode.LOW_IDLE;
+          yield SystemMode.HIGH_IDLE;
         }
       case L3_CORAL_PIVOT:
         if (hasCoral()) {
-          // if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
+          if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
             yield SystemMode.GOING_L3_CORAL_PIVOT;
-          // }
+          }
         } else {
-          yield SystemMode.LOW_IDLE;
+          yield SystemMode.HIGH_IDLE;
         }
       case L3_ALGAE_BATTERY:
         if (hasCoral()) {
           yield SystemMode.HIGH_IDLE;
         } else {
-          // if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
+          if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
             yield SystemMode.GOING_L3_ALGAE_BATTERY;
-          // }
+          }
         }
       case L3_ALGAE_PIVOT:
         if (hasCoral()) {
           yield SystemMode.HIGH_IDLE;
         } else {
-          // if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
+          if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
             yield SystemMode.GOING_L3_ALGAE_PIVOT;
-          // }
+          } else {
+            yield systemMode;
+          }
         }
       case L4_CORAL_BATTERY:
         if (hasCoral()) {
-          // if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
+          if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
             yield SystemMode.GOING_L4_CORAL_BATTERY;
-          // }
+          }
         } else {
           yield SystemMode.LOW_IDLE;
         }
 
       case L4_CORAL_PIVOT:
         if (hasCoral()) {
-          // if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
+          if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
             yield SystemMode.GOING_L4_CORAL_PIVOT;
-          // }
+          }
         } else {
           yield SystemMode.LOW_IDLE;
         }
@@ -303,10 +305,12 @@ public class Arm extends SubsystemBase {
         if (hasCoral()) {
           yield SystemMode.HIGH_IDLE;
         } else {
-          // if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
+          if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
             yield SystemMode.GOING_ALGAE_BARGE;
-          // }
+          }
         }
+      case CLIMB:
+        yield SystemMode.CLIMBING;
       // case HIGH_IDLE:
       //   yield SystemMode.HIGH_IDLE;
       // case LOW_IDLE:
@@ -338,6 +342,7 @@ public class Arm extends SubsystemBase {
         break;
       case GOING_L3_ALGAE_PIVOT:
         setpoint = new Rotation2d(Units.degreesToRadians(87));
+        break;
       case GOING_L3_CORAL_BATTERY:
         setpoint = new Rotation2d(Units.degreesToRadians(55));
         break;
@@ -358,7 +363,9 @@ public class Arm extends SubsystemBase {
         break;
       case HIGH_IDLE:
         setpoint = new Rotation2d(Units.degreesToRadians(60));
-      default:
+        break;
+      case CLIMBING:
+        setpoint = new Rotation2d(Units.degreesToRadians(-11));
         break;
     }
   }
@@ -371,7 +378,7 @@ public class Arm extends SubsystemBase {
     logValues(); // Logs values to SmartDashboard/Glass
     // checkTunableValues(); //Updates PID and FF values
 
-    var ffOutput = ffModel.calculate(setpoint.getRadians(), velocity.getRadians()); // Calculates Feedforward output
+    var ffOutput = ffModel.calculate(pid.getSetpoint().position, pid.getSetpoint().velocity); // Calculates Feedforward output
     var pidOutput = pid.calculate(getEncoderPosition().getRadians(), setpoint.getRadians()); // calculates PID output
 
     // SmartDashboard.putNumber("ffoutput arm", ffOutput); //Displays the FF output

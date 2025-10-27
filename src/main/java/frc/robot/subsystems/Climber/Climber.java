@@ -35,6 +35,23 @@ public class Climber extends SubsystemBase {
         climberMotor.configure(climberConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
+    public void climberOpen() {
+        if (climberEncoder.getPosition() < ClimberConstants.climberMax) {
+            climberMotor.set(1);
+        } else{
+            climberMotor.set(0);
+        }
+    }
+    public void climberClimb() {
+        
+        if (climberEncoder.getPosition() > ClimberConstants.climberMin) {
+            climberMotor.set(-1);
+        } else {
+            climberMotor.set(0);
+        }
+    }
+
+
     public void checkPosition() {
         climberEncoder.getPosition();
     }

@@ -478,7 +478,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         int firstTag;
         int endtag;
         Pose2d currentPose = getState().Pose;
-        Pose2d currentPoseCopy = getStateCopy().Pose;
         List<Pose2d> reefTagPoseList = new ArrayList<>(12);
         List<Pose2d> flippedReefTagListwID = new ArrayList<>(6);
         HashMap<Integer, Pose2d> reefTagPoseListwID = new HashMap<>(6);
@@ -503,9 +502,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
         }
         Pose2d nearestPose = currentPose.nearest(reefTagPoseList);
-        // Pose2d mostRecent = currentPoseCopy.nearest(reefTagPoseList);
-        // used to be rotated by
-        // 180, now is accounted for
+
         if (flippedReefTagListwID.contains(nearestPose)) {
             double angle = nearestPose.getRotation().getRadians();
             target = new Pose2d(
@@ -529,6 +526,45 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         TheField.getObject("target").setPose(target);
 
         return target;
+    }
+
+    public Rotation2d getReefFaceAngle() {
+        Pose2d target;
+        int firstTag;
+        int endtag;
+        Pose2d currentPose = getState().Pose;
+        List<Pose2d> reefTagPoseList = new ArrayList<>(12);
+        List<Pose2d> flippedReefTagListwID = new ArrayList<>(6);
+        HashMap<Integer, Pose2d> reefTagPoseListwID = new HashMap<>(6);
+
+        if (isRedAlliance()) {
+            firstTag = 6;
+            endtag = 12;
+        } else {
+            firstTag = 17;
+            endtag = 23;
+        }
+        for (int i = firstTag; i < endtag; i++) {
+            Pose2d aprilTag = vision.kFieldLayout.getTagPose(i).get().toPose2d();
+            reefTagPoseList.add(aprilTag);
+            reefTagPoseList.add(aprilTag.rotateAround(aprilTag.getTranslation(), Rotation2d.k180deg));
+            // flippedReefTagListwID.put(i,
+            // aprilTag.rotateAround(aprilTag.getTranslation(), Rotation2d.k180deg));
+            flippedReefTagListwID
+                    .add(new Pose2d(aprilTag.getTranslation(), aprilTag.getRotation().rotateBy(Rotation2d.k180deg)));
+
+            reefTagPoseListwID.put(i, aprilTag);
+
+        }
+        Pose2d nearestPose = currentPose.nearest(reefTagPoseList);
+        Rotation2d angle;
+        if (flippedReefTagListwID.contains(nearestPose)) {
+            angle = nearestPose.getRotation();
+        } else {
+            angle = nearestPose.getRotation().rotateBy(Rotation2d.k180deg);
+        }
+
+        return angle;
     }
 
     public ScoringMode decideScoringMode() {

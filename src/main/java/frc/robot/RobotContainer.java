@@ -16,6 +16,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.events.TriggerEvent;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveControlParameters;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -29,6 +30,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.DeferredCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -36,12 +38,14 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.LightsConstants;
+import frc.robot.Constants.WantedSuperState;
 import frc.robot.Constants.ArmConstants.ArmWantedMode;
 import frc.robot.Constants.ElevatorConstants.ElevateMode;
 import frc.robot.Constants.ElevatorConstants.ElevatorWantedMode;
 import frc.robot.Constants.IntakeConstants.IntakeWantedMode;
 import frc.robot.Constants.IntakeConstants.IntakeWantedMode;
 import frc.robot.Constants.VisionConstants.ScoringMode;
+import frc.robot.Constants.WristConstants.WristWantedMode;
 import frc.robot.commands.Arm.ArmCommand;
 import frc.robot.commands.Arm.ManualArm;
 import frc.robot.commands.Arm.ToAngle;
@@ -86,6 +90,7 @@ public class RobotContainer {
         final Vision vision = new Vision();
         public static boolean isModified = false;
         public SendableChooser<Command> m_chooser = new SendableChooser<>();
+        // private Superstructure superstructure = new Superstructure();
 
         public RobotContainer() {
                 configureBindings();
@@ -109,6 +114,9 @@ public class RobotContainer {
         // .withSteerRequestType(SteerRequestType.Position);
         private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
         private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
+        private final SwerveRequest.FieldCentricFacingAngle faceReef = new SwerveRequest.FieldCentricFacingAngle()
+                                        .withHeadingPID(2, 0, 0);
+        
 
         private final Telemetry logger = new Telemetry(MaxSpeed);
 
@@ -137,6 +145,7 @@ public class RobotContainer {
         }
 
         private void configureBindings() {
+
                 // Nperte that X is defined as forward according to WPILib convention,
                 // and Y is defined as to the left according to WPILib convention.
 
@@ -189,15 +198,30 @@ public class RobotContainer {
                 //                                 new ElevateLevel(elevator, ElevateMode.L2))));
                 // driver.leftBumper().onFalse(getIntakeIdleSeq());                
                 
-                driver.rightBumper().onTrue(new SequentialCommandGroup(
-                        new ToAngle(() -> Arm.getEncoderPosition().getRadians(), arm),
-                        new ParallelCommandGroup(
-                                        new ToWristAngle(() -> Units.degreesToRadians(34), wrist),
-                                        new ArmCommand(arm, ArmWantedMode.INTAKE_CORAL),
-                                        // new ToAngle(() -> Units.degreesToRadians(-7), arm), 
-                                        new IntakeCommand(intake, IntakeWantedMode.INTAKE_CORAL),
-                                        new ElevateLevel(elevator, ElevateMode.L2))));
-                driver.rightBumper().onFalse(getIntakeIdleSeq());
+                //Ground intake
+                driver.rightBumper()
+                        .onTrue(
+                                new ParallelCommandGroup(
+                                        new InstantCommand(() -> wrist.setWantedWristMode(WristWantedMode.INTAKE_CORAL)),
+                                        new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.INTAKE_CORAL)),
+                                        new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.INTAKE_CORAL)),
+                                        new InstantCommand(() -> intake.setWantedIntakeMode(IntakeWantedMode.INTAKE_CORAL))))
+                        .onFalse(
+                                new ParallelCommandGroup(
+                                        new InstantCommand(()-> wrist.setWantedWristMode(WristWantedMode.IDLE)),
+                                        new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.IDLE)),
+                                        new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.IDLE)),
+                                        new InstantCommand(() -> intake.setWantedIntakeMode(IntakeWantedMode.IDLE))));
+
+                // driver.rightBumper().onTrue(new SequentialCommandGroup(
+                //         new ToAngle(() -> Arm.getEncoderPosition().getRadians(), arm),
+                //         new ParallelCommandGroup(
+                //                         new ToWristAngle(() -> Units.degreesToRadians(34), wrist),
+                //                         new ArmCommand(arm, ArmWantedMode.INTAKE_CORAL),
+                //                         // new ToAngle(() -> Units.degreesToRadians(-7), arm), 
+                //                         new IntakeCommand(intake, IntakeWantedMode.INTAKE_CORAL),
+                //                         new ElevateLevel(elevator, ElevateMode.L2))));
+                // driver.rightBumper().onFalse(getIntakeIdleSeq());
 
                 // driver.rightBumper().whileTrue(new SequentialCommandGroup(
                 //                 new ToAngle(() -> Arm.getEncoderPosition().getRadians(), arm),
@@ -210,12 +234,13 @@ public class RobotContainer {
 
                 // 9659 inspired align
                 driver.leftTrigger().whileTrue(
-                                drivetrain.defer(
-                                                () -> DriveToLocation.driveTo(drivetrain.addOffset(true), drivetrain)));
+                        drivetrain.defer(
+                                () -> DriveToLocation.driveTo(drivetrain.addOffset(true), drivetrain)));
                 driver.rightTrigger().whileTrue(
-                                drivetrain.defer(() -> DriveToLocation.driveTo(drivetrain.addOffset(false),
-                                                drivetrain)));
-
+                        drivetrain.defer(
+                                () -> DriveToLocation.driveTo(drivetrain.addOffset(false), drivetrain)));
+                // FACE REEF WHEN HAVE CORAL
+                // drivetrain.applyRequest(() -> faceReef.withTargetDirection(drivetrain.getReefFaceAngle()));
                 /* OPERATOR CONTROLS */
                 // joysticks
                 arm.setDefaultCommand(new ManualArm(() -> -operator.getLeftY(), arm));
@@ -223,19 +248,25 @@ public class RobotContainer {
 
                 // buttons
                 // operator.rightBumper().whileTrue(new IntakeOut(intake));
-                operator.leftBumper().whileTrue(new IntakeCommand(intake, IntakeWantedMode.INTAKE_ALGAE));
-                operator.leftBumper().onFalse(new IntakeCommand(intake, IntakeWantedMode.IDLE));
+                // operator.leftBumper().whileTrue(new IntakeCommand(intake, IntakeWantedMode.INTAKE_ALGAE));
+                // operator.leftBumper().onFalse(new IntakeCommand(intake, IntakeWantedMode.IDLE));
+                operator.leftBumper()
+                        .onTrue(new InstantCommand(() -> intake.setWantedIntakeMode(IntakeWantedMode.INTAKE_ALGAE)))
+                        .onFalse(new InstantCommand(() -> intake.setWantedIntakeMode(IntakeWantedMode.IDLE)));
                 // BATTERY_SIDE outtake
-                operator.rightBumper().and(()-> drivetrain.decideScoringMode() == ScoringMode.BATTERY_SIDE).and(() -> (operator.x().getAsBoolean() == false)).whileTrue(
-                        new IntakeCommand(intake, IntakeWantedMode.SCORE_CORAL_BATTERYSIDE));
+                operator.rightBumper().and(()-> drivetrain.decideScoringMode() == ScoringMode.BATTERY_SIDE).and(() -> (operator.x().getAsBoolean() == false))
+                        .onTrue(new InstantCommand(() -> intake.setWantedIntakeMode(IntakeWantedMode.SCORE_CORAL_BATTERYSIDE)))
+                        .onFalse(new InstantCommand(() -> intake.setWantedIntakeMode(IntakeWantedMode.IDLE)));
 
-                operator.rightBumper().and(() -> drivetrain.decideScoringMode() == ScoringMode.BATTERY_SIDE).and(operator.x()).whileTrue(
-                        new IntakeCommand(intake, IntakeWantedMode.SCORE_CORAL_L1));
+                operator.rightBumper().and(operator.x())
+                        .onTrue(new InstantCommand(() -> intake.setWantedIntakeMode(IntakeWantedMode.SCORE_CORAL_L1)))
+                        .onFalse(new InstantCommand(() -> intake.setWantedIntakeMode(IntakeWantedMode.IDLE)));
 
-                operator.rightBumper().and(() -> drivetrain.decideScoringMode() == ScoringMode.PIVOT_SIDE).and(() -> (operator.x().getAsBoolean() == false)).whileTrue(
-                        new IntakeCommand(intake, IntakeWantedMode.SCORE_CORAL_PIVOTSIDE));
+                operator.rightBumper().and(() -> drivetrain.decideScoringMode() == ScoringMode.PIVOT_SIDE).and(() -> (operator.x().getAsBoolean() == false))
+                        .onTrue(new InstantCommand(() -> intake.setWantedIntakeMode(IntakeWantedMode.SCORE_CORAL_PIVOTSIDE)))
+                        .onFalse(new InstantCommand(() -> intake.setWantedIntakeMode(IntakeWantedMode.IDLE)));
 
-                operator.rightBumper().onFalse(new IntakeCommand(intake, IntakeWantedMode.IDLE));
+                // operator.rightBumper().onFalse(new IntakeCommand(intake, IntakeWantedMode.IDLE));
                 // operator.rightBumper().and(operator.x()).whileTrue(
                 //                 new IntakeOutL1(intake));
 
@@ -273,13 +304,24 @@ public class RobotContainer {
                 //                         new ToWristAngle(() -> Units.degreesToRadians(-88), wrist)),
                 //                 new ElevatorCommand(elevator, ElevatorWantedMode.L4_CORAL_PIVOT)));
                 // L4 PIVOT SIDE
-                operator.y().and(() -> drivetrain.decideScoringMode() == ScoringMode.PIVOT_SIDE)
-                        .whileTrue(
+                operator.y().and(() -> drivetrain.decideScoringMode() == ScoringMode.PIVOT_SIDE).and(beamBroken)
+                        .onTrue(
                                 new ParallelCommandGroup(
-                                        new ArmCommand(arm, ArmWantedMode.L4_CORAL_PIVOT),
-                                        new ToWristAngle(() -> Units.degreesToRadians(-88), wrist),
-                                        new ElevatorCommand(elevator, ElevatorWantedMode.L4_CORAL_PIVOT)));
-                operator.y().onFalse(getIdleCommands());
+                                        new InstantCommand(() -> wrist.setWantedWristMode(WristWantedMode.L4_CORAL_PIVOT)),
+                                        new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.L4_CORAL_PIVOT)),
+                                        new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.L4_CORAL_PIVOT))))
+                        .onFalse(
+                                new ParallelCommandGroup(
+                                        new InstantCommand(()-> wrist.setWantedWristMode(WristWantedMode.IDLE)),
+                                        new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.IDLE)),
+                                        new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.IDLE))));
+                // operator.y().and(() -> drivetrain.decideScoringMode() == ScoringMode.PIVOT_SIDE)
+                //         .whileTrue(
+                //                 new ParallelCommandGroup(
+                //                         new ArmCommand(arm, ArmWantedMode.L4_CORAL_PIVOT),
+                //                         new ToWristAngle(() -> Units.degreesToRadians(-88), wrist),
+                //                         new ElevatorCommand(elevator, ElevatorWantedMode.L4_CORAL_PIVOT)));
+                // operator.y().onFalse(getIdleCommands());
                 // L3
                 // operator.b().and(() -> drivetrain.decideScoringMode() == ScoringMode.PIVOT_SIDE)
                 //         .whileTrue(new SequentialCommandGroup(
@@ -288,38 +330,75 @@ public class RobotContainer {
                 //                         new ArmCommand(arm, ArmWantedMode.L3_CORAL_PIVOT)),
                 //                 new ElevatorCommand(elevator, ElevatorWantedMode.L3_CORAL_PIVOT)));
                 // L3 PIVOT SIDE
-                operator.b().and(() -> drivetrain.decideScoringMode() == ScoringMode.PIVOT_SIDE)
-                        .whileTrue(
+                operator.b().and(() -> drivetrain.decideScoringMode() == ScoringMode.PIVOT_SIDE).and(beamBroken)
+                        .onTrue(
                                 new ParallelCommandGroup(
-                                        new ArmCommand(arm, ArmWantedMode.L3_CORAL_PIVOT),
-                                        new ToWristAngle(() -> Units.degreesToRadians(-80), wrist),
-                                        new ElevatorCommand(elevator, ElevatorWantedMode.L3_CORAL_PIVOT)));
-                operator.b().onFalse(getIdleCommands());
+                                        new InstantCommand(() -> wrist.setWantedWristMode(WristWantedMode.L3_CORAL_PIVOT)),
+                                        new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.L3_CORAL_PIVOT)),
+                                        new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.L3_CORAL_PIVOT))))
+                        .onFalse(
+                                new ParallelCommandGroup(
+                                        new InstantCommand(()-> wrist.setWantedWristMode(WristWantedMode.IDLE)),
+                                        new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.IDLE)),
+                                        new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.IDLE))));
                 // L2
-                operator.a().whileTrue(new SequentialCommandGroup(
-                                new ToAngle(() -> Arm.getEncoderPosition().getRadians(), arm),
+                operator.a()
+                        .onTrue(
                                 new ParallelCommandGroup(
-                                                new ToAngle(() -> Units.degreesToRadians(45), arm),
-                                                new ToWristAngle(() -> Units.degreesToRadians(-40), wrist)),
-                                new ElevateLevel(elevator, ElevateMode.L2)));
-                operator.a().onFalse(getIdleCommands());
+                                        new InstantCommand(() -> wrist.setWantedWristMode(WristWantedMode.L2_CORAL)),
+                                        new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.L2_CORAL)),
+                                        new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.L2_CORAL))))
+                        .onFalse(
+                                new ParallelCommandGroup(
+                                        new InstantCommand(()-> wrist.setWantedWristMode(WristWantedMode.IDLE)),
+                                        new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.IDLE)),
+                                        new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.IDLE))));
+                // operator.a().whileTrue(new SequentialCommandGroup(
+                //                 new ToAngle(() -> Arm.getEncoderPosition().getRadians(), arm),
+                //                 new ParallelCommandGroup(
+                //                                 new ToAngle(() -> Units.degreesToRadians(45), arm),
+                //                                 new ToWristAngle(() -> Units.degreesToRadians(-40), wrist)),
+                //                 new ElevateLevel(elevator, ElevateMode.L2)));
+                // operator.a().onFalse(getIdleCommands());
                 // L1
-                operator.x().whileTrue(new SequentialCommandGroup(
-                                new ToAngle(() -> Arm.getEncoderPosition().getRadians(), arm),
+                operator.x()
+                        .onTrue(
                                 new ParallelCommandGroup(
-                                                new ToAngle(() -> Units.degreesToRadians(20), arm),
-                                                new ToWristAngle(() -> Units.degreesToRadians(-3), wrist)),
-                                new ElevateLevel(elevator, ElevateMode.L1)));
-                operator.x().onFalse(getIdleCommands());
+                                        new InstantCommand(() -> wrist.setWantedWristMode(WristWantedMode.L1)),
+                                        new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.L1)),
+                                        new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.L1))))
+                        .onFalse(
+                                new ParallelCommandGroup(
+                                        new InstantCommand(()-> wrist.setWantedWristMode(WristWantedMode.IDLE)),
+                                        new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.IDLE)),
+                                        new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.IDLE))));
+                // operator.x().whileTrue(new SequentialCommandGroup(
+                //                 new ToAngle(() -> Arm.getEncoderPosition().getRadians(), arm),
+                //                 new ParallelCommandGroup(
+                //                                 new ToAngle(() -> Units.degreesToRadians(20), arm),
+                //                                 new ToWristAngle(() -> Units.degreesToRadians(-3), wrist)),
+                //                 new ElevateLevel(elevator, ElevateMode.L1)));
+                // operator.x().onFalse(getIdleCommands());
 
                 // } else {
                 // L4 battery side
-                operator.y().and(() -> drivetrain.decideScoringMode() == ScoringMode.BATTERY_SIDE)
-                        .whileTrue(
+                operator.y().and(() -> drivetrain.decideScoringMode() == ScoringMode.BATTERY_SIDE).and(beamBroken)
+                        .onTrue(
                                 new ParallelCommandGroup(
-                                        new ArmCommand(arm, ArmWantedMode.L4_CORAL_BATTERY),
-                                        new ToWristAngle(() -> Units.degreesToRadians(3), wrist),
-                                        new ElevatorCommand(elevator, ElevatorWantedMode.L4_CORAL_BATTERY)));
+                                        new InstantCommand(() -> wrist.setWantedWristMode(WristWantedMode.L4_CORAL_BATTERY)),
+                                        new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.L4_CORAL_BATTERY)),
+                                        new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.L4_CORAL_BATTERY))))
+                        .onFalse(
+                                new ParallelCommandGroup(
+                                        new InstantCommand(()-> wrist.setWantedWristMode(WristWantedMode.IDLE)),
+                                        new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.IDLE)),
+                                        new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.IDLE))));
+                // operator.y().and(() -> drivetrain.decideScoringMode() == ScoringMode.BATTERY_SIDE)
+                //         .whileTrue(
+                //                 new ParallelCommandGroup(
+                //                         new ArmCommand(arm, ArmWantedMode.L4_CORAL_BATTERY),
+                //                         new ToWristAngle(() -> Units.degreesToRadians(3), wrist),
+                //                         new ElevatorCommand(elevator, ElevatorWantedMode.L4_CORAL_BATTERY)));
 
                 // operator.y().and(() -> drivetrain.decideScoringMode() == ScoringMode.BATTERY_SIDE)
                 //         .whileTrue(new SequentialCommandGroup(
@@ -335,12 +414,23 @@ public class RobotContainer {
                 //                         new ArmCommand(arm, ArmWantedMode.L3_CORAL_BATTERY)),
                 //                 new ElevatorCommand(elevator, ElevatorWantedMode.L3_CORAL_BATTERY)));
                 // L3 battery side
-                operator.b().and(() -> drivetrain.decideScoringMode() == ScoringMode.BATTERY_SIDE)
-                        .whileTrue(
+                operator.b().and(() -> drivetrain.decideScoringMode() == ScoringMode.BATTERY_SIDE).and(beamBroken)
+                        .onTrue(
                                 new ParallelCommandGroup(
-                                        new ArmCommand(arm, ArmWantedMode.L3_CORAL_BATTERY),
-                                        new ToWristAngle(() -> Units.degreesToRadians(-58), wrist),
-                                        new ElevatorCommand(elevator, ElevatorWantedMode.L3_CORAL_BATTERY)));
+                                        new InstantCommand(() -> wrist.setWantedWristMode(WristWantedMode.L3_CORAL_BATTERY)),
+                                        new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.L3_CORAL_BATTERY)),
+                                        new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.L3_CORAL_BATTERY))))
+                        .onFalse(
+                                new ParallelCommandGroup(
+                                        new InstantCommand(()-> wrist.setWantedWristMode(WristWantedMode.IDLE)),
+                                        new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.IDLE)),
+                                        new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.IDLE))));
+                // operator.b().and(() -> drivetrain.decideScoringMode() == ScoringMode.BATTERY_SIDE)
+                //         .whileTrue(
+                //                 new ParallelCommandGroup(
+                //                         new ArmCommand(arm, ArmWantedMode.L3_CORAL_BATTERY),
+                //                         new ToWristAngle(() -> Units.degreesToRadians(-58), wrist),
+                //                         new ElevatorCommand(elevator, ElevatorWantedMode.L3_CORAL_BATTERY)));
         
                 // operator.b().and(() -> drivetrain.decideScoringMode() == ScoringMode.BATTERY_SIDE)
                 //         .whileTrue(new SequentialCommandGroup(
@@ -350,73 +440,140 @@ public class RobotContainer {
 
 
                 // L3 Algae Removal dunk
-                driver.b().and(() -> drivetrain.decideScoringMode() == ScoringMode.PIVOT_SIDE)
-                                .whileTrue(new SequentialCommandGroup(
-                                                new ToAngle(() -> Arm.getEncoderPosition().getRadians(), arm),
-                                                new ParallelCommandGroup(
-                                                                new ToWristAngle(() -> Units.degreesToRadians(-53),
-                                                                                wrist),
-                                                                new ToAngle(() -> Units.degreesToRadians(87), arm)),
-                                                new ElevateLevel(elevator, ElevateMode.L3AR)));
+                operator.b().and(() -> drivetrain.decideScoringMode() == ScoringMode.PIVOT_SIDE).and(beamNotBroken)
+                        .onTrue(
+                                new ParallelCommandGroup(
+                                        new InstantCommand(() -> wrist.setWantedWristMode(WristWantedMode.L3_ALGAE_PIVOT)),
+                                        new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.L3_ALGAE_PIVOT)),
+                                        new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.L3_ALGAE_PIVOT))))
+                        .onFalse(
+                                new ParallelCommandGroup(
+                                        new InstantCommand(()-> wrist.setWantedWristMode(WristWantedMode.IDLE)),
+                                        new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.IDLE)),
+                                        new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.IDLE))));
+                // driver.b().and(() -> drivetrain.decideScoringMode() == ScoringMode.PIVOT_SIDE)
+                //                 .whileTrue(new SequentialCommandGroup(
+                //                                 new ToAngle(() -> Arm.getEncoderPosition().getRadians(), arm),
+                //                                 new ParallelCommandGroup(
+                //                                                 new ToWristAngle(() -> Units.degreesToRadians(-53),
+                //                                                                 wrist),
+                //                                                 new ToAngle(() -> Units.degreesToRadians(87), arm)),
+                //                                 new ElevateLevel(elevator, ElevateMode.L3AR)));
 
-                // L2 Algae Removal dunk
-                driver.a().and(() -> drivetrain.decideScoringMode() == ScoringMode.PIVOT_SIDE)
-                                .whileTrue(new SequentialCommandGroup(
-                                                new ToAngle(() -> Arm.getEncoderPosition().getRadians(), arm),
-                                                new ParallelCommandGroup(
-                                                                new ToWristAngle(() -> Units.degreesToRadians(-76),
-                                                                                wrist),
-                                                                new ToAngle(() -> Units.degreesToRadians(88.67), arm)),
-                                                new ElevateLevel(elevator, ElevateMode.L2AR)));
+                
+                // driver.a().and(() -> drivetrain.decideScoringMode() == ScoringMode.PIVOT_SIDE)
+                //                 .whileTrue(new SequentialCommandGroup(
+                //                                 new ToAngle(() -> Arm.getEncoderPosition().getRadians(), arm),
+                //                                 new ParallelCommandGroup(
+                //                                                 new ToWristAngle(() -> Units.degreesToRadians(-76),
+                //                                                                 wrist),
+                //                                                 new ToAngle(() -> Units.degreesToRadians(88.67), arm)),
+                //                                 new ElevateLevel(elevator, ElevateMode.L2AR)));
 
                 // L3 Algae Removal reach
-                driver.b().and(() -> drivetrain.decideScoringMode() == ScoringMode.BATTERY_SIDE)
-                                .whileTrue(new SequentialCommandGroup(
-                                                new ToAngle(() -> Arm.getEncoderPosition().getRadians(), arm),
-                                                new ParallelCommandGroup(
-                                                                new ToWristAngle(() -> Units.degreesToRadians(44.5),
-                                                                                wrist),
-                                                                new ToAngle(() -> Units.degreesToRadians(65), arm)),
-                                                new ElevateLevel(elevator, ElevateMode.L3R)));
-                // l3 algae align
-                driver.b().and(() -> drivetrain.decideScoringMode() == ScoringMode.BATTERY_SIDE)
-                                .whileTrue(drivetrain.defer(
-                                                () -> DriveToLocation.driveTo(drivetrain
-                                                                .getCenterReefPose(), drivetrain))
-                                                .until(() -> drivetrain.getState().Pose == drivetrain
-                                                                .getCenterReefPose()));
-                driver.b().onFalse(getIdleCommands());
-                // L3 algae align forward
-                driver.b().and(() -> drivetrain.decideScoringMode() == ScoringMode.PIVOT_SIDE).whileTrue(
-                                drivetrain.defer(() -> DriveToLocation.driveTo(drivetrain.getCenterReefPose(),
-                                                drivetrain)));
+                operator.b().and(() -> drivetrain.decideScoringMode() == ScoringMode.BATTERY_SIDE).and(beamNotBroken)
+                        .onTrue(
+                                new ParallelCommandGroup(
+                                        new InstantCommand(() -> wrist.setWantedWristMode(WristWantedMode.L3_ALGAE_BATTERY)),
+                                        new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.L3_ALGAE_BATTERY)),
+                                        new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.L3_ALGAE_BATTERY))))
+                        .onFalse(
+                                new ParallelCommandGroup(
+                                        new InstantCommand(()-> wrist.setWantedWristMode(WristWantedMode.IDLE)),
+                                        new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.IDLE)),
+                                        new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.IDLE))));
+                // driver.b().and(() -> drivetrain.decideScoringMode() == ScoringMode.BATTERY_SIDE)
+                //                 .whileTrue(new SequentialCommandGroup(
+                //                                 new ToAngle(() -> Arm.getEncoderPosition().getRadians(), arm),
+                //                                 new ParallelCommandGroup(
+                //                                                 new ToWristAngle(() -> Units.degreesToRadians(44.5),
+                //                                                                 wrist),
+                //                                                 new ToAngle(() -> Units.degreesToRadians(65), arm)),
+                //                                 new ElevateLevel(elevator, ElevateMode.L3R)));
+                // Algae align
+                driver.b()
+                        .whileTrue(drivetrain.defer(
+                                () -> DriveToLocation.driveTo(drivetrain.getCenterReefPose(), drivetrain))
+                                        .until(() -> drivetrain.getState().Pose == drivetrain.getCenterReefPose()));
+                // // L3 algae align forward
+                // driver.b().and(() -> drivetrain.decideScoringMode() == ScoringMode.PIVOT_SIDE).whileTrue(
+                //         drivetrain.defer(
+                //                 () -> DriveToLocation.driveTo(drivetrain.getCenterReefPose(), drivetrain)));
 
-                // L2 Algae Removal reach
-                driver.a().and(() -> drivetrain.decideScoringMode() == ScoringMode.BATTERY_SIDE)
-                                .whileTrue(new SequentialCommandGroup(
-                                                new ToAngle(() -> Arm.getEncoderPosition().getRadians(), arm),
-                                                new ParallelCommandGroup(
-                                                                new ToWristAngle(() -> Units.degreesToRadians(-3),
-                                                                                wrist),
-                                                                new ToAngle(() -> Units.degreesToRadians(25), arm)),
-                                                new ElevateLevel(elevator, ElevateMode.L2AR)));
-                driver.a().onFalse(getIdleCommands());
-
+                // L2 Algae Removal Battery side
+                operator.a().and(() -> drivetrain.decideScoringMode() == ScoringMode.BATTERY_SIDE).and(beamNotBroken)
+                        .onTrue(
+                                new ParallelCommandGroup(
+                                        new InstantCommand(() -> wrist.setWantedWristMode(WristWantedMode.L2_ALGAE_BATTERY)),
+                                        new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.L2_ALGAE_BATTERY)),
+                                        new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.L2_ALGAE_BATTERY))))
+                        .onFalse(
+                                new ParallelCommandGroup(
+                                        new InstantCommand(()-> wrist.setWantedWristMode(WristWantedMode.IDLE)),
+                                        new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.IDLE)),
+                                        new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.IDLE))));
+                // driver.a().and(() -> drivetrain.decideScoringMode() == ScoringMode.BATTERY_SIDE)
+                //                 .whileTrue(new SequentialCommandGroup(
+                //                                 new ToAngle(() -> Arm.getEncoderPosition().getRadians(), arm),
+                //                                 new ParallelCommandGroup(
+                //                                                 new ToWristAngle(() -> Units.degreesToRadians(-3),
+                //                                                                 wrist),
+                //                                                 new ToAngle(() -> Units.degreesToRadians(25), arm)),
+                //                                 new ElevateLevel(elevator, ElevateMode.L2AR)));
+                // L2 Algae Removal Pivot side
+                operator.a().and(() -> drivetrain.decideScoringMode() == ScoringMode.PIVOT_SIDE).and(beamNotBroken)
+                        .onTrue(
+                                new ParallelCommandGroup(
+                                        new InstantCommand(() -> wrist.setWantedWristMode(WristWantedMode.L2_ALGAE_PIVOT)),
+                                        new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.L2_ALGAE_PIVOT)),
+                                        new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.L2_ALGAE_PIVOT))))
+                        .onFalse(
+                                new ParallelCommandGroup(
+                                        new InstantCommand(()-> wrist.setWantedWristMode(WristWantedMode.IDLE)),
+                                        new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.IDLE)),
+                                        new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.IDLE))));
+                                        
                 operator.start().onTrue(new ElevatorReset(elevator));
                 beamBroken.onTrue(new SetSolidColor(wpiLights, LightsConstants.GRBColors.get("green")));
                 beamBroken.onFalse(new SetSolidColor(wpiLights, LightsConstants.GRBColors.get("blue")));
                 // d-pad
-                operator.povDown().whileTrue(new ClimbDown(climber, () -> 1));
-                operator.povUp().whileTrue(new Climb(climber, () -> 1));
-                operator.povLeft().whileTrue(new IntakeIn(intake)); //should be intake out
+                operator.povDown()
+                        .onTrue(new InstantCommand(() -> climber.climberOpen()))
+                        .onFalse(new InstantCommand(() -> climber.climberMotor.set(0)));
+                operator.povUp()
+                        .onTrue(new InstantCommand(() -> climber.climberClimb()))
+                        .onFalse(new InstantCommand(() -> climber.climberMotor.set(0)));
+
+                // operator.povDown().whileTrue(new Climb(climber, () -> -1));
+                // operator.povUp().whileTrue(new Climb(climber, () -> 1));
+
+                // operator.povLeft()
+                //         .onTrue(new InstantCommand(() -> intake.setWantedIntakeMode(IntakeWantedMode.SCORE_CORAL_BATTERYSIDE)))
+                //         .onFalse(new InstantCommand(() -> intake.setWantedIntakeMode(IntakeWantedMode.IDLE)));
+                // operator.povRight()
+                //         .onTrue(new InstantCommand(() -> intake.setWantedIntakeMode(IntakeWantedMode.SCORE_CORAL_PIVOTSIDE)))
+                //         .onFalse(new InstantCommand(() -> intake.setWantedIntakeMode(IntakeWantedMode.IDLE)));
+                
+                
                 //barge
-                operator.leftTrigger().whileTrue(new SequentialCommandGroup(
+                operator.leftTrigger()
+                        .onTrue(
                                 new ParallelCommandGroup(
-                                                new ToAngle(() -> Units.degreesToRadians(78), arm), // 75
-                                                new ToWristAngle(() -> Units.degreesToRadians(32), wrist)), // 36.5
-                                new ElevateLevel(elevator, ElevateMode.L4).withTimeout(0.7),
-                                new IntakeOut(intake).withTimeout(0.5)));
-                operator.leftTrigger().onFalse(getIdleCommands());
+                                        new InstantCommand(() -> wrist.setWantedWristMode(WristWantedMode.ALGAE_BARGE)),
+                                        new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.ALGAE_BARGE)),
+                                        new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.ALGAE_BARGE))))
+                        .onFalse(
+                                new ParallelCommandGroup(
+                                        new InstantCommand(()-> wrist.setWantedWristMode(WristWantedMode.IDLE)),
+                                        new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.IDLE)),
+                                        new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.IDLE))));
+                // operator.leftTrigger().whileTrue(new SequentialCommandGroup(
+                //                 new ParallelCommandGroup(
+                //                                 new ToAngle(() -> Units.degreesToRadians(78), arm), // 75
+                //                                 new ToWristAngle(() -> Units.degreesToRadians(32), wrist)), // 36.5
+                //                 new ElevateLevel(elevator, ElevateMode.L4).withTimeout(0.7),
+                //                 new IntakeOut(intake).withTimeout(0.5)));
+                // operator.leftTrigger().onFalse(getIdleCommands());
 
 /* OFFSEASON CODE TESTING GROUND */ ////////////////////////////////////////////////////////////////////
         // //Combined controllers test
@@ -435,8 +592,8 @@ public class RobotContainer {
                                         new ElevateLevel(elevator, ElevateMode.L2))));
         
         /*handling algae*/
-        operator.povDown().whileTrue(new IntakeCommand(intake, IntakeWantedMode.INTAKE_ALGAE));
-        operator.povUp().whileTrue(new IntakeCommand(intake, IntakeWantedMode.SCORE_ALGAE));
+        // operator.povDown().whileTrue(new IntakeCommand(intake, IntakeWantedMode.INTAKE_ALGAE));
+        // operator.povUp().whileTrue(new IntakeCommand(intake, IntakeWantedMode.SCORE_ALGAE));
 
         // /* SCORING */
         //scoring coral
@@ -598,23 +755,25 @@ public class RobotContainer {
         }
 
         public void configureNamedCommands() {
-                NamedCommands.registerCommand("L4", new SequentialCommandGroup(
-                                new ParallelCommandGroup(
-                                                new ToAngle(() -> Units.degreesToRadians(82), arm),
-                                                new ToWristAngle(() -> Units.degreesToRadians(-88), wrist)),
-                                new ElevateLevel(elevator, ElevateMode.L4)).withTimeout(0.7));
+                // NamedCommands.registerCommand("L4", 
+                //         new ParallelCommandGroup(
+                //                 new InstantCommand(() -> wrist.setWantedWristMode(WristWantedMode.L4_CORAL_PIVOT)),
+                //                 new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.L4_CORAL_PIVOT)),
+                //                 new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.L4_CORAL_PIVOT))));
 
-                NamedCommands.registerCommand("armToL4", new ParallelCommandGroup(
-                                new ToWristAngle(() -> Units.degreesToRadians(-88), wrist),
-                                new ToAngle(() -> Units.degreesToRadians(70), arm)));
+                // NamedCommands.registerCommand("armToL4", 
+                //         new ParallelCommandGroup(
+                //                 new InstantCommand(() -> wrist.setWantedWristMode(WristWantedMode.L4_CORAL_PIVOT)),
+                //                 new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.L4_CORAL_PIVOT))));
 
-                NamedCommands.registerCommand("outtake", new IntakeOutVar(intake, () -> 0.6).withTimeout(0.4));
+                // NamedCommands.registerCommand("outtake", 
+                //         new InstantCommand(() -> intake.setWantedIntakeMode(IntakeWantedMode.SCORE_CORAL_PIVOTSIDE)));
 
-                NamedCommands.registerCommand("intake", new ParallelCommandGroup(
-                                new ToWristAngle(() -> Units.degreesToRadians(33), wrist),
-                                new ToAngle(() -> Units.degreesToRadians(-7), arm),
-                                new IntakeIn(intake),
-                                new ElevateLevel(elevator, ElevateMode.HP)).until(() -> intake.hasCoral()));
+                // NamedCommands.registerCommand("intake", 
+                //         new ParallelCommandGroup(
+                //                 new InstantCommand(() -> intake.setWantedIntakeMode(IntakeWantedMode.INTAKE_CORAL)),
+                //                 new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.INTAKE_CORAL)),
+                //                 new InstantCommand(() -> wrist.setWantedWristMode(WristWantedMode.INTAKE_CORAL))));
 
                 NamedCommands.registerCommand("reset", new SequentialCommandGroup(
                                 new ToWristAngle(() -> Units.degreesToRadians(-61.5), wrist),

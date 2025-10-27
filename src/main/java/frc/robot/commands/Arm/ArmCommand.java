@@ -15,7 +15,7 @@ public class ArmCommand extends Command {
     }
 
     @Override
-    public void initialize() {
+    public void execute() {
         arm.setWantedArmMode(this.desiredMode);
     }
 

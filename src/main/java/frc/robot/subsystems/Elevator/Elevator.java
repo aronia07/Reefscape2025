@@ -331,6 +331,8 @@ public class Elevator extends SubsystemBase {
     leftElevatorMotor.set(-leftpidOutput);
     rightElevatorMotor.set(leftpidOutput);
 
+    SmartDashboard.putString("ELEVATOR WANTED STATE", wantedMode.toString());
+    SmartDashboard.putString("ELEVATOR SYSTEM STATE", systemMode.toString());
     SmartDashboard.putNumber("Elevator velocity", leftElevatorMotor.get());
     // SmartDashboard.putNumber("Elevator PID output left", leftpidOutput);
     SmartDashboard.putNumber("Elevator's Setpoint", elevatorSetpoint);

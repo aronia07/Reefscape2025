@@ -20,23 +20,34 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.math.controller.ArmFeedforward;
 //import frc.lib.util.
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.lib.util.CANSparkMaxUtil;
 import frc.lib.util.LoggedTunableNumber;
 import frc.lib.util.CANSparkMaxUtil.Usage;
 import frc.robot.Constants;
+import frc.robot.Constants.WristConstants.SystemMode;
+import frc.robot.Constants.WristConstants.WristWantedMode;
+import frc.robot.Constants.ArmConstants.ArmWantedMode;
 import frc.robot.Constants.WristConstants;
 import frc.robot.subsystems.Arm.Arm;
 import frc.robot.subsystems.Wrist.Encoders.WristEncoder;
 import frc.robot.subsystems.Wrist.Encoders.WristEncoderThroughbore;
 
 public class Wrist extends SubsystemBase {
+
+  private WristWantedMode wantedMode = WristWantedMode.IDLE;
+  private SystemMode systemMode = SystemMode.HIGH_IDLE;
+
+  private DigitalInput beamy = Constants.beamy;
+
   // Initialize motors
   private final SparkMax wristMotor = new SparkMax(Constants.WristConstants.wristMotorID, MotorType.kBrushless);
-
   private final SparkMaxConfig wristConfig = new SparkMaxConfig();
 
   // Initialize encoders
@@ -45,10 +56,11 @@ public class Wrist extends SubsystemBase {
   public Rotation2d encoderPosition = new Rotation2d();
 
   // PID controller + feedforward initialization
-  private final PIDController pid = new PIDController(
+  private final ProfiledPIDController pid = new ProfiledPIDController(
       Constants.WristConstants.wristPID[0],
       Constants.WristConstants.wristPID[1],
-      Constants.WristConstants.wristPID[2]);
+      Constants.WristConstants.wristPID[2],
+      new TrapezoidProfile.Constraints(WristConstants.maxVelocity, WristConstants.maxVelocity));
   private ArmFeedforward ffModel = new ArmFeedforward(
       Constants.WristConstants.wristFF[0],
       Constants.WristConstants.wristFF[1],
@@ -94,7 +106,7 @@ public class Wrist extends SubsystemBase {
 
   // Resets the PID's i value
   public void resetI() {
-    pid.reset();
+    // pid.;
   }
 
   // returns the encoder's position
@@ -183,8 +195,190 @@ public class Wrist extends SubsystemBase {
     SmartDashboard.putNumber("Wrist current", wristMotor.getOutputCurrent());
   }
 
+  public boolean hasCoral() {
+    return !beamy.get();
+  }
+
+  public void setWantedWristMode(WristWantedMode desiredMode) {
+    this.wantedMode = desiredMode;
+  }
+
+  private SystemMode changeCurrentSystemMode() {
+    return switch (wantedMode) {
+      case IDLE:
+      if (hasCoral()) {
+        yield SystemMode.HIGH_IDLE;
+      } else {
+        yield SystemMode.LOW_IDLE;
+      }
+      case INTAKE_CORAL:
+        if (hasCoral()) {
+          yield SystemMode.HIGH_IDLE;
+        } else {
+          // if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
+            yield SystemMode.INTAKING_CORAL;
+          // }
+        }
+      case INTAKE_ALGAE:
+        if (hasCoral()) {
+          yield SystemMode.HIGH_IDLE;
+        } else {
+          // if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
+            yield SystemMode.INTAKING_ALGAE;
+          // }
+        }
+      case L1:
+        if (hasCoral()) {
+          // if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
+            yield SystemMode.GOING_L1;
+          // }
+        } else {
+          yield SystemMode.LOW_IDLE;
+        }
+      case L2_CORAL:
+        if (hasCoral()) {
+          // if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
+            yield SystemMode.GOING_L2_CORAL;
+          // }
+        } else {
+          yield SystemMode.LOW_IDLE;
+        }
+      case L2_ALGAE_BATTERY:
+        if (hasCoral()) {
+          yield SystemMode.HIGH_IDLE;
+        } else {
+          // if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
+            yield SystemMode.GOING_L2_ALGAE_BATTERY;
+          // }
+        }
+      case L2_ALGAE_PIVOT:
+        if (hasCoral()) {
+          yield SystemMode.HIGH_IDLE;
+        } else {
+          // if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
+            yield SystemMode.GOING_L2_ALGAE_PIVOT;
+          // }
+        }
+      case L3_CORAL_BATTERY:
+        if (hasCoral()) {
+          // if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
+            yield SystemMode.GOING_L3_CORAL_BATTERY;
+          // }
+        } else {
+          yield SystemMode.LOW_IDLE;
+        }
+      case L3_CORAL_PIVOT:
+        // if (hasCoral()) {
+          // if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
+            yield SystemMode.GOING_L3_CORAL_PIVOT;
+          // }
+        // } else {
+        //   yield SystemMode.LOW_IDLE;
+        // }
+      case L3_ALGAE_BATTERY:
+        if (hasCoral()) {
+          yield SystemMode.HIGH_IDLE;
+        } else {
+          // if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
+            yield SystemMode.GOING_L3_ALGAE_BATTERY;
+          // }
+        }
+      case L3_ALGAE_PIVOT:
+        if (hasCoral()) {
+          yield SystemMode.HIGH_IDLE;
+        } else {
+          // if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
+            yield SystemMode.GOING_L3_ALGAE_PIVOT;
+          // }
+        }
+      case L4_CORAL_BATTERY:
+        if (hasCoral()) {
+          // if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
+            yield SystemMode.GOING_L4_CORAL_BATTERY;
+          // }
+        } else {
+          yield SystemMode.LOW_IDLE;
+        }
+
+      case L4_CORAL_PIVOT:
+        if (hasCoral()) {
+          // if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
+            yield SystemMode.GOING_L4_CORAL_PIVOT;
+          // }
+        } else {
+          yield SystemMode.LOW_IDLE;
+        }
+      case ALGAE_BARGE:
+        if (hasCoral()) {
+          yield SystemMode.HIGH_IDLE;
+        } else {
+          // if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
+            yield SystemMode.GOING_ALGAE_BARGE;
+          // }
+        }
+      case CLIMB:
+        yield SystemMode.CLIMBING;
+      // case HIGH_IDLE:
+      //   yield SystemMode.HIGH_IDLE;
+      // case LOW_IDLE:
+      //   yield SystemMode.LOW_IDLE;
+    };
+  }
+
+  private void applyState() {
+    switch (systemMode) {
+      case INTAKING_CORAL:
+        setpoint = new Rotation2d(Units.degreesToRadians(34));
+        break;
+      case INTAKING_ALGAE:
+        break;
+      case GOING_L1:
+        setpoint = new Rotation2d(Units.degreesToRadians(-3));
+        break;
+      case GOING_L2_CORAL:
+        setpoint = new Rotation2d(Units.degreesToRadians(-40));
+        break;
+      case GOING_L2_ALGAE_PIVOT:
+        setpoint = new Rotation2d(Units.degreesToRadians(-76));
+        break;
+      case GOING_L2_ALGAE_BATTERY:
+        setpoint = new Rotation2d(Units.degreesToRadians(-3));
+        break;
+      case GOING_L3_ALGAE_BATTERY:
+        setpoint = new Rotation2d(Units.degreesToRadians(44.5));
+        break;
+      case GOING_L3_ALGAE_PIVOT:
+        setpoint = new Rotation2d(Units.degreesToRadians(-53));
+        break;
+      case GOING_L3_CORAL_BATTERY:
+        setpoint = new Rotation2d(Units.degreesToRadians(-58));
+        break;
+      case GOING_L3_CORAL_PIVOT:
+        setpoint = new Rotation2d(Units.degreesToRadians(-80));
+        break;
+      case GOING_L4_CORAL_BATTERY:
+        setpoint = new Rotation2d(Units.degreesToRadians(3));
+        break;
+      case GOING_L4_CORAL_PIVOT:
+        setpoint = new Rotation2d(Units.degreesToRadians(-88));
+        break;
+      case GOING_ALGAE_BARGE:
+        setpoint = new Rotation2d(Units.degreesToRadians(32));
+        break;
+      case HIGH_IDLE:
+        setpoint = new Rotation2d(Units.degreesToRadians(-77));
+        break;
+      case LOW_IDLE:
+        setpoint = new Rotation2d(Units.degreesToRadians(-17));
+        break;
+      case CLIMBING:
+        setpoint = new Rotation2d(Units.degreesToRadians(-17));
+    }
+  }
   @Override
   public void periodic() {
+    systemMode = changeCurrentSystemMode();
+    applyState();
 
     encoderPosition = encoder.getAbsolutePosition(); // Finds the exact position of the encoder
     logValues(); // Logs values to SmartDashboard/Glass
@@ -194,7 +388,8 @@ public class Wrist extends SubsystemBase {
     // velocity.getRadians()); //Calculates Feedforward output
     var pidOutput = pid.calculate(getEncoderPosition().getRadians(), setpoint.getRadians()); // calculates PID output
 
-    // SmartDashboard.putNumber("ffoutput arm", ffOutput); //Displays the FF output
+    SmartDashboard.putString("WRIST WANTED STATE", wantedMode.toString());
+    SmartDashboard.putString("WRIST SYSTEM STATE", wantedMode.toString());
     // calculated above on Smartdahsboard/Glass
 
     // PID+FF output on the leader and follower motors

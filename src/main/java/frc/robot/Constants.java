@@ -32,6 +32,43 @@ import edu.wpi.first.wpilibj.util.Color;
 
 public final class Constants {
 
+    public static enum WantedSuperState {
+        IDLE,
+        INTAKE_CORAL_FROM_GROUND,
+        SCORE_L1,
+        SCORE_CORAL_L2_BATTERY_SIDE,
+        SCORE_CORAL_L2_PIVOT_SIDE,
+        REMOVE_ALGAE_L2_BATTERY_SIDE,
+        REMOVE_ALGAE_L2_PIVOT_SIDE,
+        SCORE_CORAL_L3_BATTERY_SIDE,
+        SCORE_CORAL_L3_PIVOT_SIDE,
+        REMOVE_ALGAE_L3_BATTERY_SIDE,
+        REMOVE_ALGAE_L3_PIVOT_SIDE,
+        INTAKE_ALGAE_FROM_GROUND,
+        SCORE_ALGAE_IN_NET,
+        SCORE_ALGAE_IN_PROCESSOR,
+        CLIMB
+    }
+
+    public static enum CurrentSuperState {
+        IDLING,
+        NO_PIECE_TELEOP,
+        HOLDING_CORAL_TELEOP,
+        HOLDING_ALGAE,
+        INTAKE_CORAL_FROM_GROUND,
+        SCORING_L1,
+        SCORING_L2_BATTERY_SIDE,
+        SCORING_L2_PIVOT_SIDE,
+        SCORING_L3_BATTERY_SIDE,
+        SCORING_L3_PIVOT_SIDE,
+        INTAKING_ALGAE_FROM_REEF,
+        INTAKING_ALGAE_FROM_GROUND,
+        SCORING_ALGAE_IN_NET,
+        SCORING_ALGAE_IN_PROCESSOR,
+        CLIMBING
+    }
+
+
     public static DigitalInput beamy = new DigitalInput(1);
 
     public static boolean enableTunableValues = false;
@@ -165,6 +202,45 @@ public final class Constants {
         public static final Rotation2d wristOldMin = Rotation2d.fromDegrees(-95);
         public static final Rotation2d wristNewMin = Rotation2d.fromDegrees(268);
         public static final Rotation2d tolernace = Rotation2d.fromDegrees(0.5);
+
+        public static enum WristWantedMode {
+            IDLE,
+            INTAKE_CORAL,
+            INTAKE_ALGAE,
+            L1,
+            L2_CORAL,
+            L2_ALGAE_BATTERY,
+            L2_ALGAE_PIVOT,
+            L3_CORAL_BATTERY,
+            L3_CORAL_PIVOT,
+            L3_ALGAE_BATTERY,
+            L3_ALGAE_PIVOT,
+            L4_CORAL_BATTERY,
+            L4_CORAL_PIVOT,
+            ALGAE_BARGE,
+            CLIMB
+            // HIGH_IDLE,
+            // LOW_IDLE
+        }
+
+        public static enum SystemMode {
+            HIGH_IDLE,
+            LOW_IDLE,
+            INTAKING_CORAL,
+            INTAKING_ALGAE,
+            GOING_L1,
+            GOING_L2_CORAL,
+            GOING_L2_ALGAE_PIVOT,
+            GOING_L2_ALGAE_BATTERY,
+            GOING_L3_CORAL_BATTERY,
+            GOING_L3_CORAL_PIVOT,
+            GOING_L3_ALGAE_BATTERY,
+            GOING_L3_ALGAE_PIVOT,
+            GOING_L4_CORAL_BATTERY,
+            GOING_L4_CORAL_PIVOT,
+            GOING_ALGAE_BARGE,
+            CLIMBING
+        }
     }
 
     public static final class IntakeConstants {
@@ -313,6 +389,7 @@ public final class Constants {
             L4_CORAL_BATTERY,
             L4_CORAL_PIVOT,
             ALGAE_BARGE,
+            CLIMB
             // HIGH_IDLE,
             // LOW_IDLE
         }
@@ -332,7 +409,8 @@ public final class Constants {
             GOING_L3_ALGAE_PIVOT,
             GOING_L4_CORAL_BATTERY,
             GOING_L4_CORAL_PIVOT,
-            GOING_ALGAE_BARGE
+            GOING_ALGAE_BARGE,
+            CLIMBING
         }
 
         // Arm's polynomial regression (useed to predict distances from speaker)
