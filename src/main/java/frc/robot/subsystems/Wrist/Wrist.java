@@ -40,9 +40,14 @@ import frc.robot.subsystems.Wrist.Encoders.WristEncoder;
 import frc.robot.subsystems.Wrist.Encoders.WristEncoderThroughbore;
 
 public class Wrist extends SubsystemBase {
+  private enum SwitchStateStatus {
+    CAN_SWITCH,
+    CANNOT_SWITCH,
+  }
 
   private WristWantedMode wantedMode = WristWantedMode.IDLE;
   private SystemMode systemMode = SystemMode.HIGH_IDLE;
+  private SwitchStateStatus switchStateStatus = SwitchStateStatus.CAN_SWITCH;
 
   private DigitalInput beamy = Constants.beamy;
 
@@ -203,125 +208,202 @@ public class Wrist extends SubsystemBase {
     this.wantedMode = desiredMode;
   }
 
+  public boolean canSwitch() {
+    return switchStateStatus == SwitchStateStatus.CAN_SWITCH;
+  }
+
   private SystemMode changeCurrentSystemMode() {
     return switch (wantedMode) {
       case IDLE:
-      if (hasCoral()) {
         yield SystemMode.HIGH_IDLE;
-      } else {
-        yield SystemMode.LOW_IDLE;
-      }
+      case INTAKE_IDLE:
+        if (hasCoral()) {
+          yield SystemMode.HIGH_IDLE;
+        } else {
+          yield SystemMode.LOW_IDLE;
+        }
       case INTAKE_CORAL:
         if (hasCoral()) {
           yield SystemMode.HIGH_IDLE;
         } else {
-          // if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
+          if (systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE || systemMode == SystemMode.CLIMBING) {
             yield SystemMode.INTAKING_CORAL;
-          // }
+          }
         }
       case INTAKE_ALGAE:
         if (hasCoral()) {
           yield SystemMode.HIGH_IDLE;
         } else {
-          // if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
+          if (systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE || systemMode == SystemMode.CLIMBING) {
             yield SystemMode.INTAKING_ALGAE;
-          // }
+          }
         }
       case L1:
         if (hasCoral()) {
-          // if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
+          if (systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE || systemMode == SystemMode.CLIMBING) {
             yield SystemMode.GOING_L1;
-          // }
+          }
         } else {
-          yield SystemMode.LOW_IDLE;
+          yield systemMode;
         }
-      case L2_CORAL:
+      case L2_BATTERY:
         if (hasCoral()) {
-          // if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
-            yield SystemMode.GOING_L2_CORAL;
-          // }
+          yield systemMode;
         } else {
-          yield SystemMode.LOW_IDLE;
-        }
-      case L2_ALGAE_BATTERY:
-        if (hasCoral()) {
-          yield SystemMode.HIGH_IDLE;
-        } else {
-          // if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
+          if (systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE || systemMode == SystemMode.CLIMBING) {
             yield SystemMode.GOING_L2_ALGAE_BATTERY;
-          // }
+          } else {
+            yield systemMode;
+          }
         }
-      case L2_ALGAE_PIVOT:
+      case L2_PIVOT:
         if (hasCoral()) {
-          yield SystemMode.HIGH_IDLE;
+          if (systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE || systemMode == SystemMode.CLIMBING) {
+            yield SystemMode.GOING_L2_CORAL;
+          } else {
+            yield systemMode;
+          }
         } else {
-          // if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
+          if (systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE || systemMode == SystemMode.CLIMBING) {
             yield SystemMode.GOING_L2_ALGAE_PIVOT;
-          // }
+          } else {
+            yield systemMode;
+          }
         }
-      case L3_CORAL_BATTERY:
+      case L3_PIVOT:
         if (hasCoral()) {
-          // if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
-            yield SystemMode.GOING_L3_CORAL_BATTERY;
-          // }
-        } else {
-          yield SystemMode.LOW_IDLE;
-        }
-      case L3_CORAL_PIVOT:
-        // if (hasCoral()) {
-          // if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
+          if (systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE || systemMode == SystemMode.CLIMBING) {
             yield SystemMode.GOING_L3_CORAL_PIVOT;
-          // }
-        // } else {
-        //   yield SystemMode.LOW_IDLE;
-        // }
-      case L3_ALGAE_BATTERY:
-        if (hasCoral()) {
-          yield SystemMode.HIGH_IDLE;
+          } else {
+            yield systemMode;
+          }
         } else {
-          // if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
-            yield SystemMode.GOING_L3_ALGAE_BATTERY;
-          // }
-        }
-      case L3_ALGAE_PIVOT:
-        if (hasCoral()) {
-          yield SystemMode.HIGH_IDLE;
-        } else {
-          // if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
+          if (systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE || systemMode == SystemMode.CLIMBING) {
             yield SystemMode.GOING_L3_ALGAE_PIVOT;
-          // }
+          } else {
+            yield systemMode;
+          }
         }
-      case L4_CORAL_BATTERY:
+      case L3_BATTERY:
         if (hasCoral()) {
-          // if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
-            yield SystemMode.GOING_L4_CORAL_BATTERY;
-          // }
+          if (systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE || systemMode == SystemMode.CLIMBING) {
+            yield SystemMode.GOING_L3_CORAL_BATTERY;
+          } else {
+            yield systemMode;
+          }
         } else {
-          yield SystemMode.LOW_IDLE;
+          if (systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE || systemMode == SystemMode.CLIMBING) {
+            yield SystemMode.GOING_L3_ALGAE_BATTERY;
+          } else {
+            yield systemMode;
+          }
         }
-
-      case L4_CORAL_PIVOT:
+      case L4_PIVOT:
         if (hasCoral()) {
-          // if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
+          if (systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE || systemMode == SystemMode.CLIMBING) {
             yield SystemMode.GOING_L4_CORAL_PIVOT;
-          // }
+          } else {
+            yield systemMode;
+          }
         } else {
-          yield SystemMode.LOW_IDLE;
-        }
+          yield systemMode;
+          }
+      case L4_BATTERY:
+        if (hasCoral()) {
+          if (systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE || systemMode == SystemMode.CLIMBING) {
+            yield SystemMode.GOING_L4_CORAL_PIVOT;
+          } else {
+            yield systemMode;
+          }
+        } else {
+            yield systemMode;
+          }
+
       case ALGAE_BARGE:
         if (hasCoral()) {
-          yield SystemMode.HIGH_IDLE;
+          yield systemMode;
         } else {
-          // if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
+          if (systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE || systemMode == SystemMode.CLIMBING) {
             yield SystemMode.GOING_ALGAE_BARGE;
-          // }
+          } else {
+            yield systemMode;
+          }
         }
       case CLIMB:
         yield SystemMode.CLIMBING;
-      // case HIGH_IDLE:
-      //   yield SystemMode.HIGH_IDLE;
-      // case LOW_IDLE:
-      //   yield SystemMode.LOW_IDLE;
+            // case L4_CORAL_BATTERY:
+      //   if (hasCoral()) {
+      //     if (canSwitch()) {
+      //       yield SystemMode.GOING_L4_CORAL_BATTERY;
+      //     }
+      //   } else {
+      //     yield SystemMode.LOW_IDLE;
+      //   }
+
+      // case L4_CORAL_PIVOT:
+      //   if (hasCoral()) {
+      //     if (canSwitch()) {
+      //       yield SystemMode.GOING_L4_CORAL_PIVOT;
+      //     }
+      //   } else {
+      //     yield SystemMode.LOW_IDLE;
+      //   }
+      // case L3_CORAL_BATTERY:
+      //   if (hasCoral()) {
+      //     if (canSwitch()) {
+      //       yield SystemMode.GOING_L3_CORAL_BATTERY;
+      //     }
+      //   } else {
+      //     yield SystemMode.LOW_IDLE;
+      //   }
+      // case L3_CORAL_PIVOT:
+      //   if (hasCoral()) {
+      //     if (canSwitch()) {
+      //       yield SystemMode.GOING_L3_CORAL_PIVOT;
+      //     }
+      //   } else {
+      //     yield SystemMode.LOW_IDLE;
+      //   }
+      // case L3_ALGAE_BATTERY:
+      //   if (hasCoral()) {
+      //     yield SystemMode.HIGH_IDLE;
+      //   } else {
+      //     if (canSwitch()) {
+      //       yield SystemMode.GOING_L3_ALGAE_BATTERY;
+      //     }
+      //   }
+      // case L3_ALGAE_PIVOT:
+      //   if (hasCoral()) {
+      //     yield SystemMode.HIGH_IDLE;
+      //   } else {
+      //     if (canSwitch()) {
+      //       yield SystemMode.GOING_L3_ALGAE_PIVOT;
+      //     }
+      //   }
+      // case L2_ALGAE_PIVOT:
+      //   if (hasCoral()) {
+      //     yield SystemMode.HIGH_IDLE;
+      //   } else {
+      //     if (canSwitch()) {
+      //       yield SystemMode.GOING_L2_ALGAE_PIVOT;
+      //     }
+      //   }
+      // case L2_CORAL:
+      //   if (hasCoral()) {
+      //     if (canSwitch()) {
+      //       yield SystemMode.GOING_L2_CORAL;
+      //     }
+      //   } else {
+      //     yield SystemMode.LOW_IDLE;
+      //   }
+      // case L2_ALGAE_BATTERY:
+      //   if (hasCoral()) {
+      //     yield SystemMode.HIGH_IDLE;
+      //   } else {
+      //     if (systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE || systemMode == SystemMode.CLIMBING) {
+      //       yield SystemMode.GOING_L2_ALGAE_BATTERY;
+      //     }
+      //   }
     };
   }
 
@@ -373,8 +455,10 @@ public class Wrist extends SubsystemBase {
         break;
       case CLIMBING:
         setpoint = new Rotation2d(Units.degreesToRadians(-17));
+        break;
     }
   }
+
   @Override
   public void periodic() {
     systemMode = changeCurrentSystemMode();
@@ -389,7 +473,7 @@ public class Wrist extends SubsystemBase {
     var pidOutput = pid.calculate(getEncoderPosition().getRadians(), setpoint.getRadians()); // calculates PID output
 
     SmartDashboard.putString("WRIST WANTED STATE", wantedMode.toString());
-    SmartDashboard.putString("WRIST SYSTEM STATE", wantedMode.toString());
+    SmartDashboard.putString("WRIST SYSTEM STATE", systemMode.toString());
     // calculated above on Smartdahsboard/Glass
 
     // PID+FF output on the leader and follower motors

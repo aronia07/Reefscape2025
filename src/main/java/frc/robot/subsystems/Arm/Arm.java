@@ -28,6 +28,10 @@ import frc.robot.Constants.ArmConstants.SystemMode;
 import frc.robot.subsystems.Arm.Encoders.ArmEncoderThroughbore;
 
 public class Arm extends SubsystemBase {
+  private enum SwitchStateStatus {
+    CAN_SWITCH,
+    CANNOT_SWITCH,
+  }
   // Initialize motors
   private final SparkMax leader = new SparkMax(Constants.ArmConstants.leaderID, MotorType.kBrushless);
   private final SparkMax follower = new SparkMax(Constants.ArmConstants.followerID, MotorType.kBrushless);
@@ -42,6 +46,7 @@ public class Arm extends SubsystemBase {
 
   private ArmWantedMode wantedMode = ArmWantedMode.IDLE;
   private SystemMode systemMode = SystemMode.HIGH_IDLE;
+  private SwitchStateStatus switchStateStatus = SwitchStateStatus.CAN_SWITCH;
 
   // PID controller + feedforward initialization
   private final ProfiledPIDController pid = new ProfiledPIDController(Constants.ArmConstants.armPID[0],
@@ -194,127 +199,271 @@ public class Arm extends SubsystemBase {
     this.wantedMode = desiredMode;
   }
 
+  public boolean canSwitch() {
+    return switchStateStatus == SwitchStateStatus.CAN_SWITCH;
+  }
+
   private SystemMode changeCurrentSystemMode() {
     return switch (wantedMode) {
-      case IDLE:
-        if (!hasCoral() || (systemMode == SystemMode.INTAKING_CORAL)) {
-          yield SystemMode.LOW_IDLE;
-        } else {
-          yield SystemMode.HIGH_IDLE;
-        }
-      case INTAKE_CORAL:
-        if (hasCoral()) {
-          yield SystemMode.HIGH_IDLE;
-        } else {
-          if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
-            yield SystemMode.INTAKING_CORAL;
-          }
-        }
-      case INTAKE_ALGAE:
-        if (hasCoral()) {
-          yield SystemMode.HIGH_IDLE;
-        } else {
-          if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
-            yield SystemMode.INTAKING_ALGAE;
-          }
-        }
-      case L1:
-        if (hasCoral()) {
-          if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
-            yield SystemMode.GOING_L1;
-          }
-        } else {
-          yield SystemMode.HIGH_IDLE;
-        }
-      case L2_CORAL:
-        if (hasCoral()) {
-          if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
-            yield SystemMode.GOING_L2_CORAL;
-          }
-        } else {
-          yield SystemMode.HIGH_IDLE;
-        }
-      case L2_ALGAE_BATTERY:
-        if (hasCoral()) {
-          yield SystemMode.HIGH_IDLE;
-        } else {
-          if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
-            yield SystemMode.GOING_L2_ALGAE_BATTERY;
-          }
-        }
-      case L2_ALGAE_PIVOT:
-        if (hasCoral()) {
-          yield SystemMode.HIGH_IDLE;
-        } else {
-          // if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
-            yield SystemMode.GOING_L2_ALGAE_PIVOT;
-          // }
-        }
-      case L3_CORAL_BATTERY:
-        if (hasCoral()) {
-          // if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
-            yield SystemMode.GOING_L3_CORAL_BATTERY;
-          // }
-        } else {
-          yield SystemMode.HIGH_IDLE;
-        }
-      case L3_CORAL_PIVOT:
-        if (hasCoral()) {
-          if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
-            yield SystemMode.GOING_L3_CORAL_PIVOT;
-          }
-        } else {
-          yield SystemMode.HIGH_IDLE;
-        }
-      case L3_ALGAE_BATTERY:
-        if (hasCoral()) {
-          yield SystemMode.HIGH_IDLE;
-        } else {
-          if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
-            yield SystemMode.GOING_L3_ALGAE_BATTERY;
-          }
-        }
-      case L3_ALGAE_PIVOT:
-        if (hasCoral()) {
-          yield SystemMode.HIGH_IDLE;
-        } else {
-          if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
-            yield SystemMode.GOING_L3_ALGAE_PIVOT;
-          } else {
-            yield systemMode;
-          }
-        }
-      case L4_CORAL_BATTERY:
-        if (hasCoral()) {
-          if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
-            yield SystemMode.GOING_L4_CORAL_BATTERY;
-          }
-        } else {
-          yield SystemMode.LOW_IDLE;
-        }
+    //   case IDLE:
+    //     if (!hasCoral() || (systemMode == SystemMode.INTAKING_CORAL)) {
+    //       yield SystemMode.LOW_IDLE;
+    //     } else {
+    //       yield SystemMode.HIGH_IDLE;
+    //     }
+    //   case INTAKE_CORAL:
+    //     if (hasCoral()) {
+    //       yield SystemMode.HIGH_IDLE;
+    //     } else {
+    //       if(canSwitch()) {
+    //         switchStateStatus = SwitchStateStatus.CANNOT_SWITCH;
+    //         yield SystemMode.INTAKING_CORAL;
+    //       }
+    //     }
+    //   case INTAKE_ALGAE:
+    //     if (hasCoral()) {
+    //       yield SystemMode.HIGH_IDLE;
+    //     } else {
+    //       if(canSwitch()) {
+    //         switchStateStatus = SwitchStateStatus.CANNOT_SWITCH;
+    //         yield SystemMode.INTAKING_ALGAE;
+    //       }
+    //     }
+    //   case L1:
+    //     if (hasCoral()) {
+    //       if(canSwitch()) {
+    //         switchStateStatus = SwitchStateStatus.CANNOT_SWITCH;
+    //         yield SystemMode.GOING_L1;
+    //       }
+    //     } else {
+    //       yield SystemMode.HIGH_IDLE;
+    //     }
+    //   case L2_CORAL:
+    //     if (hasCoral()) {
+    //       if(canSwitch()) {
+    //         switchStateStatus = SwitchStateStatus.CANNOT_SWITCH;
+    //         yield SystemMode.GOING_L2_CORAL;
+    //       }
+    //     } else {
+    //       yield SystemMode.HIGH_IDLE;
+    //     }
+    //   case L2_ALGAE_BATTERY:
+    //     if (hasCoral()) {
+    //       yield SystemMode.HIGH_IDLE;
+    //     } else {
+    //       if(canSwitch()) {
+    //         switchStateStatus = SwitchStateStatus.CANNOT_SWITCH;
+    //         yield SystemMode.GOING_L2_ALGAE_BATTERY;
+    //       }
+    //     }
+    //   case L2_ALGAE_PIVOT:
+    //     if (hasCoral()) {
+    //       yield SystemMode.HIGH_IDLE;
+    //     } else {
+    //       if(canSwitch()) {
+    //         switchStateStatus = SwitchStateStatus.CANNOT_SWITCH;
+    //         yield SystemMode.GOING_L2_ALGAE_PIVOT;
+    //       }
+    //     }
+    //   case L3_CORAL_BATTERY:
+    //     if (hasCoral()) {
+    //       if(canSwitch()) {
+    //         switchStateStatus = SwitchStateStatus.CANNOT_SWITCH;
+    //         yield SystemMode.GOING_L3_CORAL_BATTERY;
+    //       }
+    //     } else {
+    //       yield SystemMode.HIGH_IDLE;
+    //     }
+    //   // case L3_CORAL_PIVOT:
+    //   //   if (hasCoral()) {
+    //   //     if(canSwitch()) {
+    //   //       switchStateStatus = SwitchStateStatus.CANNOT_SWITCH;
+    //   //       yield SystemMode.GOING_L3_CORAL_PIVOT;
+    //   //     }
+    //   //   } else {
+    //   //     yield SystemMode.HIGH_IDLE;
+    //   //   }
+    //   case L3_PIVOT:
+    //     if (hasCoral()) {
+    //       if (systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE || systemMode == SystemMode.CLIMBING) {
+    //         yield SystemMode.GOING_L3_CORAL_PIVOT;
+    //       } else {
+    //         yield systemMode;
+    //       }
+    //     } else {
+    //       if (systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE || systemMode == SystemMode.CLIMBING) {
+    //         yield SystemMode.GOING_L3_ALGAE_PIVOT;
+    //       } else {
+    //         yield systemMode;
+    //       }
+    //     }
+    //   case L3_ALGAE_BATTERY:
+    //     if (hasCoral()) {
+    //       yield SystemMode.HIGH_IDLE;
+    //     } else {
+    //       if(canSwitch()) {
+    //         switchStateStatus = SwitchStateStatus.CANNOT_SWITCH;
+    //         yield SystemMode.GOING_L3_ALGAE_BATTERY;
+    //       }
+    //     }
+    //   // case L3_ALGAE_PIVOT:
+    //   //   if (hasCoral()) {
+    //   //     yield SystemMode.HIGH_IDLE;
+    //   //   } else {
+    //   //     if(canSwitch()) {
+    //   //       switchStateStatus = SwitchStateStatus.CANNOT_SWITCH;
+    //   //       yield SystemMode.GOING_L3_ALGAE_PIVOT;
+    //   //     } else {
+    //   //       yield systemMode;
+    //   //     }
+    //   //   }
+    //   case L4_CORAL_BATTERY:
+    //     if (hasCoral()) {
+    //       if(canSwitch()) {
+    //         switchStateStatus = SwitchStateStatus.CANNOT_SWITCH;
+    //         yield SystemMode.GOING_L4_CORAL_BATTERY;
+    //       }
+    //     } else {
+    //       yield SystemMode.HIGH_IDLE;
+    //     }
 
-      case L4_CORAL_PIVOT:
-        if (hasCoral()) {
-          if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
-            yield SystemMode.GOING_L4_CORAL_PIVOT;
-          }
-        } else {
-          yield SystemMode.LOW_IDLE;
-        }
-      case ALGAE_BARGE:
-        if (hasCoral()) {
-          yield SystemMode.HIGH_IDLE;
-        } else {
-          if(systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE) {
-            yield SystemMode.GOING_ALGAE_BARGE;
-          }
-        }
-      case CLIMB:
-        yield SystemMode.CLIMBING;
-      // case HIGH_IDLE:
-      //   yield SystemMode.HIGH_IDLE;
-      // case LOW_IDLE:
-      //   yield SystemMode.LOW_IDLE;
+    //   case L4_CORAL_PIVOT:
+    //     if (hasCoral()) {
+    //       if(canSwitch()) {
+    //         switchStateStatus = SwitchStateStatus.CANNOT_SWITCH;
+    //         yield SystemMode.GOING_L4_CORAL_PIVOT;
+    //       }
+    //     } else {
+    //       yield SystemMode.HIGH_IDLE;
+    //     }
+    //   case ALGAE_BARGE:
+    //     if (hasCoral()) {
+    //       yield SystemMode.HIGH_IDLE;
+    //     } else {
+    //       if(canSwitch()) {
+    //         switchStateStatus = SwitchStateStatus.CANNOT_SWITCH;
+    //         yield SystemMode.GOING_ALGAE_BARGE;
+    //       }
+    //     }
+    
+  case INTAKE_IDLE:
+    if (hasCoral()) {
+      yield SystemMode.HIGH_IDLE;
+    } else {
+      yield SystemMode.LOW_IDLE;
+    }
+  case INTAKE_CORAL:
+    if (hasCoral()) {
+      yield SystemMode.HIGH_IDLE;
+    } else {
+      if (systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE || systemMode == SystemMode.CLIMBING) {
+        yield SystemMode.INTAKING_CORAL;
+      }
+    }
+  case INTAKE_ALGAE:
+    if (hasCoral()) {
+      yield SystemMode.HIGH_IDLE;
+    } else {
+      if (systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE || systemMode == SystemMode.CLIMBING) {
+        yield SystemMode.INTAKING_ALGAE;
+      }
+    }
+  case L1:
+    if (hasCoral()) {
+      if (systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE || systemMode == SystemMode.CLIMBING) {
+        yield SystemMode.GOING_L1;
+      }
+    } else {
+      yield systemMode;
+    }
+  case L2_BATTERY:
+    if (hasCoral()) {
+      yield systemMode;
+    } else {
+      if (systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE || systemMode == SystemMode.CLIMBING) {
+        yield SystemMode.GOING_L2_ALGAE_BATTERY;
+      } else {
+        yield systemMode;
+      }
+    }
+  case L2_PIVOT:
+    if (hasCoral()) {
+      if (systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE || systemMode == SystemMode.CLIMBING) {
+        yield SystemMode.GOING_L2_CORAL;
+      } else {
+        yield systemMode;
+      }
+    } else {
+      if (systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE || systemMode == SystemMode.CLIMBING) {
+        yield SystemMode.GOING_L2_ALGAE_PIVOT;
+      } else {
+        yield systemMode;
+      }
+    }
+  case L3_PIVOT:
+    if (hasCoral()) {
+      if (systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE || systemMode == SystemMode.CLIMBING) {
+        yield SystemMode.GOING_L3_CORAL_PIVOT;
+      } else {
+        yield systemMode;
+      }
+    } else {
+      if (systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE || systemMode == SystemMode.CLIMBING) {
+        yield SystemMode.GOING_L3_ALGAE_PIVOT;
+      } else {
+        yield systemMode;
+      }
+    }
+  case L3_BATTERY:
+    if (hasCoral()) {
+      if (systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE || systemMode == SystemMode.CLIMBING) {
+        yield SystemMode.GOING_L3_CORAL_BATTERY;
+      } else {
+        yield systemMode;
+      }
+    } else {
+      if (systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE || systemMode == SystemMode.CLIMBING) {
+        yield SystemMode.GOING_L3_ALGAE_BATTERY;
+      } else {
+        yield systemMode;
+      }
+    }
+  case L4_PIVOT:
+    if (hasCoral()) {
+      if (systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE || systemMode == SystemMode.CLIMBING) {
+        yield SystemMode.GOING_L4_CORAL_PIVOT;
+      } else {
+        yield systemMode;
+      }
+    } else {
+      yield systemMode;
+      }
+  case L4_BATTERY:
+    if (hasCoral()) {
+      if (systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE || systemMode == SystemMode.CLIMBING) {
+        yield SystemMode.GOING_L4_CORAL_PIVOT;
+      } else {
+        yield systemMode;
+      }
+    } else {
+        yield systemMode;
+      }
+
+  case ALGAE_BARGE:
+    if (hasCoral()) {
+      yield systemMode;
+    } else {
+      if (systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE || systemMode == SystemMode.CLIMBING) {
+        yield SystemMode.GOING_ALGAE_BARGE;
+      } else {
+        yield systemMode;
+      }
+    }
+    case CLIMB:
+      switchStateStatus = SwitchStateStatus.CAN_SWITCH;
+      yield SystemMode.CLIMBING;
+    case IDLE:
+      yield SystemMode.HIGH_IDLE;
     };
   }
 
@@ -359,9 +508,11 @@ public class Arm extends SubsystemBase {
         setpoint = new Rotation2d(Units.degreesToRadians(78));
         break;
       case LOW_IDLE:
+        switchStateStatus = SwitchStateStatus.CAN_SWITCH;
         setpoint = new Rotation2d(Units.degreesToRadians(20));
         break;
       case HIGH_IDLE:
+        switchStateStatus = SwitchStateStatus.CAN_SWITCH;
         setpoint = new Rotation2d(Units.degreesToRadians(60));
         break;
       case CLIMBING:

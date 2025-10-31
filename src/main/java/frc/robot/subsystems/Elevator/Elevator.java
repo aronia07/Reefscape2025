@@ -24,6 +24,10 @@ import frc.robot.Constants.ElevatorConstants.SystemMode;
 import frc.robot.subsystems.Intake.Intake;
 
 public class Elevator extends SubsystemBase {
+  private enum SwitchStateStatus {
+    CAN_SWITCH,
+    CANNOT_SWITCH,
+  }
 
   public SparkMax leftElevatorMotor = new SparkMax(ElevatorConstants.leftElevatorMotorID, MotorType.kBrushless);
   public SparkMax rightElevatorMotor = new SparkMax(ElevatorConstants.rightElevatorMotorID, MotorType.kBrushless);
@@ -50,6 +54,8 @@ public class Elevator extends SubsystemBase {
   private ElevateMode elevateMode = ElevateMode.OFF;
   private ElevatorWantedMode wantedMode = ElevatorWantedMode.IDLE;
   private SystemMode systemMode = SystemMode.IDLE;
+  private SwitchStateStatus switchStateStatus = SwitchStateStatus.CAN_SWITCH;
+
   private DigitalInput beamy = Constants.beamy;
   // private boolean isLeftDone = false;
   // private boolean isRightDone = false;
@@ -167,7 +173,6 @@ public class Elevator extends SubsystemBase {
     }
     // }
   }
-  
 
   public boolean atGoal() {
     return Math.abs(encoderLeft.getPosition() - elevatorSetpoint) < ElevatorConstants.elevatorTolerance;
@@ -181,13 +186,19 @@ public class Elevator extends SubsystemBase {
     return !beamy.get();
   }
 
+  public boolean canSwitch() {
+    return switchStateStatus == SwitchStateStatus.CAN_SWITCH;
+  }
+
   private SystemMode changeCurrentSystemMode() {
     return switch (wantedMode) {
       case IDLE:
         yield SystemMode.IDLE;
       case L1:
         if (hasCoral()) {
-          yield SystemMode.GOING_L1;
+          if (canSwitch()) {
+            yield SystemMode.GOING_L1;
+          }
         } else {
           yield SystemMode.IDLE;
         }
@@ -195,113 +206,217 @@ public class Elevator extends SubsystemBase {
         if (hasCoral()) {
           yield SystemMode.IDLE;
         } else {
-          yield SystemMode.INTAKING_CORAL;
+          if (canSwitch()) {
+            yield SystemMode.INTAKING_CORAL;
+          }
         }
       case INTAKE_ALGAE:
         if (hasCoral()) {
           yield SystemMode.IDLE;
         } else {
-          yield SystemMode.INTAKING_ALGAE;
+          if (canSwitch()) {
+            yield SystemMode.INTAKING_ALGAE;
+          }
         }
-      case L2_CORAL:
+      case L2_BATTERY:
         if (hasCoral()) {
-          yield SystemMode.GOING_L2_CORAL;
+          if (systemMode == SystemMode.IDLE) {
+            yield SystemMode.GOING_L2_CORAL;
+          } else {
+            yield systemMode;
+          }
         } else {
-          yield SystemMode.IDLE;
+          if (systemMode == SystemMode.IDLE) {
+            yield SystemMode.GOING_L2_ALGAE_BATTERY;
+          } else {
+            yield systemMode;
+          }
         }
-      case L2_ALGAE_BATTERY:
+      case L2_PIVOT:
         if (hasCoral()) {
-          yield SystemMode.IDLE;
+          yield systemMode;
         } else {
-          yield SystemMode.GOING_L2_ALGAE_BATTERY;
+          if (systemMode == SystemMode.IDLE) {
+            yield SystemMode.GOING_L2_ALGAE_PIVOT;
+          } else {
+            yield systemMode;
+          }
         }
-      case L2_ALGAE_PIVOT:
+      case L3_PIVOT:
         if (hasCoral()) {
-          yield SystemMode.IDLE;
+          if (systemMode == SystemMode.IDLE) {
+            yield SystemMode.GOING_L3_CORAL_PIVOT;
+          } else {
+            yield systemMode;
+          }
         } else {
-          yield SystemMode.GOING_L2_ALGAE_PIVOT;
+          if (systemMode == SystemMode.IDLE) {
+            yield SystemMode.GOING_L3_ALGAE_PIVOT;
+          } else {
+            yield systemMode;
+          }
         }
-      case L3_CORAL_BATTERY:
+      case L3_BATTERY:
         if (hasCoral()) {
-          yield SystemMode.GOING_L3_CORAL_BATTERY;
+          if (systemMode == SystemMode.IDLE) {
+            yield SystemMode.GOING_L3_CORAL_BATTERY;
+          } else {
+            yield systemMode;
+          }
         } else {
-          yield SystemMode.IDLE;
+          if (systemMode == SystemMode.IDLE) {
+            yield SystemMode.GOING_L3_ALGAE_BATTERY;
+          } else {
+            yield systemMode;
+          }
         }
-      case L3_CORAL_PIVOT:
+      case L4_PIVOT:
         if (hasCoral()) {
-          yield SystemMode.GOING_L3_CORAL_PIVOT;
+          if (systemMode == SystemMode.IDLE) {
+            yield SystemMode.GOING_L4_CORAL_PIVOT;
+          } else {
+            yield systemMode;
+          }
         } else {
-          yield SystemMode.IDLE;
+          yield systemMode;
         }
-      case L3_ALGAE_BATTERY:
+      case L4_BATTERY:
         if (hasCoral()) {
-          yield SystemMode.IDLE;
+          if (systemMode == SystemMode.IDLE) {
+            yield SystemMode.GOING_L4_CORAL_PIVOT;
+          } else {
+            yield systemMode;
+          }
         } else {
-          yield SystemMode.GOING_L3_ALGAE_BATTERY;
-        }
-      case L3_ALGAE_PIVOT:
-        if (hasCoral()) {
-          yield SystemMode.IDLE;
-        } else {
-          yield SystemMode.GOING_L3_ALGAE_PIVOT;
-        }
-      case L4_CORAL_BATTERY:
-        if (hasCoral()) {
-          yield SystemMode.GOING_L4_CORAL_BATTERY;
-        } else {
-          yield SystemMode.IDLE;
-        }
-      case L4_CORAL_PIVOT:
-        if (hasCoral()) {
-          yield SystemMode.GOING_L4_CORAL_PIVOT;
-        } else {
-          yield SystemMode.IDLE;
+          yield systemMode;
         }
       case ALGAE_BARGE:
         yield SystemMode.GOING_ALGAE_BARGE;
+      // case L2_CORAL:
+      // if (hasCoral()) {
+      // if (canSwitch()) {
+      // yield SystemMode.GOING_L2_CORAL;
+      // }
+      // } else {
+      // yield SystemMode.IDLE;
+      // }
+      // case L2_ALGAE_BATTERY:
+      // if (hasCoral()) {
+      // yield SystemMode.IDLE;
+      // } else {
+      // if (canSwitch()) {
+      // yield SystemMode.GOING_L2_ALGAE_BATTERY;
+      // }
+      // }
+      // case L2_ALGAE_PIVOT:
+      // if (hasCoral()) {
+      // yield SystemMode.IDLE;
+      // } else {
+      // if (canSwitch()) {
+      // yield SystemMode.GOING_L2_ALGAE_PIVOT;
+      // }
+      // }
+      // case L3_CORAL_BATTERY:
+      // if (hasCoral()) {
+      // if (canSwitch()) {
+      // yield SystemMode.GOING_L3_CORAL_BATTERY;
+      // }
+      // } else {
+      // yield SystemMode.IDLE;
+      // }
+      // case L3_CORAL_PIVOT:
+      // if (hasCoral()) {
+      // if (systemMode == SystemMode.IDLE) {
+      // yield SystemMode.GOING_L3_CORAL_PIVOT;
+      // } else {
+      // yield systemMode;
+      // }
+      // } else {
+      // yield systemMode;
+      // }
+      // case L3_ALGAE_BATTERY:
+      // if (hasCoral()) {
+      // yield SystemMode.IDLE;
+      // } else {
+      // if (canSwitch()) {
+      // yield SystemMode.GOING_L3_ALGAE_BATTERY;
+      // }
+      // }
+      // case L4_CORAL_BATTERY:
+      // if (hasCoral()) {
+      // if (canSwitch()) {
+      // yield SystemMode.GOING_L4_CORAL_BATTERY;
+      // }
+      // } else {
+      // yield SystemMode.IDLE;
+      // }
+      // case L4_CORAL_PIVOT:
+      // if (hasCoral()) {
+      // if (canSwitch()) {
+      // yield SystemMode.GOING_L4_CORAL_PIVOT;
+      // }
+      // } else {
+      // yield SystemMode.IDLE;
+      // }
     };
   }
 
   private void applyState() {
     switch (systemMode) {
       case INTAKING_CORAL:
+        switchStateStatus = SwitchStateStatus.CANNOT_SWITCH;
         elevatorSetpoint = ElevatorConstants.LevelOneSetpoint;
+        break;
       case INTAKING_ALGAE:
+        switchStateStatus = SwitchStateStatus.CANNOT_SWITCH;
         elevatorSetpoint = ElevatorConstants.LevelOneSetpoint;
+        break;
       case GOING_L1:
+        switchStateStatus = SwitchStateStatus.CANNOT_SWITCH;
         elevatorSetpoint = ElevatorConstants.LevelOneSetpoint;
         break;
       case GOING_L2_CORAL:
+        switchStateStatus = SwitchStateStatus.CANNOT_SWITCH;
         elevatorSetpoint = ElevatorConstants.LevelTwoSetpoint;
         break;
       case GOING_L2_ALGAE_BATTERY:
+        switchStateStatus = SwitchStateStatus.CANNOT_SWITCH;
         elevatorSetpoint = ElevatorConstants.LevelTwoAlgaeSetpoint;
         break;
       case GOING_L2_ALGAE_PIVOT:
+        switchStateStatus = SwitchStateStatus.CANNOT_SWITCH;
         elevatorSetpoint = ElevatorConstants.LevelTwoAlgaeSetpoint;
         break;
       case GOING_L3_ALGAE_BATTERY:
+        switchStateStatus = SwitchStateStatus.CANNOT_SWITCH;
         elevatorSetpoint = ElevatorConstants.LevelThreeSetpointR;
         break;
       case GOING_L3_ALGAE_PIVOT:
+        switchStateStatus = SwitchStateStatus.CANNOT_SWITCH;
         elevatorSetpoint = ElevatorConstants.LevelThreeAR;
         break;
       case GOING_L3_CORAL_BATTERY:
+        switchStateStatus = SwitchStateStatus.CANNOT_SWITCH;
         elevatorSetpoint = ElevatorConstants.LevelThreeSetpointM;
         break;
       case GOING_L3_CORAL_PIVOT:
-        elevatorSetpoint = ElevatorConstants.LevelThreeSetpointR;
+        switchStateStatus = SwitchStateStatus.CANNOT_SWITCH;
+        elevatorSetpoint = ElevatorConstants.LevelThreeSetpoint;
         break;
       case GOING_L4_CORAL_BATTERY:
+        switchStateStatus = SwitchStateStatus.CANNOT_SWITCH;
         elevatorSetpoint = ElevatorConstants.LevelFourSetpoint;
         break;
       case GOING_L4_CORAL_PIVOT:
+        switchStateStatus = SwitchStateStatus.CANNOT_SWITCH;
         elevatorSetpoint = ElevatorConstants.LevelFourSetpoint;
         break;
       case GOING_ALGAE_BARGE:
+        switchStateStatus = SwitchStateStatus.CANNOT_SWITCH;
         elevatorSetpoint = ElevatorConstants.LevelFourSetpoint;
         break;
       case IDLE:
+        switchStateStatus = SwitchStateStatus.CAN_SWITCH;
         elevatorSetpoint = 1;
         break;
       default:
@@ -333,10 +448,12 @@ public class Elevator extends SubsystemBase {
 
     SmartDashboard.putString("ELEVATOR WANTED STATE", wantedMode.toString());
     SmartDashboard.putString("ELEVATOR SYSTEM STATE", systemMode.toString());
+    SmartDashboard.putString("ELEVATOR can Switch? STATE", switchStateStatus.toString());
     SmartDashboard.putNumber("Elevator velocity", leftElevatorMotor.get());
     // SmartDashboard.putNumber("Elevator PID output left", leftpidOutput);
     SmartDashboard.putNumber("Elevator's Setpoint", elevatorSetpoint);
-    // SmartDashboard.putNumber("Elevator Current", leftElevatorMotor.getOutputCurrent());
+    // SmartDashboard.putNumber("Elevator Current",
+    // leftElevatorMotor.getOutputCurrent());
     // SmartDashboard.putNumber("Elevator FF Output", ffOutput);
 
   }

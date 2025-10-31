@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.ejml.interfaces.decomposition.LUDecomposition_F32;
 import org.opencv.core.Point;
 
 import edu.wpi.first.apriltag.AprilTag;
@@ -194,7 +195,7 @@ public final class Constants {
         public static int maxAccel = 0;
         public static double[] wristFF = { 0, 0, 0 };
         public static double wristGearRatio = 0;
-        public static Rotation2d wristOffset = new Rotation2d(Units.degreesToRadians(-59.526573 + 2.440350)); // -59.7-18.8
+        public static Rotation2d wristOffset = new Rotation2d(Units.degreesToRadians(-59.526573 + 2.440350 - 4.805406+9.8)); // -59.7-18.8
         public static final Rotation2d maxVelocityPerSecond = Rotation2d.fromDegrees(600); // was 600
         public static final Rotation2d maxAcceleration = Rotation2d.fromDegrees(900); // was 900
 
@@ -204,21 +205,28 @@ public final class Constants {
         public static final Rotation2d tolernace = Rotation2d.fromDegrees(0.5);
 
         public static enum WristWantedMode {
+            INTAKE_IDLE,
             IDLE,
             INTAKE_CORAL,
             INTAKE_ALGAE,
             L1,
-            L2_CORAL,
-            L2_ALGAE_BATTERY,
-            L2_ALGAE_PIVOT,
-            L3_CORAL_BATTERY,
-            L3_CORAL_PIVOT,
-            L3_ALGAE_BATTERY,
-            L3_ALGAE_PIVOT,
-            L4_CORAL_BATTERY,
-            L4_CORAL_PIVOT,
+            L2_PIVOT,
+            L2_BATTERY,
+            L3_PIVOT,
+            L3_BATTERY,
+            L4_BATTERY,
+            L4_PIVOT,
             ALGAE_BARGE,
             CLIMB
+            // L2_CORAL,
+            // L2_ALGAE_BATTERY,
+            // L2_ALGAE_PIVOT,
+            // L3_CORAL_BATTERY,
+            // L3_CORAL_PIVOT,
+            // L3_ALGAE_BATTERY,
+            // L3_ALGAE_PIVOT,
+            // L4_CORAL_BATTERY,
+            // L4_CORAL_PIVOT,
             // HIGH_IDLE,
             // LOW_IDLE
         }
@@ -312,16 +320,22 @@ public final class Constants {
             INTAKE_CORAL,
             INTAKE_ALGAE,
             L1,
-            L2_CORAL,
-            L2_ALGAE_BATTERY,
-            L2_ALGAE_PIVOT,
-            L3_CORAL_BATTERY,
-            L3_CORAL_PIVOT,
-            L3_ALGAE_BATTERY,
-            L3_ALGAE_PIVOT,
-            L4_CORAL_BATTERY,
-            L4_CORAL_PIVOT,
+            L2_PIVOT,
+            L2_BATTERY,
+            L3_PIVOT,
+            L3_BATTERY,
+            L4_BATTERY,
+            L4_PIVOT,
             ALGAE_BARGE
+            
+            // L3_CORAL_PIVOT,
+            // L3_ALGAE_BATTERY,
+            // L3_ALGAE_PIVOT,
+            
+            // L2_CORAL,
+            // L2_ALGAE_BATTERY,
+            // L2_ALGAE_PIVOT,
+            // L3_CORAL_BATTERY,
         }
         
         public static enum SystemMode {
@@ -375,22 +389,36 @@ public final class Constants {
         public static double[] armPID = new double[] { 1.47, 0, 0f }; // Arm PID values
 
         public static enum ArmWantedMode {
+            INTAKE_IDLE,
             IDLE,
             INTAKE_CORAL,
             INTAKE_ALGAE,
             L1,
-            L2_CORAL,
-            L2_ALGAE_BATTERY,
-            L2_ALGAE_PIVOT,
-            L3_CORAL_BATTERY,
-            L3_CORAL_PIVOT,
-            L3_ALGAE_BATTERY,
-            L3_ALGAE_PIVOT,
-            L4_CORAL_BATTERY,
-            L4_CORAL_PIVOT,
+            L2_PIVOT,
+            L2_BATTERY,
+            L3_PIVOT,
+            L3_BATTERY,
+            L4_BATTERY,
+            L4_PIVOT,
             ALGAE_BARGE,
             CLIMB
-            // HIGH_IDLE,
+            // IDLE,
+            // INTAKE_CORAL,
+            // INTAKE_ALGAE,
+            // L1,
+            // L2_CORAL,
+            // L2_ALGAE_BATTERY,
+            // L2_ALGAE_PIVOT,
+            // L3_CORAL_BATTERY,
+            // L3_PIVOT,
+            // // L3_CORAL_PIVOT,
+            // L3_ALGAE_BATTERY,
+            // // L3_ALGAE_PIVOT,
+            // L4_CORAL_BATTERY,
+            // L4_CORAL_PIVOT,
+            // ALGAE_BARGE,
+            // CLIMB
+            // // HIGH_IDLE,
             // LOW_IDLE
         }
 

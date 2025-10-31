@@ -113,23 +113,23 @@ public class Intake extends SubsystemBase {
             //     yield SystemMode.IDLING;
             // }
             case SCORE_CORAL_BATTERYSIDE:
-            if(hasCoral()){
+            // if(hasCoral()){
                 yield SystemMode.SCORING_CORAL_BATTERYSIDE;
-            } else {
-                yield SystemMode.IDLING;
-            }
+            // } else {
+            //     yield SystemMode.IDLING;
+            // }
             case SCORE_CORAL_PIVOTSIDE:
-            if(hasCoral()){
+            // if(hasCoral()){
                 yield SystemMode.SCORING_CORAL_PIVOTSIDE;
-            } else {
-                yield SystemMode.IDLING;
-            }
+            // } else {
+            //     yield SystemMode.IDLING;
+            // }
             case SCORE_CORAL_L1:
-            if(hasCoral()){
+            // if(hasCoral()){
                 yield SystemMode.SCORING_CORAL_L1;
-            } else {
-                yield SystemMode.IDLING;
-            }
+            // } else {
+            //     yield SystemMode.IDLING;
+            // }
             case IDLE:
                 yield SystemMode.IDLING;    
         };
