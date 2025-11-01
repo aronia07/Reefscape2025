@@ -529,7 +529,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     public Rotation2d getReefFaceAngle() {
-        Pose2d target;
         int firstTag;
         int endtag;
         Pose2d currentPose = getState().Pose;

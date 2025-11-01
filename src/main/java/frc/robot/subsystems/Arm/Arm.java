@@ -354,7 +354,7 @@ public class Arm extends SubsystemBase {
     }
   case INTAKE_CORAL:
     if (hasCoral()) {
-      yield SystemMode.HIGH_IDLE;
+      yield systemMode;
     } else {
       if (systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE || systemMode == SystemMode.CLIMBING) {
         yield SystemMode.INTAKING_CORAL;
@@ -362,7 +362,7 @@ public class Arm extends SubsystemBase {
     }
   case INTAKE_ALGAE:
     if (hasCoral()) {
-      yield SystemMode.HIGH_IDLE;
+      yield systemMode;
     } else {
       if (systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE || systemMode == SystemMode.CLIMBING) {
         yield SystemMode.INTAKING_ALGAE;
@@ -508,11 +508,9 @@ public class Arm extends SubsystemBase {
         setpoint = new Rotation2d(Units.degreesToRadians(78));
         break;
       case LOW_IDLE:
-        switchStateStatus = SwitchStateStatus.CAN_SWITCH;
         setpoint = new Rotation2d(Units.degreesToRadians(20));
         break;
       case HIGH_IDLE:
-        switchStateStatus = SwitchStateStatus.CAN_SWITCH;
         setpoint = new Rotation2d(Units.degreesToRadians(60));
         break;
       case CLIMBING:

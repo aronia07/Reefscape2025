@@ -224,7 +224,7 @@ public class Wrist extends SubsystemBase {
         }
       case INTAKE_CORAL:
         if (hasCoral()) {
-          yield SystemMode.HIGH_IDLE;
+          yield systemMode;
         } else {
           if (systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE || systemMode == SystemMode.CLIMBING) {
             yield SystemMode.INTAKING_CORAL;
@@ -232,7 +232,7 @@ public class Wrist extends SubsystemBase {
         }
       case INTAKE_ALGAE:
         if (hasCoral()) {
-          yield SystemMode.HIGH_IDLE;
+          yield systemMode;
         } else {
           if (systemMode == SystemMode.HIGH_IDLE || systemMode == SystemMode.LOW_IDLE || systemMode == SystemMode.CLIMBING) {
             yield SystemMode.INTAKING_ALGAE;

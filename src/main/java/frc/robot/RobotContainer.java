@@ -90,7 +90,6 @@ public class RobotContainer {
         final Vision vision = new Vision();
         public static boolean isModified = false;
         public SendableChooser<Command> m_chooser = new SendableChooser<>();
-        // private Superstructure superstructure = new Superstructure();
 
         public RobotContainer() {
                 configureBindings();
@@ -185,7 +184,7 @@ public class RobotContainer {
                 // driver.povLeft().whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
                 // driver.povRight().whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
                 // Bumpers and Triggers
-                // reset the field-centric heading on left bumper press
+                // reset the field-centric heading on start button press
                 driver.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
                 // // HP Pickup
@@ -213,25 +212,6 @@ public class RobotContainer {
                                         new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.INTAKE_IDLE)),
                                         new InstantCommand(() -> intake.setWantedIntakeMode(IntakeWantedMode.IDLE))));
 
-                // driver.rightBumper().onTrue(new SequentialCommandGroup(
-                //         new ToAngle(() -> Arm.getEncoderPosition().getRadians(), arm),
-                //         new ParallelCommandGroup(
-                //                         new ToWristAngle(() -> Units.degreesToRadians(34), wrist),
-                //                         new ArmCommand(arm, ArmWantedMode.INTAKE_CORAL),
-                //                         // new ToAngle(() -> Units.degreesToRadians(-7), arm), 
-                //                         new IntakeCommand(intake, IntakeWantedMode.INTAKE_CORAL),
-                //                         new ElevateLevel(elevator, ElevateMode.L2))));
-                // driver.rightBumper().onFalse(getIntakeIdleSeq());
-
-                // driver.rightBumper().whileTrue(new SequentialCommandGroup(
-                //                 new ToAngle(() -> Arm.getEncoderPosition().getRadians(), arm),
-                //                 new ParallelCommandGroup(
-                //                                 new ToWristAngle(() -> Units.degreesToRadians(34), wrist),
-                //                                 new ToAngle(() -> Units.degreesToRadians(-6), arm),
-                //                                 new IntakeIn(intake),
-                //                                 new ElevateLevel(elevator, ElevateMode.HP))
-                //                                 .finallyDo(this::intakeIdle)));
-
                 // 9659 inspired align
                 driver.leftTrigger().whileTrue(
                         drivetrain.defer(
@@ -245,7 +225,7 @@ public class RobotContainer {
                                 () -> DriveToLocation.driveTo(drivetrain.getCenterReefPose(), drivetrain))
                                         .until(() -> drivetrain.getState().Pose == drivetrain.getCenterReefPose()));
                 // FACE REEF WHEN HAVE CORAL
-                // drivetrain.applyRequest(() -> faceReef.withTargetDirection(drivetrain.getReefFaceAngle()));
+                // beamBroken.whileTrue(drivetrain.applyRequest(() -> faceReef.withTargetDirection(drivetrain.getReefFaceAngle())));
                 /* OPERATOR CONTROLS */
                 // joysticks
                 arm.setDefaultCommand(new ManualArm(() -> -operator.getLeftY(), arm));
@@ -311,10 +291,11 @@ public class RobotContainer {
                 // L4 PIVOT SIDE
                 operator.y().and(() -> drivetrain.decideScoringMode() == ScoringMode.PIVOT_SIDE)
                         .onTrue(
-                                new ParallelCommandGroup(
-                                        new InstantCommand(() -> wrist.setWantedWristMode(WristWantedMode.L4_PIVOT)),
-                                        new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.L4_PIVOT)),
-                                        new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.L4_PIVOT))))
+                                new SequentialCommandGroup(
+                                        new ParallelCommandGroup(
+                                                new InstantCommand(() -> wrist.setWantedWristMode(WristWantedMode.L4_PIVOT)),
+                                                new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.L4_PIVOT)),
+                                        new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.L4_PIVOT)))))
                         .onFalse(
                                 new ParallelCommandGroup(
                                         new InstantCommand(()-> wrist.setWantedWristMode(WristWantedMode.IDLE)),
@@ -350,10 +331,11 @@ public class RobotContainer {
                 // L2
                 operator.a().and(() -> drivetrain.decideScoringMode() == ScoringMode.PIVOT_SIDE)
                         .onTrue(
-                                new ParallelCommandGroup(
-                                        new InstantCommand(() -> wrist.setWantedWristMode(WristWantedMode.L2_PIVOT)),
-                                        new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.L2_PIVOT)),
-                                        new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.L2_PIVOT))))
+                                new SequentialCommandGroup(
+                                        new ParallelCommandGroup(
+                                                new InstantCommand(() -> wrist.setWantedWristMode(WristWantedMode.L2_PIVOT)),
+                                                new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.L2_PIVOT)),
+                                        new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.L2_PIVOT)))))
                         .onFalse(
                                 new ParallelCommandGroup(
                                         new InstantCommand(()-> wrist.setWantedWristMode(WristWantedMode.IDLE)),
@@ -369,10 +351,11 @@ public class RobotContainer {
                 // L1
                 operator.x()
                         .onTrue(
-                                new ParallelCommandGroup(
-                                        new InstantCommand(() -> wrist.setWantedWristMode(WristWantedMode.L1)),
-                                        new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.L1)),
-                                        new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.L1))))
+                                new SequentialCommandGroup(
+                                        new ParallelCommandGroup(
+                                                new InstantCommand(() -> wrist.setWantedWristMode(WristWantedMode.L1)),
+                                                new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.L1)),
+                                        new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.L1)))))
                         .onFalse(
                                 new ParallelCommandGroup(
                                         new InstantCommand(()-> wrist.setWantedWristMode(WristWantedMode.IDLE)),
@@ -390,10 +373,11 @@ public class RobotContainer {
                 // L4 battery side
                 operator.y().and(() -> drivetrain.decideScoringMode() == ScoringMode.BATTERY_SIDE)
                         .onTrue(
-                                new ParallelCommandGroup(
-                                        new InstantCommand(() -> wrist.setWantedWristMode(WristWantedMode.L4_PIVOT)),
-                                        new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.L4_PIVOT)),
-                                        new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.L4_PIVOT))))
+                                new SequentialCommandGroup(
+                                        new ParallelCommandGroup(
+                                                new InstantCommand(() -> wrist.setWantedWristMode(WristWantedMode.L4_BATTERY)),
+                                                new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.L4_BATTERY)),
+                                        new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.L4_BATTERY)))))
                         .onFalse(
                                 new ParallelCommandGroup(
                                         new InstantCommand(()-> wrist.setWantedWristMode(WristWantedMode.IDLE)),
@@ -419,7 +403,7 @@ public class RobotContainer {
                 //                         new ToWristAngle(() -> Units.degreesToRadians(-58), wrist),
                 //                         new ArmCommand(arm, ArmWantedMode.L3_CORAL_BATTERY)),
                 //                 new ElevatorCommand(elevator, ElevatorWantedMode.L3_CORAL_BATTERY)));
-                // L3 battery side
+                // L3 Coral and Algae Battery Side
                 operator.b().and(() -> drivetrain.decideScoringMode() == ScoringMode.BATTERY_SIDE)
                         .onTrue(
                                 new SequentialCommandGroup(
@@ -527,18 +511,18 @@ public class RobotContainer {
                 //                                                 new ToAngle(() -> Units.degreesToRadians(25), arm)),
                 //                                 new ElevateLevel(elevator, ElevateMode.L2AR)));
                 // L2 Algae Removal Pivot side
-                operator.a().and(() -> drivetrain.decideScoringMode() == ScoringMode.PIVOT_SIDE).and(beamNotBroken)
-                        .onTrue(
-                                new SequentialCommandGroup(
-                                        new ParallelCommandGroup(
-                                                new InstantCommand(() -> wrist.setWantedWristMode(WristWantedMode.L2_PIVOT)),
-                                                new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.L2_PIVOT)),
-                                        new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.L2_PIVOT)))))
-                        .onFalse(
-                                new SequentialCommandGroup(
-                                        new InstantCommand(() -> wrist.setWantedWristMode(WristWantedMode.IDLE)),
-                                        new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.IDLE)),
-                                        new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.IDLE))));
+                // operator.a().and(() -> drivetrain.decideScoringMode() == ScoringMode.PIVOT_SIDE).and(beamNotBroken)
+                //         .onTrue(
+                //                 new SequentialCommandGroup(
+                //                         new ParallelCommandGroup(
+                //                                 new InstantCommand(() -> wrist.setWantedWristMode(WristWantedMode.L2_PIVOT)),
+                //                                 new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.L2_PIVOT)),
+                //                         new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.L2_PIVOT)))))
+                //         .onFalse(
+                //                 new SequentialCommandGroup(
+                //                         new InstantCommand(() -> wrist.setWantedWristMode(WristWantedMode.IDLE)),
+                //                         new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.IDLE)),
+                //                         new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.IDLE))));
                                         
                 operator.start().onTrue(new ElevatorReset(elevator));
                 beamBroken.onTrue(new SetSolidColor(wpiLights, LightsConstants.GRBColors.get("green")));
@@ -547,16 +531,15 @@ public class RobotContainer {
                 operator.povDown()
                         .onTrue(
                                 new ParallelCommandGroup(
-                                        new InstantCommand(() -> climber.climberOpen()),
+                                        new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.IDLE)),
                                         new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.CLIMB)),
-                                        new InstantCommand(() -> wrist.setWantedWristMode(WristWantedMode.CLIMB))))
-                        .onFalse(new InstantCommand(() -> climber.climberMotor.set(0)));
-                operator.povUp()
-                        .onTrue(new InstantCommand(() -> climber.climberClimb()))
-                        .onFalse(new InstantCommand(() -> climber.climberMotor.set(0)));
+                                        new InstantCommand(() -> wrist.setWantedWristMode(WristWantedMode.CLIMB))));
+                // operator.povUp()
+                        // .onTrue(new InstantCommand(() -> climber.climberClimb()))
+                        // .onFalse(new InstantCommand(() -> climber.climberMotor.set(0)));
 
-                // operator.povDown().whileTrue(new Climb(climber, () -> -1));
-                // operator.povUp().whileTrue(new Climb(climber, () -> 1));
+                operator.povDown().whileTrue(new Climb(climber, () -> -1));
+                operator.povUp().whileTrue(new Climb(climber, () -> 1));
 
                 // operator.povLeft()
                 //         .onTrue(new InstantCommand(() -> intake.setWantedIntakeMode(IntakeWantedMode.SCORE_CORAL_BATTERYSIDE)))
@@ -565,7 +548,7 @@ public class RobotContainer {
                 //         .onTrue(new InstantCommand(() -> intake.setWantedIntakeMode(IntakeWantedMode.SCORE_CORAL_PIVOTSIDE)))
                 //         .onFalse(new InstantCommand(() -> intake.setWantedIntakeMode(IntakeWantedMode.IDLE)));
                 
-                
+                //elevator timeout .7, intake out timeout .5
                 //barge
                 operator.leftTrigger()
                         .onTrue(
@@ -770,7 +753,7 @@ public class RobotContainer {
                         new ParallelCommandGroup(
                                 new InstantCommand(() -> wrist.setWantedWristMode(WristWantedMode.L4_PIVOT)),
                                 new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.L4_PIVOT)),
-                                new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.L4_PIVOT))));
+                                new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.L4_PIVOT))).withTimeout(0.7));
 
                 NamedCommands.registerCommand("armToL4", 
                         new ParallelCommandGroup(
@@ -778,7 +761,7 @@ public class RobotContainer {
                                 new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.L4_PIVOT))));
 
                 NamedCommands.registerCommand("outtake", 
-                        new InstantCommand(() -> intake.setWantedIntakeMode(IntakeWantedMode.SCORE_CORAL_PIVOTSIDE)));
+                        new InstantCommand(() -> intake.setWantedIntakeMode(IntakeWantedMode.SCORE_CORAL_PIVOTSIDE)).withTimeout(0.4));
 
                 NamedCommands.registerCommand("intake", 
                         new ParallelCommandGroup(
@@ -786,12 +769,13 @@ public class RobotContainer {
                                 new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.INTAKE_CORAL)),
                                 new InstantCommand(() -> wrist.setWantedWristMode(WristWantedMode.INTAKE_CORAL))));
                                 
-                NamedCommands.registerCommand("reset", new SequentialCommandGroup(
-                        new InstantCommand(() -> intake.setWantedIntakeMode(IntakeWantedMode.IDLE)),
-                        new InstantCommand(() -> wrist.setWantedWristMode(WristWantedMode.IDLE)),
-                        new ParallelCommandGroup(
-                                new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.IDLE)),
-                                new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.IDLE)))));
+                NamedCommands.registerCommand("reset", 
+                        new SequentialCommandGroup(
+                                new InstantCommand(() -> intake.setWantedIntakeMode(IntakeWantedMode.IDLE)),
+                                new InstantCommand(() -> wrist.setWantedWristMode(WristWantedMode.IDLE)),
+                                new ParallelCommandGroup(
+                                        new InstantCommand(() -> arm.setWantedArmMode(ArmWantedMode.IDLE)),
+                                        new InstantCommand(() -> elevator.setWantedElevatorMode(ElevatorWantedMode.IDLE)))));
 
 
                 // NamedCommands.registerCommand("reset", new SequentialCommandGroup(

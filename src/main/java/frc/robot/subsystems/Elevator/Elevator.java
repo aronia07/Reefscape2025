@@ -200,11 +200,11 @@ public class Elevator extends SubsystemBase {
             yield SystemMode.GOING_L1;
           }
         } else {
-          yield SystemMode.IDLE;
+          yield systemMode;
         }
       case INTAKE_CORAL:
         if (hasCoral()) {
-          yield SystemMode.IDLE;
+          yield systemMode;
         } else {
           if (canSwitch()) {
             yield SystemMode.INTAKING_CORAL;
@@ -364,59 +364,45 @@ public class Elevator extends SubsystemBase {
   private void applyState() {
     switch (systemMode) {
       case INTAKING_CORAL:
-        switchStateStatus = SwitchStateStatus.CANNOT_SWITCH;
         elevatorSetpoint = ElevatorConstants.LevelOneSetpoint;
         break;
       case INTAKING_ALGAE:
-        switchStateStatus = SwitchStateStatus.CANNOT_SWITCH;
         elevatorSetpoint = ElevatorConstants.LevelOneSetpoint;
         break;
       case GOING_L1:
-        switchStateStatus = SwitchStateStatus.CANNOT_SWITCH;
         elevatorSetpoint = ElevatorConstants.LevelOneSetpoint;
         break;
       case GOING_L2_CORAL:
-        switchStateStatus = SwitchStateStatus.CANNOT_SWITCH;
         elevatorSetpoint = ElevatorConstants.LevelTwoSetpoint;
         break;
       case GOING_L2_ALGAE_BATTERY:
-        switchStateStatus = SwitchStateStatus.CANNOT_SWITCH;
         elevatorSetpoint = ElevatorConstants.LevelTwoAlgaeSetpoint;
         break;
       case GOING_L2_ALGAE_PIVOT:
-        switchStateStatus = SwitchStateStatus.CANNOT_SWITCH;
         elevatorSetpoint = ElevatorConstants.LevelTwoAlgaeSetpoint;
         break;
       case GOING_L3_ALGAE_BATTERY:
-        switchStateStatus = SwitchStateStatus.CANNOT_SWITCH;
         elevatorSetpoint = ElevatorConstants.LevelThreeSetpointR;
         break;
       case GOING_L3_ALGAE_PIVOT:
-        switchStateStatus = SwitchStateStatus.CANNOT_SWITCH;
         elevatorSetpoint = ElevatorConstants.LevelThreeAR;
         break;
       case GOING_L3_CORAL_BATTERY:
-        switchStateStatus = SwitchStateStatus.CANNOT_SWITCH;
         elevatorSetpoint = ElevatorConstants.LevelThreeSetpointM;
         break;
       case GOING_L3_CORAL_PIVOT:
-        switchStateStatus = SwitchStateStatus.CANNOT_SWITCH;
         elevatorSetpoint = ElevatorConstants.LevelThreeSetpoint;
         break;
       case GOING_L4_CORAL_BATTERY:
-        switchStateStatus = SwitchStateStatus.CANNOT_SWITCH;
         elevatorSetpoint = ElevatorConstants.LevelFourSetpoint;
         break;
       case GOING_L4_CORAL_PIVOT:
-        switchStateStatus = SwitchStateStatus.CANNOT_SWITCH;
         elevatorSetpoint = ElevatorConstants.LevelFourSetpoint;
         break;
       case GOING_ALGAE_BARGE:
-        switchStateStatus = SwitchStateStatus.CANNOT_SWITCH;
         elevatorSetpoint = ElevatorConstants.LevelFourSetpoint;
         break;
       case IDLE:
-        switchStateStatus = SwitchStateStatus.CAN_SWITCH;
         elevatorSetpoint = 1;
         break;
       default:
