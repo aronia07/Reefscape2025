@@ -75,6 +75,7 @@ import frc.robot.subsystems.Drive.Vision;
 import frc.robot.subsystems.Elevator.Elevator;
 import frc.robot.subsystems.Intake.Intake;
 import frc.robot.subsystems.Lights.LEDSubsystem_WPIlib;
+import frc.robot.subsystems.Lights.LEDSubsystem_LEDMatrix;
 import frc.robot.subsystems.Wrist.Wrist;
 import frc.robot.subsystems.Arm.Arm;
 import frc.robot.subsystems.Climber.Climber;
@@ -86,6 +87,7 @@ public class RobotContainer {
         final Intake intake = new Intake();
         final Wrist wrist = new Wrist();
         final LEDSubsystem_WPIlib wpiLights = new LEDSubsystem_WPIlib();
+        final LEDSubsystem_LEDMatrix ledMatrix = new LEDSubsystem_LEDMatrix();
         final Climber climber = new Climber();
         final Vision vision = new Vision();
         public static boolean isModified = false;
